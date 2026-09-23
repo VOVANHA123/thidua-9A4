@@ -1797,7 +1797,7 @@ class ClassDataManager {
     const totalScore = 100 + totalPlus - totalMinus;
 
     // Star Rating
-    let rank = 'CẦN CỐ GẮNG HƠN';
+    let rank = 'CẦN CỐ GẮNG';
     let stars = 2;
     let rankClass = 'rank-2star';
 

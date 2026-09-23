@@ -2508,18 +2508,16 @@ class AppController {
             }
           }
 
-          // Rank / proposal
+          // Rank / proposal - Đồng bộ chính xác theo thông tin xếp loại bên tab Bảng điểm thi đua
           const scoreObj = window.classData.calculateStudentScore(s.id, this.bienBanWeek);
-          const sc = scoreObj.totalScore;
-          if (sc >= 150) {
-            rankHtml = (minusEvents.length === 0) ? 'Xuất sắc' : 'Tốt';
-          } else if (sc >= 130) {
-            rankHtml = 'Tốt';
-          } else if (sc >= 110) {
-            rankHtml = 'Khá';
-          } else {
-            rankHtml = 'Cần cố gắng';
-          }
+          const rankMap = {
+            'XUẤT SẮC': 'Xuất sắc',
+            'TỐT': 'Tốt',
+            'CỐ GẮNG': 'Cố gắng',
+            'CẦN CỐ GẮNG': 'Cần cố gắng',
+            'CẦN CỐ GẮNG HƠN': 'Cần cố gắng'
+          };
+          rankHtml = rankMap[scoreObj.rank] || scoreObj.rank || 'Cần cố gắng';
         }
 
         rowsHtml += `

@@ -1,0 +1,1084 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sơ Đồ Lớp Học - Lớp 9A4 (29 Học Sinh)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary-green: #1e5a38;
+      --chalk-board: #19462d;
+      --board-frame: #8d5b28;
+      --wood-desk: #df9e59;
+      --wood-top: #f3c285;
+      --wood-shadow: #b37330;
+      --cream-bg: #f9f5ec;
+      --floor-color: #eee4d3;
+      --accent-red: #d32f2f;
+      --accent-gold: #fbc02d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', 'Montserrat', sans-serif;
+      background: #1e1e24;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Action bar */
+    .action-bar {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2b2c34;
+      padding: 12px 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      color: #fff;
+    }
+
+    .action-bar h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn-print {
+      background: #2e7d32;
+      color: white;
+    }
+    .btn-print:hover {
+      background: #236327;
+      transform: translateY(-1px);
+    }
+
+    .btn-download {
+      background: #e65100;
+      color: white;
+    }
+    .btn-download:hover {
+      background: #bf4300;
+      transform: translateY(-1px);
+    }
+
+    /* Classroom Container (16:9 ratio poster) */
+    .poster-container {
+      width: 1280px;
+      height: 720px;
+      background: linear-gradient(180deg, #fbf7ee 0%, #faefe0 60%, #ece0ce 100%);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      border: 8px solid #c8a26c;
+    }
+
+    /* Background 3D room styling */
+    .classroom-wall {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48%;
+      background: linear-gradient(to bottom, #fcf9f2 0%, #f6edd9 90%, #dfcfb2 100%);
+      border-bottom: 5px solid #c2a884;
+      box-shadow: inset 0 20px 40px rgba(255,255,255,0.8), 0 8px 15px rgba(0,0,0,0.06);
+    }
+
+    .classroom-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 52%;
+      background: repeating-linear-gradient(45deg, #f2e9dc, #f2e9dc 60px, #ebe1d2 60px, #ebe1d2 120px);
+      box-shadow: inset 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    /* TOP WALL ELEMENTS */
+    .top-section {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 14px 28px;
+      height: 250px;
+    }
+
+    /* Left: 5 Điều Bác Hồ */
+    .bac-ho-board {
+      width: 250px;
+      background: #fffdf8;
+      border: 5px solid #8b4513;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 15px rgba(210, 105, 30, 0.1);
+      padding: 8px 12px;
+      position: relative;
+    }
+    .bac-ho-title {
+      color: #d32f2f;
+      font-weight: 900;
+      font-size: 0.85rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      border-bottom: 2px solid #e0c8a0;
+      padding-bottom: 4px;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+    }
+    .bac-ho-list {
+      list-style: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #3e2723;
+      line-height: 1.45;
+    }
+    .bac-ho-list li {
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bac-ho-list li span.bullet {
+      color: #c62828;
+      font-weight: 900;
+    }
+    .lotus-deco-left {
+      position: absolute;
+      bottom: 2px;
+      right: 6px;
+      font-size: 1.2rem;
+      opacity: 0.85;
+    }
+
+    /* Center: Cờ & Bảng Đen */
+    .center-wall {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 660px;
+      margin: 0 16px;
+    }
+
+    /* Flag */
+    .flag-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .vn-flag {
+      width: 64px;
+      height: 42px;
+      background: #da251d;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .vn-star {
+      position: relative;
+      display: inline-block;
+      width: 0px;
+      height: 0px;
+      border-right: 12px solid transparent;
+      border-bottom: 8.5px solid #ffff00;
+      border-left: 12px solid transparent;
+      transform: rotate(35deg);
+    }
+    .vn-star:before {
+      border-bottom: 10px solid #ffff00;
+      border-left: 3.5px solid transparent;
+      border-right: 3.5px solid transparent;
+      position: absolute;
+      height: 0;
+      width: 0;
+      top: -6.5px;
+      left: -8px;
+      display: block;
+      content: '';
+      transform: rotate(-35deg);
+    }
+    .vn-star:after {
+      position: absolute;
+      display: block;
+      color: #ffff00;
+      top: 0.5px;
+      left: -12.5px;
+      width: 0px;
+      height: 0px;
+      border-right: 12px solid transparent;
+      border-bottom: 8.5px solid #ffff00;
+      border-left: 12px solid transparent;
+      transform: rotate(-70deg);
+      content: '';
+    }
+
+    /* Chalkboard */
+    .chalkboard {
+      width: 100%;
+      height: 145px;
+      background: radial-gradient(circle at 50% 40%, #1e5a38 0%, #123d24 100%);
+      border: 8px solid #7c4a1e;
+      border-radius: 12px;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.35), inset 0 0 40px rgba(0,0,0,0.5);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 20px;
+      color: #ffffff;
+    }
+    .board-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 8px rgba(255,255,255,0.7), 2px 2px 4px rgba(0,0,0,0.6);
+      color: #fefefe;
+      margin-bottom: 4px;
+    }
+    .board-sub {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ffeb3b;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    }
+    .chalkboard-flourish {
+      margin-top: 6px;
+      width: 160px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ffd54f, transparent);
+      border-radius: 2px;
+    }
+    .board-lotus-l, .board-lotus-r {
+      position: absolute;
+      bottom: 8px;
+      font-size: 1.8rem;
+    }
+    .board-lotus-l { left: 16px; }
+    .board-lotus-r { right: 16px; }
+
+    /* Right: Bookshelf & Door */
+    .right-corner {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .bookshelf {
+      width: 135px;
+      background: #965a25;
+      border: 4px solid #6d3f16;
+      border-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .class-sign-tag {
+      background: #1976d2;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 4px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .shelf-row {
+      height: 48px;
+      border-bottom: 4px solid #5a3311;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 4px 6px;
+      background: #7e481b;
+    }
+    .book-item {
+      width: 10px;
+      height: 32px;
+      border-radius: 2px;
+    }
+    .b1 { background: #e53935; height: 35px; }
+    .b2 { background: #1e88e5; height: 30px; }
+    .b3 { background: #43a047; height: 33px; }
+    .b4 { background: #fdd835; height: 28px; }
+    .b5 { background: #8e24aa; height: 34px; }
+    .globe-icon { font-size: 1.3rem; }
+    .plant-icon { font-size: 1.3rem; }
+
+    .door-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .door-sign {
+      background: #ffffff;
+      color: #c62828;
+      border: 2px solid #c62828;
+      border-radius: 6px;
+      font-weight: 900;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      margin-bottom: 6px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .classroom-door {
+      width: 75px;
+      height: 180px;
+      background: linear-gradient(135deg, #a46731 0%, #7c4a1e 100%);
+      border: 4px solid #583311;
+      border-radius: 6px;
+      position: relative;
+      box-shadow: 4px 8px 15px rgba(0,0,0,0.3);
+    }
+    .door-window {
+      width: 50px;
+      height: 65px;
+      margin: 12px auto 0;
+      background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+      border: 3px solid #583311;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .door-window::after {
+      content: '🌿';
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 1.2rem;
+    }
+    .door-handle {
+      position: absolute;
+      left: 10px;
+      top: 95px;
+      width: 8px;
+      height: 18px;
+      background: #ffd54f;
+      border-radius: 3px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /* Teacher's Desk (Bàn giáo viên phía trước bên trái) */
+    .teacher-desk {
+      position: absolute;
+      top: 175px;
+      left: 28px;
+      z-index: 25;
+      width: 175px;
+      height: 65px;
+      background: linear-gradient(180deg, #f0be80 0%, #c48743 100%);
+      border: 3px solid #8e5824;
+      border-radius: 8px;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.22);
+      padding: 4px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .teacher-label {
+      position: absolute;
+      top: -12px;
+      left: 12px;
+      background: #8e5824;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .teacher-items {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+    }
+    .laptop-graphic {
+      font-size: 1.3rem;
+    }
+    .flower-vase {
+      font-size: 1.2rem;
+    }
+    .chair-back {
+      position: absolute;
+      top: -18px;
+      left: 70px;
+      width: 35px;
+      height: 16px;
+      background: #7a461b;
+      border-radius: 6px 6px 0 0;
+      border: 2px solid #583311;
+    }
+
+    /* SEATING CHART AREA (4 COLUMNS) */
+    .seating-chart {
+      position: absolute;
+      top: 250px;
+      bottom: 60px;
+      left: 30px;
+      right: 30px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      z-index: 20;
+    }
+
+    /* Each Column */
+    .seat-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Desk Row (Bàn đôi) */
+    .desk-row {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Table top with 3D look */
+    .desk-top {
+      height: 52px;
+      background: linear-gradient(180deg, #fce5be 0%, #eab875 35%, #cf9244 100%);
+      border: 2px solid #9e6427;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.14), inset 0 2px 4px rgba(255,255,255,0.7);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      gap: 6px;
+      position: relative;
+    }
+
+    /* Desk row indicator (Hàng 1, Hàng 2...) */
+    .row-index {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: #93734e;
+    }
+
+    /* Student Seat Tag */
+    .seat-card {
+      background: #ffffff;
+      border-radius: 5px;
+      border: 1.5px solid #d4a373;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 3px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease;
+    }
+    .seat-card:hover {
+      transform: scale(1.04);
+      z-index: 10;
+      border-color: #1b5e20;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .seat-student {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #1a237e;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      line-height: 1.15;
+    }
+    .seat-card.empty-seat {
+      background: repeating-linear-gradient(45deg, #f7f3ec, #f7f3ec 6px, #ede6da 6px, #ede6da 12px);
+      border: 1.5px dashed #c4b59f;
+      box-shadow: none;
+    }
+    .seat-empty-text {
+      font-size: 0.62rem;
+      color: #a4947f;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    /* Desk bench (Ghế băng đôi) */
+    .desk-bench {
+      height: 12px;
+      background: linear-gradient(180deg, #d3934d 0%, #b2732e 100%);
+      border: 1.5px solid #7d4816;
+      border-radius: 3px;
+      margin: 3px 12px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.18);
+    }
+
+    /* FOOTER BAR: COLUMN LABELS & SUMMARY */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #2b422a;
+      border-top: 4px solid #c8a26c;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+    }
+
+    .column-tags-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .col-tag-item {
+      display: flex;
+      justify-content: center;
+    }
+
+    .col-pill {
+      background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      color: #ffffff;
+      padding: 5px 22px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      border: 2px solid #81c784;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+    }
+
+    .total-badge-container {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 35;
+    }
+
+    .total-badge {
+      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+      color: #ffffff;
+      padding: 6px 28px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      border: 3px solid #ffeb3b;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* PRINT STYLES FOR A4 */
+    @media print {
+      body {
+        background: white !important;
+        padding: 0 !important;
+      }
+      .action-bar, .info-card {
+        display: none !important;
+      }
+      .poster-container {
+        width: 100% !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 5mm;
+      }
+    }
+
+    /* Explanation Card */
+    .info-card {
+      width: 100%;
+      max-width: 1280px;
+      background: #25262c;
+      color: #e0e0e0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 25px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      border-left: 5px solid #4caf50;
+    }
+    .info-card h2 {
+      font-size: 1.2rem;
+      color: #81c784;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .info-grid code {
+      background: #191a20;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffb74d;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Bar -->
+  <div class="action-bar">
+    <h1>
+      <span>🏫</span> Sơ Đồ Lớp Học - Lớp 9A4 (Năm Học 2025 - 2026)
+    </h1>
+    <div class="action-btns">
+      <button class="btn btn-print" onclick="window.print()">
+        🖨️ In Khổ Giấy A4 (Ngang)
+      </button>
+      <button class="btn btn-download" onclick="captureAndDownload()">
+        💾 Tải Ảnh Sắc Nét (PNG HD)
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Classroom Poster (16:9 - 1280x720) -->
+  <div class="poster-container" id="posterArea">
+    
+    <!-- Room Background -->
+    <div class="classroom-wall"></div>
+    <div class="classroom-floor"></div>
+
+    <!-- Top Classroom Wall Section -->
+    <div class="top-section">
+      
+      <!-- 5 Điều Bác Hồ Dạy (Bên trái) -->
+      <div class="bac-ho-board">
+        <div class="bac-ho-title">⭐ 5 ĐIỀU BÁC HỒ DẠY ⭐</div>
+        <ul class="bac-ho-list">
+          <li><span class="bullet">1.</span> Yêu Tổ quốc, yêu đồng bào.</li>
+          <li><span class="bullet">2.</span> Học tập tốt, lao động tốt.</li>
+          <li><span class="bullet">3.</span> Đoàn kết tốt, kỷ luật tốt.</li>
+          <li><span class="bullet">4.</span> Giữ gìn vệ sinh thật tốt.</li>
+          <li><span class="bullet">5.</span> Khiêm tốn, thật thà, dũng cảm.</li>
+        </ul>
+        <div class="lotus-deco-left">🌸</div>
+      </div>
+
+      <!-- Center: Quốc Kỳ & Bảng Đen Trung Tâm -->
+      <div class="center-wall">
+        <div class="flag-box">
+          <div class="vn-flag">
+            <div class="vn-star"></div>
+          </div>
+        </div>
+        <div class="chalkboard">
+          <div class="board-lotus-l">🌸</div>
+          <div class="board-title">SƠ ĐỒ LỚP HỌC - LỚP 9A4</div>
+          <div class="board-sub">29 HỌC SINH</div>
+          <div class="chalkboard-flourish"></div>
+          <div class="board-lotus-r">🌸</div>
+        </div>
+      </div>
+
+      <!-- Right: Tủ sách & Cửa Ra Vào -->
+      <div class="right-corner">
+        <div class="bookshelf">
+          <div class="class-sign-tag">LỚP 9A4</div>
+          <div class="shelf-row">
+            <span class="globe-icon">🌍</span>
+            <span class="plant-icon">🪴</span>
+          </div>
+          <div class="shelf-row">
+            <div class="book-item b1"></div>
+            <div class="book-item b2"></div>
+            <div class="book-item b3"></div>
+            <div class="book-item b4"></div>
+            <div class="book-item b5"></div>
+          </div>
+          <div class="shelf-row">
+            <div class="book-item b2"></div>
+            <div class="book-item b4"></div>
+            <div class="book-item b1"></div>
+          </div>
+        </div>
+
+        <div class="door-wrapper">
+          <div class="door-sign">
+            <span>⬅ CỬA VÀO</span>
+          </div>
+          <div class="classroom-door">
+            <div class="door-window"></div>
+            <div class="door-handle"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bàn Giáo Viên (Phía trước bên trái) -->
+    <div class="teacher-desk">
+      <div class="chair-back"></div>
+      <div class="teacher-label">BÀN GIÁO VIÊN</div>
+      <div class="teacher-items">
+        <span class="laptop-graphic">💻</span>
+        <span class="flower-vase">💐</span>
+        <span>📚</span>
+      </div>
+    </div>
+
+    <!-- 4 DÃY BÀN HỌC SINH (Bố trí theo đúng góc nhìn: Từ Phải sang Trái: DÃY 1 -> DÃY 2 -> DÃY 3 -> DÃY 4) -->
+    <!-- Trên màn hình hiển thị: Cột 1 = DÃY 4 (gần bàn GV/cửa sổ), Cột 2 = DÃY 3, Cột 3 = DÃY 2, Cột 4 = DÃY 1 (gần Cửa vào) -->
+    <div class="seating-chart">
+      
+      <!-- ================= DÃY 4 (8 HS) ================= -->
+      <div class="seat-column">
+        <!-- Hàng 1 -->
+        <div class="desk-row">
+          <div class="row-index">H1</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">HUY KHÁNH</span></div>
+            <div class="seat-card"><span class="seat-student">THANH ĐỦ</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="desk-row">
+          <div class="row-index">H2</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">THU HÀ</span></div>
+            <div class="seat-card"><span class="seat-student">PHƯƠNG THẢO</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 3 -->
+        <div class="desk-row">
+          <div class="row-index">H3</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">HUYỀN TRANG</span></div>
+            <div class="seat-card"><span class="seat-student">QUANG NGHĨA</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 4 -->
+        <div class="desk-row">
+          <div class="row-index">H4</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">NHẬT TÂN</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 5 -->
+        <div class="desk-row">
+          <div class="row-index">H5</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">THÀNH PHÁT</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+      </div>
+
+      <!-- ================= DÃY 3 (7 HS) ================= -->
+      <div class="seat-column">
+        <!-- Hàng 1 -->
+        <div class="desk-row">
+          <div class="row-index">H1</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">VĂN KHANG</span></div>
+            <div class="seat-card"><span class="seat-student">HUỲNH KHÔI</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="desk-row">
+          <div class="row-index">H2</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">TRÚC HUỲNH</span></div>
+            <div class="seat-card"><span class="seat-student">BẢO XUYÊN</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 3 -->
+        <div class="desk-row">
+          <div class="row-index">H3</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">NGỌC QUỲNH</span></div>
+            <div class="seat-card"><span class="seat-student">GIA LÂM</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 4 -->
+        <div class="desk-row">
+          <div class="row-index">H4</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">HOÀI PHONG</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 5 (Bàn trống) -->
+        <div class="desk-row">
+          <div class="row-index">H5</div>
+          <div class="desk-top">
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Bàn trống</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Bàn trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+      </div>
+
+      <!-- ================= DÃY 2 (7 HS) ================= -->
+      <div class="seat-column">
+        <!-- Hàng 1 -->
+        <div class="desk-row">
+          <div class="row-index">H1</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">TRÀ MY</span></div>
+            <div class="seat-card"><span class="seat-student">MỸ QUYÊN</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="desk-row">
+          <div class="row-index">H2</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">BẢO ANH</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 3 -->
+        <div class="desk-row">
+          <div class="row-index">H3</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">VĂN LONG</span></div>
+            <div class="seat-card"><span class="seat-student">VĂN BẢO</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 4 -->
+        <div class="desk-row">
+          <div class="row-index">H4</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">MINH TRÍ</span></div>
+            <div class="seat-card"><span class="seat-student">QUỐC NHỰT</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 5 (Bàn trống) -->
+        <div class="desk-row">
+          <div class="row-index">H5</div>
+          <div class="desk-top">
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Bàn trống</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Bàn trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+      </div>
+
+      <!-- ================= DÃY 1 (7 HS - GẦN CỬA) ================= -->
+      <div class="seat-column">
+        <!-- Hàng 1 -->
+        <div class="desk-row">
+          <div class="row-index">H1</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">VĂN TIỀM</span></div>
+            <div class="seat-card"><span class="seat-student">NHƯ TUYẾT</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="desk-row">
+          <div class="row-index">H2</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">NGỌC HÂN</span></div>
+            <div class="seat-card"><span class="seat-student">KIM ĐÀO</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 3 -->
+        <div class="desk-row">
+          <div class="row-index">H3</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">TRỌNG KHANG</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 4 -->
+        <div class="desk-row">
+          <div class="row-index">H4</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">VŨ PHƯƠNG</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+
+        <!-- Hàng 5 -->
+        <div class="desk-row">
+          <div class="row-index">H5</div>
+          <div class="desk-top">
+            <div class="seat-card"><span class="seat-student">CẨM VÂN</span></div>
+            <div class="seat-card empty-seat"><span class="seat-empty-text">Chỗ trống</span></div>
+          </div>
+          <div class="desk-bench"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Phía dưới: Nhãn Dãy & Tổng số học sinh -->
+    <div class="bottom-bar">
+      <div class="column-tags-bar">
+        <div class="col-tag-item"><span class="col-pill">DÃY 4</span></div>
+        <div class="col-tag-item"><span class="col-pill">DÃY 3</span></div>
+        <div class="col-tag-item"><span class="col-pill">DÃY 2</span></div>
+        <div class="col-tag-item"><span class="col-pill">DÃY 1 (Gần Cửa)</span></div>
+      </div>
+    </div>
+
+    <!-- Khung lớn: TỔNG SỐ 29 HỌC SINH -->
+    <div class="total-badge-container">
+      <div class="total-badge">
+        <span>🌺</span>
+        <span>TỔNG SỐ: 29 HỌC SINH</span>
+        <span>🌺</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Technical Information & Prompt Guide -->
+  <div class="info-card">
+    <h2>💡 Hướng dẫn in & Lưu trữ</h2>
+    <div class="info-grid">
+      <div>
+        <p><strong>1. Độ nét hoàn hảo khi in:</strong></p>
+        <p>Bản vẽ này được thiết kế theo tỷ lệ chuẩn, font chữ tiếng Việt chuẩn UTF-8 có dấu đầy đủ, không bị lỗi font hay biến dạng ký tự như AI tạo ảnh tự động.</p>
+        <p style="margin-top: 8px;"><strong>2. Cách in ra giấy A4:</strong></p>
+        <p>Bấm nút <code>🖨️ In Khổ Giấy A4 (Ngang)</code> phía trên, chọn máy in hoặc <strong>Save as PDF</strong>, chọn khổ <strong>A4</strong>, hướng <strong>Landscape (Ngang)</strong> và đánh dấu <em>Background graphics (Đồ họa nền)</em>.</p>
+      </div>
+      <div>
+        <p><strong>3. Vị trí các dãy theo đúng yêu cầu:</strong></p>
+        <p>Sơ đồ bố trí chuẩn theo góc nhìn từ bảng xuống: Bên phải sát cửa ra vào là <strong>Dãy 1</strong> (7 HS), tiếp đến <strong>Dãy 2</strong> (7 HS), <strong>Dãy 3</strong> (7 HS), và bên trái gần bàn giáo viên là <strong>Dãy 4</strong> (8 HS). Đúng chuẩn tổng số <strong>29 học sinh</strong>.</p>
+        <p style="margin-top: 8px;"><strong>4. Tải file ảnh PNG:</strong></p>
+        <p>Bấm nút <code>💾 Tải Ảnh Sắc Nét (PNG HD)</code> để lưu ảnh sắc nét về máy tính để gửi Zalo phụ huynh hoặc trình chiếu lên TV lớp học.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function captureAndDownload() {
+      const poster = document.getElementById('posterArea');
+      const btn = event.currentTarget;
+      const oldText = btn.innerHTML;
+      btn.innerHTML = '⏳ Đang tạo ảnh...';
+      btn.disabled = true;
+
+      html2canvas(poster, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'So_Do_Lop_9A4_29HS.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+      }).catch(err => {
+        alert('Có lỗi khi tạo ảnh, bạn hãy sử dụng nút In ấn hoặc chụp màn hình nhé!');
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>

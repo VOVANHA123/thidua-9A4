@@ -1,0 +1,60 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "api/**",
+      "vercel.json",
+      "netlify.toml",
+      "**/*.exe",
+      "**/*.zip",
+      "**/*.vsix",
+      "**/*.pdf",
+      "**/*.doc",
+      "**/*.docx",
+      "**/*.xlsx",
+      "**/*.csv",
+      "**/*.bat",
+      "**/*.ps1",
+      "**/*.md",
+      "**/*.txt"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "manifest.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ]
+  }
+}

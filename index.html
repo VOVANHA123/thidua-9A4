@@ -627,31 +627,31 @@
         </button>
       </div>
 
-      <form id="form-class-settings">
+      <form id="form-class-settings" onsubmit="event.preventDefault(); window.appController.saveClassSettings(); return false;">
         <!-- Sub-tab 1: Class Information -->
         <div class="modal-body setting-tab-pane active" id="pane-set-class">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group">
               <label class="form-label">Tên Trường:</label>
-              <input type="text" id="setting-school-name" class="form-control" required />
+              <input type="text" id="setting-school-name" class="form-control" />
             </div>
             <div class="form-group">
               <label class="form-label">Tên Lớp:</label>
-              <input type="text" id="setting-class-name" class="form-control" required />
+              <input type="text" id="setting-class-name" class="form-control" />
             </div>
             <div class="form-group">
               <label class="form-label">Tên Giáo Viên Chủ Nhiệm:</label>
-              <input type="text" id="setting-teacher-name" class="form-control" required />
+              <input type="text" id="setting-teacher-name" class="form-control" />
             </div>
             <div class="form-group">
               <label class="form-label">Mật khẩu GVCN Chính (Admin):</label>
-              <input type="text" id="setting-teacher-pass" class="form-control" required />
+              <input type="text" id="setting-teacher-pass" class="form-control" />
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Khẩu hiệu / Slogan Lớp:</label>
-            <input type="text" id="setting-slogan" class="form-control" required />
+            <input type="text" id="setting-slogan" class="form-control" />
           </div>
 
           <!-- Backup / Restore Configuration between PC and Mobile Phones -->
@@ -825,7 +825,7 @@
           </div>
           <div style="display: flex; gap: 8px;">
             <button type="button" class="btn-hero btn-white btn-close-modal">Đóng</button>
-            <button type="submit" class="btn-hero btn-gold">Lưu Cài Đặt ✨</button>
+            <button type="button" class="btn-hero btn-gold" onclick="window.appController.saveClassSettings()">Lưu Cài Đặt ✨</button>
           </div>
         </div>
       </form>

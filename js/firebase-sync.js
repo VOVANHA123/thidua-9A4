@@ -142,7 +142,7 @@
       const dm = window.classData || window.dataManager;
       if (!dm) return;
 
-      const currentClient = dm.CLIENT_SESSION_ID || 'unknown';
+      const currentClient = (dm && dm.CLIENT_SESSION_ID) || 'unknown';
       if (cloudData.lastSenderClientId && cloudData.lastSenderClientId === currentClient) {
         return; // Bỏ qua nếu chính máy này vừa gửi
       }
@@ -151,11 +151,35 @@
 
       this.isRemoteUpdate = true;
       try {
-        if (typeof dm.mergeWithDefaults === 'function') {
-          dm.data = dm.mergeWithDefaults(cloudData);
+        const serverUpdated = (cloudData.settings && cloudData.settings.updatedAt) || 0;
+        const localUpdated = (dm.data && dm.data.settings && dm.data.settings.updatedAt) || 0;
+
+        // Chỉ cập nhật cài đặt/danh sách học sinh từ cloud khi server thực sự mới hơn hoặc máy mới tinh
+        if (serverUpdated > localUpdated || dm.isFreshDevice) {
+          if (typeof dm.mergeWithDefaults === 'function') {
+            dm.data = dm.mergeWithDefaults(cloudData);
+          } else {
+            dm.data = cloudData;
+          }
         } else {
-          dm.data = cloudData;
+          // Chỉ hợp nhất sự kiện điểm số (giữ nguyên cấu hình của máy này)
+          if (Array.isArray(cloudData.events)) {
+            const eventMap = new Map();
+            const deletedSet = new Set([
+              ...(dm.data.deletedEventIds || []),
+              ...(cloudData.deletedEventIds || [])
+            ]);
+            dm.data.deletedEventIds = Array.from(deletedSet);
+            cloudData.events.forEach(e => {
+              if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+            });
+            (dm.data.events || []).forEach(e => {
+              if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+            });
+            dm.data.events = Array.from(eventMap.values());
+          }
         }
+
         dm.isFreshDevice = false;
         dm.hasUserModification = false;
         if (typeof dm.saveToStorageLocal === 'function') {
@@ -214,12 +238,20 @@
 
       const cleanUrl = this.getCleanDatabaseUrl();
 
-      const isSettingsChange = Boolean(extraMeta && (extraMeta.actionType === 'SETTINGS_UPDATE' || extraMeta.recentAction === 'CONFIG_SYNC' || extraMeta.allowSettingsOverwrite === true));
+      const isScoreOnlyAction = Boolean(extraMeta && (extraMeta.recentAction === 'SCORE_ADD' || extraMeta.recentAction === 'SCORE_DELETE'));
+      const isSettingsChange = !isScoreOnlyAction;
 
       let payloadSettings = (data && data.settings) ? { ...data.settings } : {};
       let payloadStudents = (data && data.students) ? [...data.students] : [];
       let payloadCriteria = (data && data.criteria) ? [...data.criteria] : [];
       let payloadTeachers = (data && data.teachers) ? [...data.teachers] : [];
+
+      if (isSettingsChange) {
+        payloadSettings.updatedAt = Date.now();
+        if (dm && dm.data && dm.data.settings) {
+          dm.data.settings.updatedAt = payloadSettings.updatedAt;
+        }
+      }
 
       // MERGE EVENTS & PROTECT SETTINGS WITH CLOUD FIRST TO PREVENT OVERWRITE
       let mergedEvents = Array.isArray(data.events) ? [...data.events] : [];
@@ -245,20 +277,22 @@
                 mergedEvents = Array.from(eventMap.values());
               }
 
-              // Bảo vệ settings/students nếu không phải hành động sửa cài đặt chủ động của GVCN
-              const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
-              const localUpdated = (payloadSettings.updatedAt) || 0;
-              if (!isSettingsChange && remoteUpdated >= localUpdated) {
-                if (remote.settings) payloadSettings = remote.settings;
-                if (remote.students) payloadStudents = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
-                if (remote.criteria) payloadCriteria = Array.isArray(remote.criteria) ? remote.criteria : Object.values(remote.criteria);
-                if (remote.teachers) payloadTeachers = Array.isArray(remote.teachers) ? remote.teachers : Object.values(remote.teachers);
-                if (dm && dm.data) {
-                  dm.data.settings = payloadSettings;
-                  dm.data.students = payloadStudents;
-                  dm.data.criteria = payloadCriteria;
-                  dm.data.teachers = payloadTeachers;
-                  if (typeof dm.saveToStorageLocal === 'function') dm.saveToStorageLocal();
+              // Chỉ bảo vệ settings nếu là học sinh chấm điểm (score-only action)
+              if (isScoreOnlyAction) {
+                const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
+                const localUpdated = (payloadSettings.updatedAt) || 0;
+                if (remoteUpdated >= localUpdated) {
+                  if (remote.settings) payloadSettings = remote.settings;
+                  if (remote.students) payloadStudents = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
+                  if (remote.criteria) payloadCriteria = Array.isArray(remote.criteria) ? remote.criteria : Object.values(remote.criteria);
+                  if (remote.teachers) payloadTeachers = Array.isArray(remote.teachers) ? remote.teachers : Object.values(remote.teachers);
+                  if (dm && dm.data) {
+                    dm.data.settings = payloadSettings;
+                    dm.data.students = payloadStudents;
+                    dm.data.criteria = payloadCriteria;
+                    dm.data.teachers = payloadTeachers;
+                    if (typeof dm.saveToStorageLocal === 'function') dm.saveToStorageLocal();
+                  }
                 }
               }
             }

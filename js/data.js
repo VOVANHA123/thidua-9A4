@@ -586,6 +586,7 @@ const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMfX0Uu
 
 class ClassDataManager {
   constructor() {
+    this.CLIENT_SESSION_ID = CLIENT_SESSION_ID;
     this.isFreshDevice = false;
     this.hasSuccessfullySyncedWithCloud = false;
     this.hasUserModification = false;
@@ -651,7 +652,7 @@ class ClassDataManager {
   async _doSyncFromCloud(force = false) {
     const fbDirectUrl = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4.json';
 
-    // PRIMARY CLOUD SOURCE: Google Firebase Realtime Database (Tốc độ cao & Lưu trữ vĩnh viễn trên Google Cloud)
+    // PRIMARY CLOUD SOURCE: Google Firebase Realtime Database
     try {
       const fbController = new AbortController();
       const fbTimeout = setTimeout(() => fbController.abort(), 7000);
@@ -671,17 +672,41 @@ class ClassDataManager {
           const serverEventsLen = (fbData.events || []).length;
           const localEventsLen = (this.data.events || []).length;
 
-          // Quyết định đồng bộ an toàn:
-          // Thiết bị luôn cập nhật dữ liệu từ đám mây trừ khi máy này là GVCN vừa chủ động lưu cấu hình cài đặt cục bộ
-          const shouldPull = force ||
-            this.isFreshDevice ||
-            !this.hasSuccessfullySyncedWithCloud ||
-            !this.hasUserModification ||
-            (serverUpdated >= localUpdated) ||
-            (serverEventsLen >= localEventsLen);
+          // Nếu máy này vừa sửa cài đặt mới hơn server: Đẩy cấu hình lên Firebase, TUYỆT ĐỐI không đè ngược!
+          if (localUpdated > serverUpdated && this.hasUserModification) {
+            await this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
+            this.lastSyncTime = Date.now();
+            this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
+            return { success: true, updated: false, pushed: true, data: this.data, source: 'firebase_realtime' };
+          }
 
-          if (shouldPull) {
-            this.data = this.mergeWithDefaults(fbData);
+          const isServerConfigNewer = serverUpdated > localUpdated;
+          const hasNewServerEvents = serverEventsLen > localEventsLen;
+          const shouldUpdate = force || this.isFreshDevice || isServerConfigNewer || hasNewServerEvents || (localEventsLen === 0 && serverEventsLen > 0);
+
+          if (shouldUpdate) {
+            if (isServerConfigNewer || this.isFreshDevice || force) {
+              // Server có cấu hình mới hơn hoặc người dùng chủ động bấm Tải: nhận toàn bộ
+              this.data = this.mergeWithDefaults(fbData);
+            } else {
+              // Server chỉ có thêm sự kiện điểm số (học sinh khác chấm): hợp nhất điểm số, giữ nguyên cấu hình lớp này
+              if (Array.isArray(fbData.events)) {
+                const eventMap = new Map();
+                const deletedSet = new Set([
+                  ...(this.data.deletedEventIds || []),
+                  ...(fbData.deletedEventIds || [])
+                ]);
+                this.data.deletedEventIds = Array.from(deletedSet);
+                fbData.events.forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                (this.data.events || []).forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                this.data.events = Array.from(eventMap.values());
+              }
+            }
+
             this.isFreshDevice = false;
             this.hasUserModification = false;
             this.saveToStorageLocal();
@@ -690,7 +715,7 @@ class ClassDataManager {
               try {
                 localStorage.setItem(STORAGE_BACKUP_KEY, JSON.stringify({
                   savedAt: Date.now(),
-                  eventCount: serverEventsLen,
+                  eventCount: (this.data.events || []).length,
                   data: this.data
                 }));
               } catch(be) {}
@@ -710,12 +735,6 @@ class ClassDataManager {
             }
             this.syncInProgress = false;
             return { success: true, updated: true, data: this.data, source: 'firebase_realtime' };
-          } else if (localUpdated > serverUpdated && this.hasUserModification) {
-            // Máy này có chỉnh sửa cấu hình mới hơn đám mây: đẩy lên Firebase
-            await this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
-            this.lastSyncTime = Date.now();
-            this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
-            return { success: true, updated: false, pushed: true, data: this.data, source: 'firebase_realtime' };
           } else {
             this.lastSyncTime = Date.now();
             this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
@@ -727,7 +746,6 @@ class ClassDataManager {
       console.warn('Firebase sync notice:', fbErr);
     }
 
-    // Không nạp dữ liệu cũ từ Vercel/Sheets để tránh bị đè ngược dữ liệu ban đầu
     this.lastSyncTime = Date.now();
     this.updateCloudStatusUI(this.hasSuccessfullySyncedWithCloud, this.hasSuccessfullySyncedWithCloud ? 'Đã Đồng Bộ ⚡' : 'Ngoại Tuyến');
     return { success: true, updated: false, data: this.data };
@@ -742,33 +760,34 @@ class ClassDataManager {
     const doPush = async () => {
       if (typeof navigator !== 'undefined' && !navigator.onLine) return;
 
+      const fbDirectUrl = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4.json';
+      const currentUserId = (window.authManager && window.authManager.currentUser && window.authManager.currentUser.id) || 'admin';
+
+      // Phân biệt rõ loại hành động:
+      // CHỈ CÓ SCORE_ADD và SCORE_DELETE mới là hành động chấm điểm thuần túy.
+      // Tất cả hành động khác (SETTINGS_UPDATE, CONFIG_SYNC, sửa học sinh, sửa tiêu chí, sửa GV, v.v.) là sửa cấu hình!
+      const isScoreOnlyAction = Boolean(extraMeta && (extraMeta.recentAction === 'SCORE_ADD' || extraMeta.recentAction === 'SCORE_DELETE'));
+      const isSettingsChange = !isScoreOnlyAction;
+
       // CLIENT SAFEGUARD:
-      // Chặn tuyệt đối thiết bị chưa từng đồng bộ thành công hoặc máy mới tinh cố ghi đè đám mây
-      if ((!this.hasSuccessfullySyncedWithCloud || this.isFreshDevice) && (!extraMeta || !extraMeta.allowEmptyReset)) {
-        console.warn('[SAFEGUARD BLOCKED] Prevented un-hydrated device from pushing to cloud. Attempting sync first...');
+      // Chặn thiết bị mới tinh không có dữ liệu vô tình ghi đè điểm
+      if ((!this.hasSuccessfullySyncedWithCloud || this.isFreshDevice) && isScoreOnlyAction && (!extraMeta || !extraMeta.allowEmptyReset)) {
+        console.warn('[SAFEGUARD NOTICE] Syncing before score push...');
         try {
           await this.syncFromCloud(true);
         } catch(e) {}
-        if (!this.hasSuccessfullySyncedWithCloud && (!extraMeta || !extraMeta.allowEmptyReset)) {
-          console.warn('[SAFEGUARD BLOCKED] Device still un-hydrated. Aborting push to prevent data loss.');
-          return;
-        }
       }
 
       this.isFreshDevice = false;
 
-      const fbDirectUrl = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4.json';
-      const currentUserId = (window.authManager && window.authManager.currentUser && window.authManager.currentUser.id) || 'admin';
-      const isSettingsChange = Boolean(extraMeta && (extraMeta.actionType === 'SETTINGS_UPDATE' || extraMeta.recentAction === 'CONFIG_SYNC' || extraMeta.allowSettingsOverwrite === true));
-
-      // FETCH-AND-MERGE BEFORE PUSH: Bảo vệ tuyệt đối settings/students khỏi bị ghi đè bởi thiết bị khác khi chấm điểm
+      // FETCH-AND-MERGE TRƯỚC KHI PUSH:
       if (!extraMeta || !extraMeta.allowEmptyReset) {
         try {
           const checkRes = await fetch(fbDirectUrl + '?t=' + Date.now(), { cache: 'no-cache' });
           if (checkRes.ok) {
             const remote = await checkRes.json();
             if (remote) {
-              // 1. Hợp nhất sự kiện (Events)
+              // 1. Luôn hợp nhất sự kiện (Events) để không mất điểm đã chấm trên các máy khác
               if (Array.isArray(remote.events)) {
                 const remoteEventMap = new Map();
                 const deletedSet = new Set([
@@ -795,13 +814,12 @@ class ClassDataManager {
                 this.data.events = Array.from(remoteEventMap.values());
               }
 
-              // 2. BẢO VỆ CÀI ĐẶT LỚP HỌC (Settings, Students, Criteria, Teachers):
-              // Nếu hành động này KHÔNG PHẢI là GVCN chủ động lưu trong Cài Đặt (ví dụ: học sinh/giáo viên khác chấm điểm hoặc vào app):
-              // TUYỆT ĐỐI giữ nguyên thông tin cài đặt mới nhất từ Firebase, KHÔNG được ghi đè bằng cài đặt cũ của máy này!
-              const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
-              const localUpdated = (this.data.settings && this.data.settings.updatedAt) || 0;
-
-              if (!isSettingsChange) {
+              // 2. Bảo vệ cài đặt lớp:
+              // NẾU là hành động chấm điểm thuần túy (học sinh chấm điểm):
+              // Giữ nguyên cài đặt mới nhất từ Firebase, không cho máy học sinh đè cấu hình lớp
+              if (isScoreOnlyAction) {
+                const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
+                const localUpdated = (this.data.settings && this.data.settings.updatedAt) || 0;
                 if (remoteUpdated >= localUpdated) {
                   if (remote.settings) this.data.settings = { ...this.data.settings, ...remote.settings };
                   if (remote.students) this.data.students = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
@@ -810,6 +828,8 @@ class ClassDataManager {
                   this.saveToStorageLocal();
                 }
               }
+              // NẾU là hành động sửa cài đặt / cấu hình (GVCN lưu hoặc sửa học sinh, tiêu chí, GV):
+              // TUYỆT ĐỐI KHÔNG ghi đè ngược! Giữ nguyên cấu hình vừa sửa của Thầy!
             }
           }
         } catch(checkErr) {
@@ -825,16 +845,23 @@ class ClassDataManager {
       const payload = {
         ...this.data,
         clientId: CLIENT_SESSION_ID,
+        lastSenderClientId: CLIENT_SESSION_ID,
         lastUpdatedBy: currentUserId,
         ...extraMeta
       };
 
       // 1. ĐỒNG BỘ TRỰC TIẾP QUA FIREBASE REALTIME DATABASE WEBSOCKET
       if (window.firebaseSyncEngine) {
-        window.firebaseSyncEngine.pushToCloud(this.data, extraMeta);
+        window.firebaseSyncEngine.pushToCloud(this.data, {
+          ...extraMeta,
+          isScoreOnlyAction,
+          isSettingsChange,
+          clientId: CLIENT_SESSION_ID,
+          lastSenderClientId: CLIENT_SESSION_ID
+        });
       }
 
-      // 2. ĐẨY TRỰC TIẾP QUA REST API GOOGLE FIREBASE REALTIME DATABASE (Đảm bảo lưu vĩnh viễn 100%)
+      // 2. ĐẨY TRỰC TIẾP QUA REST API GOOGLE FIREBASE REALTIME DATABASE
       try {
         const fbRes = await fetch(fbDirectUrl, {
           method: 'PUT',
@@ -844,6 +871,7 @@ class ClassDataManager {
         if (fbRes.ok) {
           this.lastSyncTime = Date.now();
           this.hasUserModification = false;
+          this.hasSuccessfullySyncedWithCloud = true;
           this.updateCloudStatusUI(true, 'Đã Lưu ⚡');
         }
       } catch (fbErr) {
@@ -854,7 +882,7 @@ class ClassDataManager {
     if (immediate) {
       return doPush();
     } else {
-      this.pushTimeout = setTimeout(doPush, 300);
+      this.pushTimeout = setTimeout(doPush, 500);
     }
   }
 
@@ -956,12 +984,31 @@ class ClassDataManager {
             const serverEventsLen = (fbData.events || []).length;
             const localEventsLen = (this.data.events || []).length;
 
-            const isServerNewer = serverUpdated > localUpdated;
+            const isServerConfigNewer = serverUpdated > localUpdated;
             const hasNewEvents = serverEventsLen > localEventsLen;
-            const needsSync = this.isFreshDevice || hasNewEvents || (localEventsLen === 0 && serverEventsLen > 0) || isServerNewer;
+            const needsSync = this.isFreshDevice || hasNewEvents || (localEventsLen === 0 && serverEventsLen > 0) || isServerConfigNewer;
 
             if (needsSync) {
-              this.data = this.mergeWithDefaults(fbData);
+              if (isServerConfigNewer || this.isFreshDevice) {
+                this.data = this.mergeWithDefaults(fbData);
+              } else {
+                // Chỉ hợp nhất điểm số, giữ nguyên cấu hình lớp của máy này
+                if (Array.isArray(fbData.events)) {
+                  const eventMap = new Map();
+                  const deletedSet = new Set([
+                    ...(this.data.deletedEventIds || []),
+                    ...(fbData.deletedEventIds || [])
+                  ]);
+                  this.data.deletedEventIds = Array.from(deletedSet);
+                  fbData.events.forEach(e => {
+                    if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                  });
+                  (this.data.events || []).forEach(e => {
+                    if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                  });
+                  this.data.events = Array.from(eventMap.values());
+                }
+              }
               this.isFreshDevice = false;
               this.hasUserModification = false;
               this.saveToStorageLocal();
@@ -970,7 +1017,7 @@ class ClassDataManager {
                 try {
                   localStorage.setItem(STORAGE_BACKUP_KEY, JSON.stringify({
                     savedAt: Date.now(),
-                    eventCount: serverEventsLen,
+                    eventCount: (this.data.events || []).length,
                     data: this.data
                   }));
                 } catch(be) {}
@@ -1434,7 +1481,10 @@ class ClassDataManager {
         if (config.criteria) this.data.criteria = config.criteria;
         if (config.students) this.data.students = config.students;
         if (config.teachers) this.data.teachers = config.teachers;
-        this.saveToStorage();
+        if (!this.data.settings) this.data.settings = {};
+        this.data.settings.updatedAt = Date.now();
+        this.saveToStorage(this.data, true, true);
+        this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
         return { success: true };
       }
       return { success: false, message: 'File cấu hình không hợp lệ!' };
@@ -1476,7 +1526,10 @@ class ClassDataManager {
       hasChangedPass: false
     };
     this.data.teachers.push(newTeacher);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return newTeacher;
   }
 
@@ -1485,7 +1538,10 @@ class ClassDataManager {
     const index = teachers.findIndex(t => t.id === id);
     if (index !== -1) {
       this.data.teachers[index] = { ...this.data.teachers[index], ...updatedFields };
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return this.data.teachers[index];
     }
     return null;
@@ -1498,7 +1554,10 @@ class ClassDataManager {
       return { success: false, message: 'Không thể xóa tài khoản Giáo viên chủ nhiệm chính!' };
     }
     this.data.teachers = teachers.filter(t => t.id !== id);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return { success: true };
   }
 
@@ -1521,7 +1580,10 @@ class ClassDataManager {
     const index = this.data.students.findIndex(s => s.id === id);
     if (index !== -1) {
       this.data.students[index] = { ...this.data.students[index], ...updatedFields };
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return this.data.students[index];
     }
     return null;
@@ -1545,14 +1607,20 @@ class ClassDataManager {
       hasChangedPass: false
     };
     this.data.students.push(newStudent);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return newStudent;
   }
 
   deleteStudent(id) {
     this.data.students = this.data.students.filter(s => s.id !== id);
     this.data.events = this.data.events.filter(e => e.studentId !== id);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
   }
 
   // --- PASSWORD & PERMISSIONS MANAGEMENT ---
@@ -1572,7 +1640,10 @@ class ClassDataManager {
       if (teacher.isPrimary) {
         this.data.settings.teacherPass = newPass.trim();
       }
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return { success: true, user: teacher };
     }
 
@@ -1584,7 +1655,10 @@ class ClassDataManager {
       }
       student.pass = newPass.trim();
       student.hasChangedPass = true;
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return { success: true, user: student };
     }
 
@@ -1596,7 +1670,10 @@ class ClassDataManager {
     if (student) {
       student.canScore = Boolean(canScore);
       student.scoreScope = canScore ? scoreScope : 'none';
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return { success: true, student };
     }
     return { success: false, message: 'Không tìm thấy học sinh!' };
@@ -1628,7 +1705,10 @@ class ClassDataManager {
       category: criteria.category ? criteria.category.trim() : (criteria.type === 'minus' ? 'Kỷ luật' : 'Học tập')
     };
     this.data.criteria.push(newCrit);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return newCrit;
   }
 
@@ -1640,7 +1720,10 @@ class ClassDataManager {
         updatedFields.points = Math.max(0.1, parseFloat(updatedFields.points) || 1);
       }
       this.data.criteria[idx] = { ...this.data.criteria[idx], ...updatedFields };
-      this.saveToStorage();
+      if (!this.data.settings) this.data.settings = {};
+      this.data.settings.updatedAt = Date.now();
+      this.saveToStorage(this.data, true, true);
+      this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return this.data.criteria[idx];
     }
     return null;
@@ -1652,7 +1735,10 @@ class ClassDataManager {
       return { success: false, message: 'Hệ thống cần giữ lại ít nhất 1 tiêu chí thi đua!' };
     }
     this.data.criteria = list.filter(c => c.id !== id);
-    this.saveToStorage();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = Date.now();
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return { success: true };
   }
 

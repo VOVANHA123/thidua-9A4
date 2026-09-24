@@ -2066,12 +2066,24 @@ class AppController {
   }
 
   saveClassSettings() {
+    const elClass = document.getElementById('setting-class-name');
+    const elSchool = document.getElementById('setting-school-name');
+    const elTeacher = document.getElementById('setting-teacher-name');
+    const elPass = document.getElementById('setting-teacher-pass');
+    const elSlogan = document.getElementById('setting-slogan');
+
+    const className = elClass ? elClass.value.trim() : (window.classData.data.settings.className || 'Lớp 9A4');
+    const schoolName = elSchool ? elSchool.value.trim() : (window.classData.data.settings.schoolName || 'TRƯỜNG THCS TÂY PHÚ');
+    const teacherName = elTeacher ? elTeacher.value.trim() : (window.classData.data.settings.teacherName || 'Thầy Võ Văn Hà');
+    const teacherPass = elPass ? elPass.value.trim() : (window.classData.data.settings.teacherPass || 'admin123');
+    const slogan = elSlogan ? elSlogan.value.trim() : (window.classData.data.settings.slogan || '');
+
     const updated = {
-      className: document.getElementById('setting-class-name').value.trim(),
-      schoolName: document.getElementById('setting-school-name').value.trim(),
-      teacherName: document.getElementById('setting-teacher-name').value.trim(),
-      teacherPass: document.getElementById('setting-teacher-pass').value.trim(),
-      slogan: document.getElementById('setting-slogan').value.trim()
+      className,
+      schoolName,
+      teacherName,
+      teacherPass,
+      slogan
     };
 
     // Thu thập toàn bộ chỉnh sửa trên danh sách học sinh (nếu có ô nào đang nhập dở)
@@ -2107,7 +2119,10 @@ class AppController {
     this.populatePortalStudentSelect();
     this.refreshAll();
     this.closeAllModals();
-    window.chibiNotifications.showToast('Đã lưu! 🌟', 'Cài đặt lớp học đã được cập nhật và lưu vĩnh viễn lên đám mây!', 'success');
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Đã lưu! 🌟', 'Cài đặt lớp học đã được cập nhật và lưu vĩnh viễn lên đám mây!', 'success');
+    }
+    if (window.chibiSound) window.chibiSound.playPlus();
   }
 
   resetAllData() {

@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
   // --- GET: RETRIEVE LATEST DATA FROM SERVER ---
   if (req.method === 'GET') {
     try {
-      // 1. Try Firebase First (High Speed <200ms & Live Realtime Master)
+      // 1. Try Firebase First (High Speed & Live Realtime Master)
       try {
         const fbRes = await fetch(FIREBASE_URL + '?t=' + Date.now(), { cache: 'no-cache' });
         if (fbRes.ok) {
@@ -51,25 +51,7 @@ module.exports = async (req, res) => {
           }
         }
       } catch(fbErr) {
-        console.warn('Firebase GET warning, trying GAS fallback:', fbErr);
-      }
-
-      // 2. Try Google Apps Script Master Database (Teacher's Sheet Backup)
-      try {
-        const gasRes = await fetch(GOOGLE_APPS_SCRIPT_URL + '?action=get&t=' + Date.now(), { cache: 'no-cache' });
-        if (gasRes.ok) {
-          const gasJson = await gasRes.json();
-          if (gasJson && gasJson.status === 'success' && gasJson.data && (gasJson.data.students || gasJson.data.settings)) {
-            return res.status(200).json({
-              success: true,
-              data: gasJson.data,
-              timestamp: (gasJson.data.settings && gasJson.data.settings.updatedAt) || Date.now(),
-              source: 'google_sheets_master'
-            });
-          }
-        }
-      } catch(gasErr) {
-        console.warn('Google Apps Script GET error, trying fallback:', gasErr);
+        console.warn('Firebase GET warning:', fbErr);
       }
 
       // 3. Fallback to setget.net

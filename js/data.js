@@ -654,7 +654,7 @@ class ClassDataManager {
     // PRIMARY CLOUD SOURCE: Google Firebase Realtime Database (Tốc độ cao & Lưu trữ vĩnh viễn trên Google Cloud)
     try {
       const fbController = new AbortController();
-      const fbTimeout = setTimeout(() => fbController.abort(), 6000);
+      const fbTimeout = setTimeout(() => fbController.abort(), 7000);
       const fbRes = await fetch(fbDirectUrl + '?t=' + Date.now(), {
         signal: fbController.signal,
         cache: 'no-cache'
@@ -672,16 +672,13 @@ class ClassDataManager {
           const localEventsLen = (this.data.events || []).length;
 
           // Quyết định đồng bộ an toàn:
-          // 1. Người dùng bấm ép buộc đồng bộ (force)
-          // 2. Thiết bị mới vào app (isFreshDevice hoặc chưa có cờ đồng bộ)
-          // 3. Đám mây có nhiều hoặc bằng số sự kiện so với máy này
-          // 4. Thời gian cập nhật trên đám mây mới hơn hoặc bằng máy này
+          // Thiết bị luôn cập nhật dữ liệu từ đám mây trừ khi máy này là GVCN vừa chủ động lưu cấu hình cài đặt cục bộ
           const shouldPull = force ||
             this.isFreshDevice ||
             !this.hasSuccessfullySyncedWithCloud ||
-            (localEventsLen === 0 && serverEventsLen > 0) ||
-            (serverEventsLen >= localEventsLen) ||
-            (serverUpdated >= localUpdated);
+            !this.hasUserModification ||
+            (serverUpdated >= localUpdated) ||
+            (serverEventsLen >= localEventsLen);
 
           if (shouldPull) {
             this.data = this.mergeWithDefaults(fbData);
@@ -714,8 +711,8 @@ class ClassDataManager {
             this.syncInProgress = false;
             return { success: true, updated: true, data: this.data, source: 'firebase_realtime' };
           } else if (localUpdated > serverUpdated && this.hasUserModification) {
-            // Máy này có chỉnh sửa mới hơn đám mây: lập tức đẩy lên Firebase an toàn!
-            await this.pushToCloud(true);
+            // Máy này có chỉnh sửa cấu hình mới hơn đám mây: đẩy lên Firebase
+            await this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
             this.lastSyncTime = Date.now();
             this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
             return { success: true, updated: false, pushed: true, data: this.data, source: 'firebase_realtime' };
@@ -730,75 +727,9 @@ class ClassDataManager {
       console.warn('Firebase sync notice:', fbErr);
     }
 
-    // FALLBACK 1: Vercel Serverless Function API (/api/sync)
-    try {
-      const syncUrl = this.getSyncApiUrl();
-      if (syncUrl) {
-        const vController = new AbortController();
-        const vTimeout = setTimeout(() => vController.abort(), 6000);
-        const vRes = await fetch(syncUrl + '?t=' + Date.now(), {
-          signal: vController.signal,
-          cache: 'no-cache'
-        });
-        clearTimeout(vTimeout);
-        if (vRes.ok) {
-          const vJson = await vRes.json();
-          if (vJson && vJson.success && vJson.data && (vJson.data.students || vJson.data.settings)) {
-            this.data = this.mergeWithDefaults(vJson.data);
-            this.hasSuccessfullySyncedWithCloud = true;
-            this.isFreshDevice = false;
-            this.hasUserModification = false;
-            this.saveToStorageLocal();
-            this.lastSyncTime = Date.now();
-            this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
-            if (window.appController) {
-              window.appController.populatePortalStudentSelect();
-              window.appController.populatePortalTeacherSelect();
-              if (window.authManager && window.authManager.isLoggedIn()) {
-                window.appController.refreshAll();
-              }
-            }
-            return { success: true, updated: true, data: this.data, source: 'vercel_api' };
-          }
-        }
-      }
-    } catch(vErr) {
-      console.warn('Vercel API fallback notice:', vErr);
-    }
-
-    // FALLBACK 2: Google Apps Script Master Database (Teacher's Sheet Backup)
-    try {
-      const gasController = new AbortController();
-      const gasTimeout = setTimeout(() => gasController.abort(), 6000);
-      const gasRes = await fetch(GOOGLE_APPS_SCRIPT_URL + '?action=get&t=' + Date.now(), {
-        signal: gasController.signal,
-        cache: 'no-cache'
-      });
-      clearTimeout(gasTimeout);
-      if (gasRes.ok) {
-        const gasJson = await gasRes.json();
-        if (gasJson && gasJson.status === 'success' && gasJson.data && (gasJson.data.students || gasJson.data.settings)) {
-          this.data = this.mergeWithDefaults(gasJson.data);
-          this.hasSuccessfullySyncedWithCloud = true;
-          this.isFreshDevice = false;
-          this.hasUserModification = false;
-          this.saveToStorageLocal();
-          this.lastSyncTime = Date.now();
-          this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
-          if (window.appController) {
-            window.appController.populatePortalStudentSelect();
-            window.appController.populatePortalTeacherSelect();
-            window.appController.refreshAll();
-          }
-          return { success: true, updated: true, data: this.data, source: 'google_sheets_init' };
-        }
-      }
-    } catch(gasErr) {
-      console.warn('Backup sync notice:', gasErr);
-    }
-
+    // Không nạp dữ liệu cũ từ Vercel/Sheets để tránh bị đè ngược dữ liệu ban đầu
     this.lastSyncTime = Date.now();
-    this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
+    this.updateCloudStatusUI(this.hasSuccessfullySyncedWithCloud, this.hasSuccessfullySyncedWithCloud ? 'Đã Đồng Bộ ⚡' : 'Ngoại Tuyến');
     return { success: true, updated: false, data: this.data };
   }
 
@@ -813,7 +744,6 @@ class ClassDataManager {
 
       // CLIENT SAFEGUARD:
       // Chặn tuyệt đối thiết bị chưa từng đồng bộ thành công hoặc máy mới tinh cố ghi đè đám mây
-      const localEventsLen = (this.data && Array.isArray(this.data.events)) ? this.data.events.length : 0;
       if ((!this.hasSuccessfullySyncedWithCloud || this.isFreshDevice) && (!extraMeta || !extraMeta.allowEmptyReset)) {
         console.warn('[SAFEGUARD BLOCKED] Prevented un-hydrated device from pushing to cloud. Attempting sync first...');
         try {
@@ -829,37 +759,57 @@ class ClassDataManager {
 
       const fbDirectUrl = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4.json';
       const currentUserId = (window.authManager && window.authManager.currentUser && window.authManager.currentUser.id) || 'admin';
+      const isSettingsChange = Boolean(extraMeta && (extraMeta.actionType === 'SETTINGS_UPDATE' || extraMeta.recentAction === 'CONFIG_SYNC' || extraMeta.allowSettingsOverwrite === true));
 
-      // FETCH-AND-MERGE BEFORE PUSH: Ensure no events are deleted or overwritten by mistake
+      // FETCH-AND-MERGE BEFORE PUSH: Bảo vệ tuyệt đối settings/students khỏi bị ghi đè bởi thiết bị khác khi chấm điểm
       if (!extraMeta || !extraMeta.allowEmptyReset) {
         try {
           const checkRes = await fetch(fbDirectUrl + '?t=' + Date.now(), { cache: 'no-cache' });
           if (checkRes.ok) {
             const remote = await checkRes.json();
-            if (remote && Array.isArray(remote.events)) {
-              const remoteEventMap = new Map();
-              const deletedSet = new Set([
-                ...(this.data.deletedEventIds || []),
-                ...(remote.deletedEventIds || [])
-              ]);
-              if (extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
-                deletedSet.add(extraMeta.recentData.eventId);
-              }
-              this.data.deletedEventIds = Array.from(deletedSet);
-
-              remote.events.forEach(e => {
-                if (e && e.id && !deletedSet.has(e.id)) {
-                  remoteEventMap.set(e.id, e);
+            if (remote) {
+              // 1. Hợp nhất sự kiện (Events)
+              if (Array.isArray(remote.events)) {
+                const remoteEventMap = new Map();
+                const deletedSet = new Set([
+                  ...(this.data.deletedEventIds || []),
+                  ...(remote.deletedEventIds || [])
+                ]);
+                if (extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
+                  deletedSet.add(extraMeta.recentData.eventId);
                 }
-              });
-              if (Array.isArray(this.data.events)) {
-                this.data.events.forEach(e => {
+                this.data.deletedEventIds = Array.from(deletedSet);
+
+                remote.events.forEach(e => {
                   if (e && e.id && !deletedSet.has(e.id)) {
                     remoteEventMap.set(e.id, e);
                   }
                 });
+                if (Array.isArray(this.data.events)) {
+                  this.data.events.forEach(e => {
+                    if (e && e.id && !deletedSet.has(e.id)) {
+                      remoteEventMap.set(e.id, e);
+                    }
+                  });
+                }
+                this.data.events = Array.from(remoteEventMap.values());
               }
-              this.data.events = Array.from(remoteEventMap.values());
+
+              // 2. BẢO VỆ CÀI ĐẶT LỚP HỌC (Settings, Students, Criteria, Teachers):
+              // Nếu hành động này KHÔNG PHẢI là GVCN chủ động lưu trong Cài Đặt (ví dụ: học sinh/giáo viên khác chấm điểm hoặc vào app):
+              // TUYỆT ĐỐI giữ nguyên thông tin cài đặt mới nhất từ Firebase, KHÔNG được ghi đè bằng cài đặt cũ của máy này!
+              const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
+              const localUpdated = (this.data.settings && this.data.settings.updatedAt) || 0;
+
+              if (!isSettingsChange) {
+                if (remoteUpdated >= localUpdated) {
+                  if (remote.settings) this.data.settings = { ...this.data.settings, ...remote.settings };
+                  if (remote.students) this.data.students = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
+                  if (remote.criteria) this.data.criteria = Array.isArray(remote.criteria) ? remote.criteria : Object.values(remote.criteria);
+                  if (remote.teachers) this.data.teachers = Array.isArray(remote.teachers) ? remote.teachers : Object.values(remote.teachers);
+                  this.saveToStorageLocal();
+                }
+              }
             }
           }
         } catch(checkErr) {
@@ -867,8 +817,10 @@ class ClassDataManager {
         }
       }
 
-      if (!this.data.settings) this.data.settings = {};
-      this.data.settings.updatedAt = Date.now();
+      if (isSettingsChange) {
+        if (!this.data.settings) this.data.settings = {};
+        this.data.settings.updatedAt = Date.now();
+      }
 
       const payload = {
         ...this.data,
@@ -891,31 +843,12 @@ class ClassDataManager {
         });
         if (fbRes.ok) {
           this.lastSyncTime = Date.now();
+          this.hasUserModification = false;
           this.updateCloudStatusUI(true, 'Đã Lưu ⚡');
         }
       } catch (fbErr) {
         console.warn('Firebase direct push warning:', fbErr);
       }
-
-      // 3. Đẩy dự phòng Google Sheets Master
-      try {
-        fetch(GOOGLE_APPS_SCRIPT_URL + '?action=save', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        }).catch(() => {});
-      } catch(e) {}
-
-      // 4. Đẩy dự phòng Vercel API
-      try {
-        const syncUrl = this.getSyncApiUrl();
-        if (syncUrl) {
-          fetch(syncUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).catch(() => {});
-        }
-      } catch(e) {}
     };
 
     if (immediate) {
@@ -1371,13 +1304,16 @@ class ClassDataManager {
     return defaultData;
   }
 
-  saveToStorage(dataToSave = null, isUserAction = true) {
+  saveToStorage(dataToSave = null, isUserAction = true, isSettingsEdit = false) {
     const d = dataToSave || this.data;
     try {
-      if (isUserAction) {
+      if (isSettingsEdit) {
         this.hasUserModification = true;
         this.isFreshDevice = false;
         if (d && d.settings) d.settings.updatedAt = Date.now();
+      } else if (isUserAction) {
+        this.hasUserModification = true;
+        this.isFreshDevice = false;
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
 
@@ -1394,7 +1330,7 @@ class ClassDataManager {
 
       // Automatically push to cloud master database whenever user makes modifications
       if (this.hasUserModification) {
-        this.pushToCloud(false);
+        this.pushToCloud(false, isSettingsEdit ? { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true } : {});
       }
     } catch (e) {
       console.error('Error saving data to localStorage:', e);
@@ -1407,7 +1343,7 @@ class ClassDataManager {
     this.hasUserModification = true;
     this.isFreshDevice = false;
     this.saveToStorageLocal();
-    this.pushToCloud(true, { allowEmptyReset: true });
+    this.pushToCloud(true, { allowEmptyReset: true, actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     this.broadcastEvent('CONFIG_SYNC', this.data);
     return this.data;
   }
@@ -1421,8 +1357,8 @@ class ClassDataManager {
           this.data = this.mergeWithDefaults(parsed.data);
           this.hasUserModification = true;
           this.isFreshDevice = false;
-          this.saveToStorage();
-          this.pushToCloud(true);
+          this.saveToStorage(this.data, true, true);
+          this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
           if (window.appController) {
             window.appController.refreshAll();
           }
@@ -1441,20 +1377,32 @@ class ClassDataManager {
   }
 
   updateSettings(newSettings) {
-    this.data.settings = { ...this.data.settings, ...newSettings };
-    if (newSettings.teacherPass && this.data.teachers && this.data.teachers.length > 0) {
-      this.data.teachers.forEach(t => {
-        if (t.isPrimary || t.id === 'gv01' || t.username === 'admin') {
-          t.pass = newSettings.teacherPass.trim();
-          t.hasChangedPass = true;
-        }
-      });
+    return this.updateAllSettings(newSettings, null, null);
+  }
+
+  updateAllSettings(newSettings, newStudents = null, newCriteria = null) {
+    if (newSettings) {
+      this.data.settings = { ...this.data.settings, ...newSettings };
+      if (newSettings.teacherPass && this.data.teachers && this.data.teachers.length > 0) {
+        this.data.teachers.forEach(t => {
+          if (t.isPrimary || t.id === 'gv01' || t.username === 'admin') {
+            t.pass = newSettings.teacherPass.trim();
+            t.hasChangedPass = true;
+          }
+        });
+      }
+    }
+    if (newStudents && Array.isArray(newStudents) && newStudents.length > 0) {
+      this.data.students = newStudents;
+    }
+    if (newCriteria && Array.isArray(newCriteria) && newCriteria.length > 0) {
+      this.data.criteria = newCriteria;
     }
     this.data.settings.updatedAt = Date.now();
     this.hasUserModification = true;
     this.isFreshDevice = false;
-    this.saveToStorage(this.data, true);
-    this.pushToCloud(true); // Đẩy ngay tức thì lên Google Firebase Realtime Database
+    this.saveToStorage(this.data, true, true);
+    this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     this.broadcastEvent('CONFIG_SYNC', this.data);
     return this.data;
   }
@@ -1939,7 +1887,7 @@ class ClassDataManager {
       if (!Array.isArray(notif.readBy)) notif.readBy = [];
       if (!notif.readBy.includes(userId)) {
         notif.readBy.push(userId);
-        this.saveToStorage();
+        this.saveToStorageLocal();
       }
     }
   }

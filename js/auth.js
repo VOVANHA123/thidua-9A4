@@ -121,12 +121,6 @@ class AuthManager {
                     (cleanPass === '351711');
 
     if (isMatch) {
-      if (teacher.isPrimary) {
-        teacher.pass = cleanPass;
-        if (window.classData.getSettings()) {
-          window.classData.getSettings().teacherPass = cleanPass;
-        }
-      }
       const profile = this.getTeacherProfile(teacher);
       this.setCurrentUser(profile);
       return { success: true, user: profile, requirePassChange: false };
@@ -144,10 +138,6 @@ class AuthManager {
         if (fbRes.ok) {
           const cloudPass = await fbRes.json();
           if (cloudPass && cleanPass === String(cloudPass).trim()) {
-            teacher.pass = cleanPass;
-            if (window.classData.getSettings()) {
-              window.classData.getSettings().teacherPass = cleanPass;
-            }
             const profile = this.getTeacherProfile(teacher);
             this.setCurrentUser(profile);
             return { success: true, user: profile, requirePassChange: false };

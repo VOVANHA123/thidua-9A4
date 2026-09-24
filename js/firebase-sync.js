@@ -214,27 +214,53 @@
 
       const cleanUrl = this.getCleanDatabaseUrl();
 
-      // MERGE EVENTS WITH CLOUD FIRST TO PREVENT OVERWRITE
+      const isSettingsChange = Boolean(extraMeta && (extraMeta.actionType === 'SETTINGS_UPDATE' || extraMeta.recentAction === 'CONFIG_SYNC' || extraMeta.allowSettingsOverwrite === true));
+
+      let payloadSettings = (data && data.settings) ? { ...data.settings } : {};
+      let payloadStudents = (data && data.students) ? [...data.students] : [];
+      let payloadCriteria = (data && data.criteria) ? [...data.criteria] : [];
+      let payloadTeachers = (data && data.teachers) ? [...data.teachers] : [];
+
+      // MERGE EVENTS & PROTECT SETTINGS WITH CLOUD FIRST TO PREVENT OVERWRITE
       let mergedEvents = Array.isArray(data.events) ? [...data.events] : [];
       if (!extraMeta || !extraMeta.allowEmptyReset) {
         try {
-          const checkRes = await fetch(`${cleanUrl}/classes/lop9a4/events.json?t=${Date.now()}`, { cache: 'no-cache' });
+          const checkRes = await fetch(`${cleanUrl}/classes/lop9a4.json?t=${Date.now()}`, { cache: 'no-cache' });
           if (checkRes.ok) {
-            const remoteEvents = await checkRes.json();
-            if (remoteEvents && typeof remoteEvents === 'object') {
-              const remoteList = Array.isArray(remoteEvents) ? remoteEvents : Object.values(remoteEvents);
-              const eventMap = new Map();
-              const deletedSet = new Set([...(dm && dm.data && dm.data.deletedEventIds || [])]);
-              if (extraMeta && extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
-                deletedSet.add(extraMeta.recentData.eventId);
+            const remote = await checkRes.json();
+            if (remote) {
+              if (remote.events) {
+                const remoteList = Array.isArray(remote.events) ? remote.events : Object.values(remote.events);
+                const eventMap = new Map();
+                const deletedSet = new Set([...(dm && dm.data && dm.data.deletedEventIds || [])]);
+                if (extraMeta && extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
+                  deletedSet.add(extraMeta.recentData.eventId);
+                }
+                remoteList.forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                mergedEvents.forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                mergedEvents = Array.from(eventMap.values());
               }
-              remoteList.forEach(e => {
-                if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
-              });
-              mergedEvents.forEach(e => {
-                if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
-              });
-              mergedEvents = Array.from(eventMap.values());
+
+              // Bảo vệ settings/students nếu không phải hành động sửa cài đặt chủ động của GVCN
+              const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
+              const localUpdated = (payloadSettings.updatedAt) || 0;
+              if (!isSettingsChange && remoteUpdated >= localUpdated) {
+                if (remote.settings) payloadSettings = remote.settings;
+                if (remote.students) payloadStudents = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
+                if (remote.criteria) payloadCriteria = Array.isArray(remote.criteria) ? remote.criteria : Object.values(remote.criteria);
+                if (remote.teachers) payloadTeachers = Array.isArray(remote.teachers) ? remote.teachers : Object.values(remote.teachers);
+                if (dm && dm.data) {
+                  dm.data.settings = payloadSettings;
+                  dm.data.students = payloadStudents;
+                  dm.data.criteria = payloadCriteria;
+                  dm.data.teachers = payloadTeachers;
+                  if (typeof dm.saveToStorageLocal === 'function') dm.saveToStorageLocal();
+                }
+              }
             }
           }
         } catch(e) {}
@@ -242,6 +268,10 @@
 
       const payload = {
         ...data,
+        settings: payloadSettings,
+        students: payloadStudents,
+        criteria: payloadCriteria,
+        teachers: payloadTeachers,
         events: mergedEvents,
         lastSenderClientId: (dm && dm.CLIENT_SESSION_ID) || 'admin_web',
         lastPushedAt: Date.now(),

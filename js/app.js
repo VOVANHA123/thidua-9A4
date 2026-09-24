@@ -80,9 +80,9 @@ class AppController {
 
     try {
       if (window.classData && typeof navigator !== 'undefined' && navigator.onLine) {
-        // High-speed cloud sync on startup (max 3.5s timeout)
+        // Đồng bộ dữ liệu mới nhất từ Firebase khi khởi động (thời gian chờ tối đa 6s)
         const syncPromise = window.classData.syncFromCloud(true);
-        const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3500));
+        const timeoutPromise = new Promise(resolve => setTimeout(resolve, 6000));
         await Promise.race([syncPromise, timeoutPromise]);
       }
     } catch(e) {
@@ -1714,6 +1714,7 @@ class AppController {
 
     students.forEach((s, idx) => {
       const row = document.createElement('div');
+      row.setAttribute('data-student-id', s.id);
       row.style.cssText = `
         display: grid;
         grid-template-columns: 28px 140px 75px 105px 120px 80px 32px;
@@ -1727,14 +1728,14 @@ class AppController {
       `;
       row.innerHTML = `
         <span style="font-weight: 700; font-size: 0.8rem; text-align: center;">${idx + 1}</span>
-        <input type="text" class="form-control" value="${s.name}" onchange="window.appController.updateStudentField('${s.id}', 'name', this.value)" style="padding: 4px 6px; font-size: 0.82rem;" />
-        <select class="form-control" onchange="window.appController.updateStudentField('${s.id}', 'group', parseInt(this.value, 10))" style="padding: 4px 4px; font-size: 0.78rem;">
+        <input type="text" class="form-control st-input-name" value="${s.name}" onchange="window.appController.updateStudentField('${s.id}', 'name', this.value)" style="padding: 4px 6px; font-size: 0.82rem;" />
+        <select class="form-control st-select-group" onchange="window.appController.updateStudentField('${s.id}', 'group', parseInt(this.value, 10))" style="padding: 4px 4px; font-size: 0.78rem;">
           <option value="1" ${s.group === 1 ? 'selected' : ''}>Tổ 1</option>
           <option value="2" ${s.group === 2 ? 'selected' : ''}>Tổ 2</option>
           <option value="3" ${s.group === 3 ? 'selected' : ''}>Tổ 3</option>
           <option value="4" ${s.group === 4 ? 'selected' : ''}>Tổ 4</option>
         </select>
-        <select class="form-control" onchange="window.appController.updateStudentRole('${s.id}', this.value)" style="padding: 4px 4px; font-size: 0.78rem;">
+        <select class="form-control st-select-role" onchange="window.appController.updateStudentRole('${s.id}', this.value)" style="padding: 4px 4px; font-size: 0.78rem;">
           <option value="member" ${s.role === 'member' ? 'selected' : ''}>Thành viên</option>
           <option value="leader" ${s.role === 'leader' ? 'selected' : ''}>Tổ trưởng</option>
           <option value="vice" ${s.role === 'vice' ? 'selected' : ''}>Lớp phó</option>
@@ -1752,7 +1753,7 @@ class AppController {
             </select>
           ` : ''}
         </div>
-        <input type="text" class="form-control" value="${s.pass || '123456'}" onchange="window.appController.updateStudentField('${s.id}', 'pass', this.value)" style="padding: 4px 4px; font-size: 0.78rem;" title="Mật khẩu học sinh" />
+        <input type="text" class="form-control st-input-pass" value="${s.pass || '123456'}" onchange="window.appController.updateStudentField('${s.id}', 'pass', this.value)" style="padding: 4px 4px; font-size: 0.78rem;" title="Mật khẩu học sinh" />
         <button type="button" class="btn-icon-sm" style="background:#ef4444; width: 28px; height: 28px; font-size: 0.75rem;" onclick="window.appController.deleteStudent('${s.id}')" title="Xóa học sinh">🗑️</button>
       `;
       container.appendChild(row);
@@ -2073,12 +2074,40 @@ class AppController {
       slogan: document.getElementById('setting-slogan').value.trim()
     };
 
-    window.classData.updateSettings(updated);
-    window.classData.pushToCloud(true);
+    // Thu thập toàn bộ chỉnh sửa trên danh sách học sinh (nếu có ô nào đang nhập dở)
+    const studentContainer = document.getElementById('settings-students-list');
+    let updatedStudents = null;
+    if (studentContainer) {
+      const rows = studentContainer.querySelectorAll('[data-student-id]');
+      if (rows && rows.length > 0) {
+        updatedStudents = JSON.parse(JSON.stringify(window.classData.data.students || []));
+        rows.forEach(row => {
+          const sId = row.getAttribute('data-student-id');
+          const student = updatedStudents.find(s => s.id === sId);
+          if (student) {
+            const elName = row.querySelector('.st-input-name');
+            const elGroup = row.querySelector('.st-select-group');
+            const elRole = row.querySelector('.st-select-role');
+            const elPass = row.querySelector('.st-input-pass');
+            if (elName && elName.value.trim()) student.name = elName.value.trim();
+            if (elGroup) student.group = parseInt(elGroup.value, 10) || student.group;
+            if (elRole) {
+              student.role = elRole.value;
+              const roleNames = { monitor: 'Lớp trưởng', vice: 'Lớp phó', leader: 'Tổ trưởng', member: 'Thành viên' };
+              student.roleName = roleNames[student.role] || 'Thành viên';
+            }
+            if (elPass && elPass.value.trim()) student.pass = elPass.value.trim();
+          }
+        });
+      }
+    }
+
+    window.classData.updateAllSettings(updated, updatedStudents, null);
     this.populatePortalTeacherSelect();
+    this.populatePortalStudentSelect();
     this.refreshAll();
     this.closeAllModals();
-    window.chibiNotifications.showToast('Đã lưu! 🌟', 'Cài đặt lớp học đã được cập nhật thành công!', 'success');
+    window.chibiNotifications.showToast('Đã lưu! 🌟', 'Cài đặt lớp học đã được cập nhật và lưu vĩnh viễn lên đám mây!', 'success');
   }
 
   resetAllData() {

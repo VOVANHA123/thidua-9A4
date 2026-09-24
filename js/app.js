@@ -1173,13 +1173,31 @@ class AppController {
 
     // Render Criteria select options
     const selectCriteria = document.getElementById('score-modal-criteria');
+    const labelCrit = document.getElementById('label-score-modal-criteria');
     if (selectCriteria) {
-      selectCriteria.innerHTML = '<option value="">-- Chọn tiêu chí chấm điểm --</option>';
       const criteriaList = window.classData.getCriteria();
-      criteriaList.forEach(c => {
-        const sign = c.type === 'plus' ? `+${c.points}` : `-${c.points}`;
-        selectCriteria.innerHTML += `<option value="${c.id}" data-type="${c.type}" data-points="${c.points}">[${sign}] ${c.icon} ${c.name} (${c.category || ''})</option>`;
-      });
+      if (labelCrit) {
+        labelCrit.textContent = `Tiêu chí chấm điểm (${criteriaList.length} Tiêu chí):`;
+      }
+      const plusList = criteriaList.filter(c => c.type === 'plus');
+      const minusList = criteriaList.filter(c => c.type === 'minus');
+
+      let optionsHtml = '<option value="">-- Chọn tiêu chí chấm điểm --</option>';
+      if (plusList.length > 0) {
+        optionsHtml += `<optgroup label="➕ ĐIỂM CỘNG (${plusList.length} tiêu chí)">`;
+        plusList.forEach(c => {
+          optionsHtml += `<option value="${c.id}" data-type="plus" data-points="${c.points}">[+${c.points}] ${c.icon || '🌸'} ${c.name} (${c.category || 'Học tập'})</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      }
+      if (minusList.length > 0) {
+        optionsHtml += `<optgroup label="➖ ĐIỂM TRỪ (${minusList.length} tiêu chí)">`;
+        minusList.forEach(c => {
+          optionsHtml += `<option value="${c.id}" data-type="minus" data-points="${c.points}">[-${c.points}] ${c.icon || '⚠️'} ${c.name} (${c.category || 'Kỷ luật'})</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      }
+      selectCriteria.innerHTML = optionsHtml;
 
       selectCriteria.onchange = (e) => {
         const opt = selectCriteria.selectedOptions[0];
@@ -1897,6 +1915,7 @@ class AppController {
 
     criteriaList.forEach(c => {
       const row = document.createElement('div');
+      row.setAttribute('data-criteria-id', c.id);
       row.style.cssText = `
         display: grid;
         grid-template-columns: 36px 1fr 105px 105px 75px 32px;
@@ -1909,9 +1928,9 @@ class AppController {
         border-radius: 6px;
       `;
       row.innerHTML = `
-        <input type="text" class="form-control" value="${c.icon || (c.type === 'plus' ? '🌸' : '⚠️')}" onchange="window.appController.updateCriteriaField('${c.id}', 'icon', this.value)" style="padding: 4px 2px; font-size: 0.95rem; text-align: center;" title="Biểu tượng" />
-        <input type="text" class="form-control" value="${c.name}" onchange="window.appController.updateCriteriaField('${c.id}', 'name', this.value)" style="padding: 4px 6px; font-size: 0.82rem; font-weight: 700; color: ${c.type === 'plus' ? '#15803d' : '#b91c1c'};" />
-        <select class="form-control" onchange="window.appController.updateCriteriaField('${c.id}', 'category', this.value)" style="padding: 4px 4px; font-size: 0.76rem;">
+        <input type="text" class="form-control crit-input-icon" value="${c.icon || (c.type === 'plus' ? '🌸' : '⚠️')}" onchange="window.appController.updateCriteriaField('${c.id}', 'icon', this.value)" style="padding: 4px 2px; font-size: 0.95rem; text-align: center;" title="Biểu tượng" />
+        <input type="text" class="form-control crit-input-name" value="${c.name}" onchange="window.appController.updateCriteriaField('${c.id}', 'name', this.value)" style="padding: 4px 6px; font-size: 0.82rem; font-weight: 700; color: ${c.type === 'plus' ? '#15803d' : '#b91c1c'};" />
+        <select class="form-control crit-select-category" onchange="window.appController.updateCriteriaField('${c.id}', 'category', this.value)" style="padding: 4px 4px; font-size: 0.76rem;">
           <option value="Học tập" ${c.category === 'Học tập' ? 'selected' : ''}>Học tập</option>
           <option value="Kỷ luật" ${c.category === 'Kỷ luật' ? 'selected' : ''}>Kỷ luật</option>
           <option value="Chuyên cần" ${c.category === 'Chuyên cần' ? 'selected' : ''}>Chuyên cần</option>
@@ -1921,11 +1940,11 @@ class AppController {
           <option value="Phong trào" ${c.category === 'Phong trào' ? 'selected' : ''}>Phong trào</option>
           <option value="Khen thưởng" ${c.category === 'Khen thưởng' ? 'selected' : ''}>Khen thưởng</option>
         </select>
-        <select class="form-control" onchange="window.appController.updateCriteriaField('${c.id}', 'type', this.value)" style="padding: 4px 4px; font-size: 0.76rem; font-weight: 700; color: ${c.type === 'plus' ? '#15803d' : '#b91c1c'};">
+        <select class="form-control crit-select-type" onchange="window.appController.updateCriteriaField('${c.id}', 'type', this.value)" style="padding: 4px 4px; font-size: 0.76rem; font-weight: 700; color: ${c.type === 'plus' ? '#15803d' : '#b91c1c'};">
           <option value="plus" ${c.type === 'plus' ? 'selected' : ''}>🌸 Điểm Cộng (+)</option>
           <option value="minus" ${c.type === 'minus' ? 'selected' : ''}>⚠️ Điểm Trừ (-)</option>
         </select>
-        <input type="number" class="form-control" value="${c.points}" min="0.5" max="20" step="0.5" onchange="window.appController.updateCriteriaField('${c.id}', 'points', parseFloat(this.value))" style="padding: 4px 4px; font-size: 0.8rem; font-weight: 800; text-align: center;" title="Số điểm" />
+        <input type="number" class="form-control crit-input-points" value="${c.points}" min="0.5" max="20" step="0.5" onchange="window.appController.updateCriteriaField('${c.id}', 'points', parseFloat(this.value))" style="padding: 4px 4px; font-size: 0.8rem; font-weight: 800; text-align: center;" title="Số điểm" />
         <button type="button" class="btn-icon-sm" style="background: #ef4444; width: 28px; height: 28px; font-size: 0.75rem;" onclick="window.appController.deleteCriteria('${c.id}')" title="Xóa tiêu chí này">🗑️</button>
       `;
       container.appendChild(row);
@@ -1962,18 +1981,24 @@ class AppController {
     });
 
     this.renderSettingsCriteriaList();
+    this.renderSummaryBoxes();
     this.closeAllModals();
     this.openSettingsModal();
     this.switchSettingsSubTab('criteria');
 
     if (window.chibiSound) window.chibiSound.playPlus();
-    window.chibiNotifications.showToast('Thêm tiêu chí thành công! 🎯', `Đã thêm: [${newCrit.type === 'plus' ? '+' : '-'}${newCrit.points}] ${newCrit.name}`, 'success');
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Thêm tiêu chí thành công! 🎯', `Đã thêm: [${newCrit.type === 'plus' ? '+' : '-'}${newCrit.points}] ${newCrit.name}`, 'success');
+    }
   }
 
   updateCriteriaField(id, field, value) {
     window.classData.updateCriteria(id, { [field]: value });
     this.renderSettingsCriteriaList();
-    window.chibiNotifications.showToast('Đã lưu tiêu chí', 'Cập nhật tiêu chí thi đua thành công!', 'info');
+    this.renderSummaryBoxes();
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Đã lưu tiêu chí', 'Cập nhật tiêu chí thi đua thành công!', 'info');
+    }
   }
 
   deleteCriteria(id) {
@@ -1981,7 +2006,10 @@ class AppController {
       const res = window.classData.deleteCriteria(id);
       if (res.success) {
         this.renderSettingsCriteriaList();
-        window.chibiNotifications.showToast('Đã xóa', 'Tiêu chí thi đua đã được xóa khỏi hệ thống.', 'info');
+        this.renderSummaryBoxes();
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đã xóa', 'Tiêu chí thi đua đã được xóa khỏi hệ thống.', 'info');
+        }
       } else {
         alert(res.message);
       }
@@ -2114,9 +2142,37 @@ class AppController {
       }
     }
 
-    window.classData.updateAllSettings(updated, updatedStudents, null);
+    // Thu thập toàn bộ chỉnh sửa trên danh sách tiêu chí (nếu có ô nào đang nhập dở)
+    const criteriaContainer = document.getElementById('settings-criteria-list');
+    let updatedCriteria = null;
+    if (criteriaContainer) {
+      const critRows = criteriaContainer.querySelectorAll('[data-criteria-id]');
+      if (critRows && critRows.length > 0) {
+        updatedCriteria = JSON.parse(JSON.stringify(window.classData.data.criteria || []));
+        critRows.forEach(row => {
+          const cId = row.getAttribute('data-criteria-id');
+          const crit = updatedCriteria.find(c => c.id === cId);
+          if (crit) {
+            const elIcon = row.querySelector('.crit-input-icon');
+            const elName = row.querySelector('.crit-input-name');
+            const elCategory = row.querySelector('.crit-select-category');
+            const elType = row.querySelector('.crit-select-type');
+            const elPoints = row.querySelector('.crit-input-points');
+
+            if (elIcon && elIcon.value.trim()) crit.icon = elIcon.value.trim();
+            if (elName && elName.value.trim()) crit.name = elName.value.trim();
+            if (elCategory && elCategory.value) crit.category = elCategory.value;
+            if (elType && elType.value) crit.type = elType.value;
+            if (elPoints && !isNaN(parseFloat(elPoints.value))) crit.points = Math.max(0.1, parseFloat(elPoints.value));
+          }
+        });
+      }
+    }
+
+    window.classData.updateAllSettings(updated, updatedStudents, updatedCriteria);
     this.populatePortalTeacherSelect();
     this.populatePortalStudentSelect();
+    this.renderSummaryBoxes();
     this.refreshAll();
     this.closeAllModals();
     if (window.chibiNotifications) {

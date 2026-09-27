@@ -12,6 +12,15 @@ class AppController {
     this.activeScoringDay = 'T2';
     this.bienBanWeek = 1;
     this.bienBanMode = 'auto';
+
+    // Criteria Statistics & Analytics State
+    this.statsPeriodType = 'week';
+    this.statsPeriodValue = 1;
+    this.statsScope = 'all';
+    this.statsTypeFilter = 'all';
+    this.activeDetailCriteriaId = null;
+    this.detailEventsCache = [];
+    this.currentStatsCache = null;
   }
 
   init() {
@@ -922,9 +931,436 @@ class AppController {
     }
   }
 
-  // --- RENDER STATS & CHARTS ---
+  // --- RENDER STATS & CHARTS (THỐNG KÊ TIÊU CHÍ THI ĐUA) ---
+  setStatsPeriodType(type) {
+    this.statsPeriodType = type;
+    document.querySelectorAll('.stats-period-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.periodType === type);
+    });
+
+    // Default period values
+    if (type === 'week') {
+      this.statsPeriodValue = typeof this.currentWeek === 'number' ? this.currentWeek : (window.classData.data.settings.currentWeek || 1);
+    } else if (type === 'month') {
+      this.statsPeriodValue = window.classData.data.settings.currentMonth || 9;
+    } else if (type === 'semester') {
+      this.statsPeriodValue = (this.currentWeek === 'hk2' || (typeof this.currentWeek === 'number' && this.currentWeek >= 19)) ? 'hk2' : 'hk1';
+    } else if (type === 'year') {
+      this.statsPeriodValue = 'all-year';
+    }
+
+    this.renderStatsSubselectors();
+    this.renderStats();
+    if (window.chibiSound) window.chibiSound.playClick();
+  }
+
+  renderStatsSubselectors() {
+    const container = document.getElementById('stats-subselector-container');
+    if (!container) return;
+
+    if (this.statsPeriodType === 'week') {
+      let optionsHtml = '';
+      for (let w = 1; w <= 35; w++) {
+        const isCurrent = w === (window.classData.data.settings.currentWeek || 1);
+        const isSelected = w === parseInt(this.statsPeriodValue, 10);
+        const hk = w <= 18 ? 'HK1' : 'HK2';
+        optionsHtml += `<option value="${w}" ${isSelected ? 'selected' : ''}>Tuần ${w} (${hk}${isCurrent ? ' - Hiện tại' : ''})</option>`;
+      }
+      container.innerHTML = `
+        <select id="stats-select-week" class="select-custom" onchange="window.appController.onStatsPeriodChange()">
+          ${optionsHtml}
+        </select>
+      `;
+    } else if (this.statsPeriodType === 'month') {
+      const months = [
+        { val: 9, name: 'Tháng 9', weeks: 'Tuần 1 - 4' },
+        { val: 10, name: 'Tháng 10', weeks: 'Tuần 5 - 8' },
+        { val: 11, name: 'Tháng 11', weeks: 'Tuần 9 - 13' },
+        { val: 12, name: 'Tháng 12', weeks: 'Tuần 14 - 17' },
+        { val: 1, name: 'Tháng 1', weeks: 'Tuần 18 - 21' },
+        { val: 2, name: 'Tháng 2', weeks: 'Tuần 22 - 25' },
+        { val: 3, name: 'Tháng 3', weeks: 'Tuần 26 - 29' },
+        { val: 4, name: 'Tháng 4', weeks: 'Tuần 30 - 33' },
+        { val: 5, name: 'Tháng 5', weeks: 'Tuần 34 - 35' }
+      ];
+      let optionsHtml = '';
+      months.forEach(m => {
+        const isSelected = m.val === parseInt(this.statsPeriodValue, 10);
+        optionsHtml += `<option value="${m.val}" ${isSelected ? 'selected' : ''}>${m.name} (${m.weeks})</option>`;
+      });
+      container.innerHTML = `
+        <select id="stats-select-month" class="select-custom" onchange="window.appController.onStatsPeriodChange()">
+          ${optionsHtml}
+        </select>
+      `;
+    } else if (this.statsPeriodType === 'semester') {
+      const isHk2 = this.statsPeriodValue === 'hk2' || this.statsPeriodValue === 2;
+      container.innerHTML = `
+        <select id="stats-select-semester" class="select-custom" onchange="window.appController.onStatsPeriodChange()">
+          <option value="hk1" ${!isHk2 ? 'selected' : ''}>🌸 Học Kỳ I (Tuần 1 – Tuần 18)</option>
+          <option value="hk2" ${isHk2 ? 'selected' : ''}>🌻 Học Kỳ II (Tuần 19 – Tuần 35)</option>
+        </select>
+      `;
+    } else if (this.statsPeriodType === 'year') {
+      const settings = window.classData.getSettings();
+      container.innerHTML = `
+        <div style="background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; padding: 5px 14px; border-radius: 999px; font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+          <span>🌟</span> <span>Toàn Bộ Niên Khóa ${settings.academicYear} (35 Tuần)</span>
+        </div>
+      `;
+    }
+  }
+
+  onStatsPeriodChange() {
+    if (this.statsPeriodType === 'week') {
+      const sel = document.getElementById('stats-select-week');
+      if (sel) this.statsPeriodValue = parseInt(sel.value, 10);
+    } else if (this.statsPeriodType === 'month') {
+      const sel = document.getElementById('stats-select-month');
+      if (sel) this.statsPeriodValue = parseInt(sel.value, 10);
+    } else if (this.statsPeriodType === 'semester') {
+      const sel = document.getElementById('stats-select-semester');
+      if (sel) this.statsPeriodValue = sel.value;
+    }
+    this.renderStats();
+    if (window.chibiSound) window.chibiSound.playClick();
+  }
+
+  populateStatsScopeOptions() {
+    const optgroup = document.getElementById('stats-select-students-optgroup');
+    if (!optgroup || !window.classData) return;
+
+    optgroup.innerHTML = '';
+    const students = window.classData.data.students || [];
+    students.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = `student-${s.id}`;
+      opt.textContent = `${s.code} - ${s.name} (Tổ ${s.group})`;
+      optgroup.appendChild(opt);
+    });
+  }
+
+  onStatsScopeChange() {
+    const sel = document.getElementById('stats-select-scope');
+    if (sel) {
+      this.statsScope = sel.value;
+      this.renderStats();
+      if (window.chibiSound) window.chibiSound.playClick();
+    }
+  }
+
+  setStatsTypeFilter(type) {
+    this.statsTypeFilter = type;
+    document.querySelectorAll('.stats-type-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === type);
+    });
+    if (this.currentStatsCache) {
+      this.renderStatsCriteriaContent(this.currentStatsCache);
+    } else {
+      this.renderStats();
+    }
+    if (window.chibiSound) window.chibiSound.playClick();
+  }
+
   renderStats() {
-    const lb = window.classData.getLeaderboard(this.currentWeek);
+    this.renderStatsSubselectors();
+    this.populateStatsScopeOptions();
+
+    // Determine scope filter
+    let groupId = 'all';
+    let studentId = 'all';
+    if (this.statsScope && this.statsScope.startsWith('group-')) {
+      groupId = this.statsScope.replace('group-', '');
+    } else if (this.statsScope && this.statsScope.startsWith('student-')) {
+      studentId = this.statsScope.replace('student-', '');
+    }
+
+    const stats = window.classData.getCriteriaStatistics({
+      periodType: this.statsPeriodType,
+      periodValue: this.statsPeriodValue,
+      groupId: groupId,
+      studentId: studentId
+    });
+
+    this.currentStatsCache = stats;
+
+    this.renderStatsKpi(stats);
+    this.renderStatsBalance(stats);
+    this.renderStatsCriteriaContent(stats);
+    this.renderStatsGroupBars();
+  }
+
+  renderStatsKpi(stats) {
+    const container = document.getElementById('stats-kpi-container');
+    if (!container) return;
+
+    const topPlus = stats.summary.topPlusCriteria;
+    const topMinus = stats.summary.topMinusCriteria;
+
+    container.innerHTML = `
+      <!-- Card 1: Tổng Lượt Thực Hiện Tốt -->
+      <div class="stats-kpi-card stats-kpi-green">
+        <div class="stats-kpi-header">
+          <span>🌸 THỰC HIỆN TỐT</span>
+          <span class="stats-kpi-icon">🌟</span>
+        </div>
+        <div class="stats-kpi-val">${stats.summary.totalPlusCount} <span style="font-size: 1rem; font-weight: 700;">lượt</span></div>
+        <div class="stats-kpi-sub">
+          <span>+${stats.summary.totalPlusPoints} điểm thưởng</span>
+          <span>• ${stats.summary.ratioPlusPercent}% tổng lượt</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Tổng Lượt Vi Phạm -->
+      <div class="stats-kpi-card stats-kpi-red">
+        <div class="stats-kpi-header">
+          <span>⚠️ LỖI VI PHẠM</span>
+          <span class="stats-kpi-icon">⏱️</span>
+        </div>
+        <div class="stats-kpi-val">${stats.summary.totalMinusCount} <span style="font-size: 1rem; font-weight: 700;">lượt</span></div>
+        <div class="stats-kpi-sub">
+          <span>-${stats.summary.totalMinusPoints} điểm nhắc nhở</span>
+          <span>• ${stats.summary.ratioMinusPercent}% tổng lượt</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Tiêu Chí Tích Cực Nhất -->
+      <div class="stats-kpi-card stats-kpi-gold">
+        <div class="stats-kpi-header">
+          <span>🥇 VIỆC TỐT TIÊU BIỂU</span>
+          <span class="stats-kpi-icon">🏆</span>
+        </div>
+        ${topPlus ? `
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${topPlus.name}">
+            ${topPlus.icon} ${topPlus.name}
+          </div>
+          <div class="stats-kpi-val" style="font-size: 1.35rem; margin-top: 2px;">
+            ${topPlus.count} <span style="font-size: 0.88rem; font-weight: 700;">lượt (+${topPlus.totalPoints}đ)</span>
+          </div>
+          <div class="stats-kpi-sub">${topPlus.category}</div>
+        ` : `
+          <div style="font-style: italic; opacity: 0.75; font-size: 0.88rem; margin-top: 10px;">Chưa có lượt ghi nhận</div>
+        `}
+      </div>
+
+      <!-- Card 4: Lỗi Vi Phạm Nhiều Nhất -->
+      <div class="stats-kpi-card stats-kpi-purple">
+        <div class="stats-kpi-header">
+          <span>🚨 LỖI CẦN LƯU Ý NHẤT</span>
+          <span class="stats-kpi-icon">📢</span>
+        </div>
+        ${topMinus ? `
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${topMinus.name}">
+            ${topMinus.icon} ${topMinus.name}
+          </div>
+          <div class="stats-kpi-val" style="font-size: 1.35rem; margin-top: 2px;">
+            ${topMinus.count} <span style="font-size: 0.88rem; font-weight: 700;">lượt (-${topMinus.totalPoints}đ)</span>
+          </div>
+          <div class="stats-kpi-sub">${topMinus.category}</div>
+        ` : `
+          <div style="font-weight: 800; color: #15803d; font-size: 0.95rem; margin-top: 10px;">Tuyệt vời! Không có vi phạm ✨</div>
+        `}
+      </div>
+    `;
+  }
+
+  renderStatsBalance(stats) {
+    const container = document.getElementById('stats-balance-container');
+    if (!container) return;
+
+    const plusPct = stats.summary.ratioPlusPercent;
+    const minusPct = stats.summary.ratioMinusPercent;
+
+    container.innerHTML = `
+      <div class="stats-balance-header">
+        <span style="color: #065f46; display: flex; align-items: center; gap: 6px;">
+          <span>🌸</span> <b>Thực Hiện Tốt: ${stats.summary.totalPlusCount} lượt (${plusPct}%)</b>
+        </span>
+        <span style="color: #991b1b; display: flex; align-items: center; gap: 6px;">
+          <b>Vi Phạm: ${stats.summary.totalMinusCount} lượt (${minusPct}%)</b> <span>⚠️</span>
+        </span>
+      </div>
+      <div class="stats-balance-bar">
+        <div class="stats-balance-bar-plus" style="width: ${plusPct}%;" title="Thực hiện tốt: ${plusPct}%"></div>
+        <div class="stats-balance-bar-minus" style="width: ${minusPct}%;" title="Vi phạm: ${minusPct}%"></div>
+      </div>
+    `;
+  }
+
+  renderStatsCriteriaContent(stats = null) {
+    if (!stats) stats = this.currentStatsCache;
+    const container = document.getElementById('stats-criteria-content');
+    if (!container || !stats) return;
+
+    let html = '';
+
+    // SECTION 1: VI PHẠM (ĐIỂM TRỪ)
+    if (this.statsTypeFilter === 'all' || this.statsTypeFilter === 'minus') {
+      html += `
+        <div class="stats-section-box">
+          <div class="stats-section-title" style="color: #991b1b;">
+            <span>⚠️ THỐNG KÊ CHI TIẾT CÁC LỖI VI PHẠM (ĐIỂM TRỪ)</span>
+            <span style="font-size: 0.82rem; background: #fee2e2; color: #b91c1c; padding: 3px 10px; border-radius: 999px;">
+              ${stats.minusCriteriaList.length} Tiêu chí vi phạm • ${stats.summary.totalMinusCount} lượt
+            </span>
+          </div>
+          ${this.renderCriteriaTableHtml(stats.minusCriteriaList, 'minus', stats.summary.totalMinusCount)}
+        </div>
+      `;
+    }
+
+    // SECTION 2: THỰC HIỆN TỐT (ĐIỂM CỘNG)
+    if (this.statsTypeFilter === 'all' || this.statsTypeFilter === 'plus') {
+      html += `
+        <div class="stats-section-box">
+          <div class="stats-section-title" style="color: #065f46;">
+            <span>🌸 THỐNG KÊ CHI TIẾT CÁC HÀNH VI TÍCH CỰC & KHEN THƯỞNG (ĐIỂM CỘNG)</span>
+            <span style="font-size: 0.82rem; background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 999px;">
+              ${stats.plusCriteriaList.length} Tiêu chí khen thưởng • ${stats.summary.totalPlusCount} lượt
+            </span>
+          </div>
+          ${this.renderCriteriaTableHtml(stats.plusCriteriaList, 'plus', stats.summary.totalPlusCount)}
+        </div>
+      `;
+    }
+
+    // SECTION 3: THỐNG KÊ THEO LĨNH VỰC (CATEGORIES)
+    if (this.statsTypeFilter === 'all' && stats.categoryStats && stats.categoryStats.length > 0) {
+      html += `
+        <div class="stats-section-box">
+          <div class="stats-section-title" style="color: #1e3a8a;">
+            <span>📊 THỐNG KÊ PHÂN BỔ THEO LĨNH VỰC</span>
+            <span style="font-size: 0.82rem; color: #64748b;">${stats.categoryStats.length} Lĩnh vực đánh giá</span>
+          </div>
+          <div class="stats-category-grid">
+      `;
+
+      stats.categoryStats.forEach(cat => {
+        html += `
+          <div class="stats-cat-card">
+            <div class="stats-cat-title">
+              <span>🏷️ <b>${cat.category}</b></span>
+              <span style="background: #e2e8f0; padding: 1px 6px; border-radius: 4px; font-size: 0.72rem;">${cat.totalCount} lượt</span>
+            </div>
+            <div style="font-size: 0.78rem; display: flex; justify-content: space-between; margin-top: 4px;">
+              <span style="color: #15803d;">🌸 Tốt: <b>${cat.plusCount} lượt</b> (+${cat.plusPoints}đ)</span>
+              <span style="color: #b91c1c;">⚠️ Phạt: <b>${cat.minusCount} lượt</b> (-${cat.minusPoints}đ)</span>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  renderCriteriaTableHtml(criteriaList, type, totalTypeCount) {
+    if (!criteriaList || criteriaList.length === 0) {
+      return `<div class="stats-empty-notice">Chưa có tiêu chí nào trong nhóm này.</div>`;
+    }
+
+    const isMinus = type === 'minus';
+    let maxCount = 1;
+    criteriaList.forEach(item => {
+      if (item.count > maxCount) maxCount = item.count;
+    });
+
+    let html = `
+      <div class="stats-table-wrapper">
+        <table class="stats-criteria-table">
+          <thead>
+            <tr>
+              <th style="width: 35px; text-align: center;">STT</th>
+              <th>Tiêu Chí Đánh Giá</th>
+              <th style="width: 90px; text-align: center;">Lĩnh Vực</th>
+              <th style="width: 65px; text-align: center;">Mức Điểm</th>
+              <th style="width: 80px; text-align: center;">Số Lượt</th>
+              <th style="width: 90px; text-align: center;">Tổng Điểm</th>
+              <th style="width: 140px;">Tỷ Lệ / Biểu Đồ</th>
+              <th style="width: 160px; text-align: center;">Số Lượt 4 Tổ</th>
+              <th style="width: 80px; text-align: center;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    criteriaList.forEach((item, idx) => {
+      const c = item.criteria;
+      const progressPct = maxCount > 0 ? Math.round((item.count / maxCount) * 100) : 0;
+      const topStudent = item.topStudents && item.topStudents.length > 0 ? item.topStudents[0] : null;
+
+      html += `
+        <tr>
+          <td style="text-align: center; color: #94a3b8; font-weight: 700;">${idx + 1}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.25rem;">${c.icon}</span>
+              <div>
+                <b style="color: #1e293b; font-size: 0.88rem;">${c.name}</b>
+                ${topStudent && topStudent.count > 0 ? `
+                  <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">
+                    ${isMinus ? '⚠️ Gặp nhiều nhất:' : '🌸 Tích cực nhất:'} <b>${topStudent.student.name}</b> (${topStudent.count} lần)
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <span style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">
+              ${c.category}
+            </span>
+          </td>
+          <td style="text-align: center; font-weight: 800; color: ${isMinus ? '#b91c1c' : '#15803d'};">
+            ${isMinus ? '-' : '+'}${c.points}đ
+          </td>
+          <td style="text-align: center;">
+            <span class="stats-badge-count ${isMinus ? 'stats-badge-minus' : 'stats-badge-plus'}">
+              ${item.count}
+            </span>
+          </td>
+          <td style="text-align: center; font-weight: 900; color: ${isMinus ? '#b91c1c' : '#15803d'};">
+            ${isMinus ? '-' : '+'}${item.totalPoints}đ
+          </td>
+          <td>
+            <div class="stats-progress-container">
+              <div class="stats-progress-track">
+                <div class="${isMinus ? 'stats-progress-fill-minus' : 'stats-progress-fill-plus'}" style="width: ${progressPct}%;"></div>
+              </div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #64748b; min-width: 32px;">${item.percentage}%</span>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <span class="stats-group-mini-pill" title="Tổ 1: ${item.groupCounts[1]} lượt">T1: <b>${item.groupCounts[1]}</b></span>
+            <span class="stats-group-mini-pill" title="Tổ 2: ${item.groupCounts[2]} lượt">T2: <b>${item.groupCounts[2]}</b></span>
+            <span class="stats-group-mini-pill" title="Tổ 3: ${item.groupCounts[3]} lượt">T3: <b>${item.groupCounts[3]}</b></span>
+            <span class="stats-group-mini-pill" title="Tổ 4: ${item.groupCounts[4]} lượt">T4: <b>${item.groupCounts[4]}</b></span>
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-hero btn-white" style="padding: 3px 8px; font-size: 0.75rem;" onclick="window.appController.openCriteriaDetailModal('${c.id}')" title="Xem danh sách chi tiết các lượt ghi nhận">
+              🔍 Chi tiết
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    return html;
+  }
+
+  renderStatsGroupBars() {
+    const periodForLeaderboard = (this.statsPeriodType === 'week') ? this.statsPeriodValue : ((this.statsPeriodType === 'semester') ? this.statsPeriodValue : 'all-year');
+    const lb = window.classData.getLeaderboard(periodForLeaderboard);
     const statsContainer = document.getElementById('stats-bars-container');
     if (!statsContainer) return;
 
@@ -944,8 +1380,8 @@ class AppController {
       barRow.style.marginBottom = '16px';
       barRow.innerHTML = `
         <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.88rem; margin-bottom: 4px;">
-          <span>${g.name} (${g.fiveStarCount} bạn 5 sao)</span>
-          <span style="color: ${col};">${g.avgScore} điểm</span>
+          <span>${g.name} (${g.fiveStarCount} bạn 5 sao • Điểm cộng: +${g.totalPlus}đ • Điểm trừ: -${g.totalMinus}đ)</span>
+          <span style="color: ${col}; font-weight: 900;">${g.avgScore} điểm</span>
         </div>
         <div style="width: 100%; height: 16px; background: #e2e8f0; border-radius: 8px; overflow: hidden;">
           <div style="width: ${percentage}%; height: 100%; background: ${col}; border-radius: 8px; transition: width 0.6s ease;"></div>
@@ -953,6 +1389,469 @@ class AppController {
       `;
       statsContainer.appendChild(barRow);
     });
+  }
+
+  // --- CRITERIA DETAIL MODAL & SEARCH ---
+  openCriteriaDetailModal(criteriaId) {
+    const criteria = window.classData.getCriteriaById(criteriaId) || { id: criteriaId, name: 'Tiêu chí', icon: '📋', type: 'plus', points: 1, category: 'Khác' };
+    this.activeDetailCriteriaId = criteriaId;
+
+    let groupId = 'all';
+    let studentId = 'all';
+    if (this.statsScope && this.statsScope.startsWith('group-')) {
+      groupId = this.statsScope.replace('group-', '');
+    } else if (this.statsScope && this.statsScope.startsWith('student-')) {
+      studentId = this.statsScope.replace('student-', '');
+    }
+
+    const events = window.classData.getFilteredEvents({
+      periodType: this.statsPeriodType,
+      periodValue: this.statsPeriodValue,
+      groupId: groupId,
+      studentId: studentId,
+      criteriaId: criteriaId
+    });
+
+    events.sort((a, b) => new Date(b.timestamp || b.recordedAt || 0) - new Date(a.timestamp || a.recordedAt || 0));
+    this.detailEventsCache = events;
+
+    const modal = document.getElementById('modal-criteria-detail');
+    const titleEl = document.getElementById('criteria-detail-modal-title');
+    const badgeEl = document.getElementById('criteria-detail-summary-badge');
+    const searchInput = document.getElementById('criteria-detail-search-input');
+
+    if (searchInput) searchInput.value = '';
+
+    if (titleEl) {
+      titleEl.innerHTML = `<span>${criteria.icon}</span> <span>Chi Tiết Ghi Nhận: ${criteria.name} (${criteria.type === 'plus' ? 'Cộng' : 'Trừ'} ${criteria.points}đ)</span>`;
+    }
+
+    if (badgeEl) {
+      let periodLabel = `Tuần ${this.statsPeriodValue}`;
+      if (this.statsPeriodType === 'month') periodLabel = `Tháng ${this.statsPeriodValue}`;
+      if (this.statsPeriodType === 'semester') periodLabel = this.statsPeriodValue === 'hk2' ? 'Học kỳ II' : 'Học kỳ I';
+      if (this.statsPeriodType === 'year') periodLabel = 'Cả năm học';
+
+      const totalPts = events.reduce((sum, e) => sum + (parseFloat(e.points) || 0), 0);
+
+      badgeEl.innerHTML = `
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;">
+          <span style="font-weight: 800; color: #1e3a8a;">🗓️ Đợt: ${periodLabel}</span>
+          <span style="color: #cbd5e1;">|</span>
+          <span style="font-weight: 800; color: #475569;">📂 Lĩnh vực: ${criteria.category}</span>
+          <span style="color: #cbd5e1;">|</span>
+          <span style="font-weight: 900; color: ${criteria.type === 'plus' ? '#15803d' : '#b91c1c'};">
+            ${criteria.type === 'plus' ? '🌸' : '⚠️'} Tổng cộng: ${events.length} lượt (${criteria.type === 'plus' ? '+' : '-'}${totalPts}đ)
+          </span>
+        </div>
+      `;
+    }
+
+    this.renderCriteriaDetailTable(events);
+    if (modal) modal.classList.add('show');
+    if (window.chibiSound) window.chibiSound.playClick();
+  }
+
+  filterCriteriaDetailEvents(query) {
+    if (!this.detailEventsCache) return;
+    const q = (query || '').toLowerCase().trim();
+    if (!q) {
+      this.renderCriteriaDetailTable(this.detailEventsCache);
+      return;
+    }
+
+    const studentsMap = {};
+    (window.classData.data.students || []).forEach(s => {
+      studentsMap[s.id] = s;
+    });
+
+    const filtered = this.detailEventsCache.filter(e => {
+      const s = studentsMap[e.studentId] || {};
+      const sName = (s.name || '').toLowerCase();
+      const sCode = (s.code || '').toLowerCase();
+      const sGroup = `tổ ${s.group || ''}`.toLowerCase();
+      const note = (e.note || '').toLowerCase();
+      const byName = (e.byName || '').toLowerCase();
+      const day = (e.day || '').toLowerCase();
+      const week = `tuần ${e.week}`.toLowerCase();
+
+      return sName.includes(q) || sCode.includes(q) || sGroup.includes(q) || note.includes(q) || byName.includes(q) || day.includes(q) || week.includes(q);
+    });
+
+    this.renderCriteriaDetailTable(filtered);
+  }
+
+  renderCriteriaDetailTable(events) {
+    const container = document.getElementById('criteria-detail-table-container');
+    const footerCount = document.getElementById('criteria-detail-footer-count');
+    if (!container) return;
+
+    if (footerCount) {
+      footerCount.textContent = `Hiển thị ${events.length} lượt ghi nhận`;
+    }
+
+    if (events.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 32px 16px; color: #94a3b8;">
+          <div style="font-size: 2rem; margin-bottom: 8px;">📭</div>
+          <p>Không tìm thấy lượt ghi nhận nào phù hợp với bộ lọc hiện tại.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const studentsMap = {};
+    (window.classData.data.students || []).forEach(s => {
+      studentsMap[s.id] = s;
+    });
+
+    const canDelete = window.authManager && typeof window.authManager.canDeleteScore === 'function' && window.authManager.canDeleteScore();
+
+    let html = `
+      <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <table class="stats-criteria-table" style="font-size: 0.82rem;">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;">STT</th>
+              <th>Học Sinh</th>
+              <th>Tổ</th>
+              <th>Thời Gian</th>
+              <th style="text-align: center;">Điểm</th>
+              <th>Ghi Chú / Nội Dung</th>
+              <th>Người Chấm</th>
+              ${canDelete ? '<th style="text-align: center;">Thao Tác</th>' : ''}
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    events.forEach((e, idx) => {
+      const st = studentsMap[e.studentId] || { name: 'Học sinh', code: '', group: 1, avatar: '👤' };
+      const isPlus = e.type === 'plus';
+      html += `
+        <tr>
+          <td style="text-align: center; color: #94a3b8; font-weight: 700;">${idx + 1}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 1.1rem;">${st.avatar || '👤'}</span>
+              <div>
+                <b style="color: #1e293b;">${st.name}</b>
+                <div style="font-size: 0.72rem; color: #64748b;">${st.code || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="stats-group-mini-pill" style="background: #e0f2fe; color: #0369a1;">Tổ ${st.group}</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #334155;">Tuần ${e.week} - ${e.day}</div>
+            <div style="font-size: 0.7rem; color: #94a3b8;">${e.recordedAt || ''}</div>
+          </td>
+          <td style="text-align: center;">
+            <span class="stats-badge-count ${isPlus ? 'stats-badge-plus' : 'stats-badge-minus'}">
+              ${isPlus ? '+' : '-'}${e.points}
+            </span>
+          </td>
+          <td>
+            <span style="color: ${e.note ? '#334155' : '#94a3b8'}; font-style: ${e.note ? 'normal' : 'italic'};">
+              ${e.note ? e.note : 'Không ghi chú'}
+            </span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #475569;">${e.byName || 'Hệ thống'}</div>
+            <div style="font-size: 0.7rem; color: #94a3b8;">${e.byRole || ''}</div>
+          </td>
+          ${canDelete ? `
+            <td style="text-align: center;">
+              <button class="btn-icon-sm" style="background: #ef4444; color: white; width: 26px; height: 26px; border-radius: 6px; border: none; cursor: pointer;" title="Xóa lượt này (Chỉ Admin)" onclick="window.appController.deleteScoreFromDetail('${e.id}')">
+                🗑️
+              </button>
+            </td>
+          ` : ''}
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML = html;
+  }
+
+  deleteScoreFromDetail(eventId) {
+    if (!window.authManager.canDeleteScore()) {
+      alert('Chỉ Giáo viên chủ nhiệm (Admin) mới có quyền xóa điểm!');
+      return;
+    }
+
+    if (confirm('Thầy có chắc chắn muốn xóa lượt ghi nhận này không?')) {
+      window.classData.deleteScoreEvent(eventId);
+      this.detailEventsCache = this.detailEventsCache.filter(e => e.id !== eventId);
+      this.renderCriteriaDetailTable(this.detailEventsCache);
+      this.refreshAll();
+      if (window.chibiNotifications) {
+        window.chibiNotifications.showToast('Đã xóa', 'Điểm thi đua đã được xóa khỏi hệ thống.', 'info');
+      }
+    }
+  }
+
+  // --- EXPORT CRITERIA STATS TO EXCEL / CSV ---
+  exportCriteriaStatsExcel() {
+    const settings = window.classData.getSettings();
+    let groupId = 'all';
+    let studentId = 'all';
+    let scopeTitle = 'Toàn Lớp 9A4';
+
+    if (this.statsScope && this.statsScope.startsWith('group-')) {
+      groupId = this.statsScope.replace('group-', '');
+      scopeTitle = `Tổ ${groupId}`;
+    } else if (this.statsScope && this.statsScope.startsWith('student-')) {
+      studentId = this.statsScope.replace('student-', '');
+      const s = window.classData.getStudentById(studentId);
+      scopeTitle = s ? `Học sinh ${s.name} (${s.code})` : 'Học sinh';
+    }
+
+    let periodLabel = `Tuần ${this.statsPeriodValue}`;
+    let fileSuffix = `Tuan_${this.statsPeriodValue}`;
+    if (this.statsPeriodType === 'month') {
+      periodLabel = `Tháng ${this.statsPeriodValue}`;
+      fileSuffix = `Thang_${this.statsPeriodValue}`;
+    } else if (this.statsPeriodType === 'semester') {
+      periodLabel = this.statsPeriodValue === 'hk2' ? 'Học kỳ II (Tuần 19-35)' : 'Học kỳ I (Tuần 1-18)';
+      fileSuffix = this.statsPeriodValue === 'hk2' ? 'HocKy2' : 'HocKy1';
+    } else if (this.statsPeriodType === 'year') {
+      periodLabel = 'Cả năm học (Tuần 1-35)';
+      fileSuffix = 'CaNam';
+    }
+
+    const stats = window.classData.getCriteriaStatistics({
+      periodType: this.statsPeriodType,
+      periodValue: this.statsPeriodValue,
+      groupId: groupId,
+      studentId: studentId
+    });
+
+    let csvContent = '\uFEFF'; // UTF-8 BOM
+    csvContent += `BÁO CÁO THỐNG KÊ TIÊU CHÍ THI ĐUA & VI PHẠM - ${settings.className.toUpperCase()}\n`;
+    csvContent += `Trường: ${settings.schoolName} | Giáo viên chủ nhiệm: ${settings.teacherName} | Niên khóa: ${settings.academicYear}\n`;
+    csvContent += `Đợt đánh giá: ${periodLabel} | Phạm vi: ${scopeTitle} | Thời gian xuất: ${new Date().toLocaleString('vi-VN')}\n\n`;
+
+    csvContent += `--- TỔNG QUAN CHỈ SỐ ---\n`;
+    csvContent += `Tổng lượt thực hiện tốt:,${stats.summary.totalPlusCount} lượt,Tổng điểm cộng:,+${stats.summary.totalPlusPoints} điểm,Tỷ lệ tích cực:,${stats.summary.ratioPlusPercent}%\n`;
+    csvContent += `Tổng lượt vi phạm:,${stats.summary.totalMinusCount} lượt,Tổng điểm trừ:,-${stats.summary.totalMinusPoints} điểm,Tỷ lệ vi phạm:,${stats.summary.ratioMinusPercent}%\n\n`;
+
+    csvContent += `STT,Mã Tiêu Chí,Tên Tiêu Chí Đánh Giá,Phân Loại,Loại Tiêu Chí,Điểm Quy Định,Số Lượt Ghi Nhận,Tổng Điểm (±),Tổ 1 (Lượt),Tổ 2 (Lượt),Tổ 3 (Lượt),Tổ 4 (Lượt),Tỷ Lệ %\n`;
+
+    // 1. Vi phạm first
+    csvContent += `\n--- 1. BẢNG THỐNG KÊ CÁC TIÊU CHÍ VI PHẠM (ĐIỂM TRỪ) ---\n`;
+    stats.minusCriteriaList.forEach((item, idx) => {
+      const c = item.criteria;
+      csvContent += `${idx + 1},"${c.id}","${c.name}","${c.category}","Vi phạm (Trừ)",-${c.points},${item.count},-${item.totalPoints},${item.groupCounts[1]},${item.groupCounts[2]},${item.groupCounts[3]},${item.groupCounts[4]},${item.percentage}%\n`;
+    });
+
+    // 2. Khen thưởng
+    csvContent += `\n--- 2. BẢNG THỐNG KÊ CÁC TIÊU CHÍ THỰC HIỆN TỐT (ĐIỂM CỘNG) ---\n`;
+    stats.plusCriteriaList.forEach((item, idx) => {
+      const c = item.criteria;
+      csvContent += `${idx + 1},"${c.id}","${c.name}","${c.category}","Thực hiện tốt (Cộng)",+${c.points},${item.count},+${item.totalPoints},${item.groupCounts[1]},${item.groupCounts[2]},${item.groupCounts[3]},${item.groupCounts[4]},${item.percentage}%\n`;
+    });
+
+    // 3. Phân bổ theo Lĩnh vực
+    csvContent += `\n--- 3. THỐNG KÊ PHÂN BỔ THEO LĨNH VỰC ---\n`;
+    csvContent += `Lĩnh Vực,Tổng Lượt,Lượt Thực Hiện Tốt,Điểm Cộng,Lượt Vi Phạm,Điểm Trừ\n`;
+    stats.categoryStats.forEach(cat => {
+      csvContent += `"${cat.category}",${cat.totalCount},${cat.plusCount},+${cat.plusPoints},${cat.minusCount},-${cat.minusPoints}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ThongKe_TieuChi_${settings.className}_${fileSuffix}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    if (window.chibiSound) window.chibiSound.playPlus();
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Xuất file thành công! 📊', 'Báo cáo thống kê tiêu chí Excel (CSV) tiếng Việt UTF-8 đã tải về máy!', 'success');
+    }
+  }
+
+  // --- PRINT CRITERIA STATS REPORT (A4 PORTRAIT) ---
+  printCriteriaStats() {
+    const settings = window.classData.getSettings();
+    let groupId = 'all';
+    let studentId = 'all';
+    let scopeTitle = 'Toàn Lớp 9A4';
+
+    if (this.statsScope && this.statsScope.startsWith('group-')) {
+      groupId = this.statsScope.replace('group-', '');
+      scopeTitle = `Tổ ${groupId}`;
+    } else if (this.statsScope && this.statsScope.startsWith('student-')) {
+      studentId = this.statsScope.replace('student-', '');
+      const s = window.classData.getStudentById(studentId);
+      scopeTitle = s ? `Học sinh ${s.name} (${s.code})` : 'Học sinh';
+    }
+
+    let periodLabel = `Tuần ${this.statsPeriodValue}`;
+    if (this.statsPeriodType === 'month') {
+      periodLabel = `Tháng ${this.statsPeriodValue}`;
+    } else if (this.statsPeriodType === 'semester') {
+      periodLabel = this.statsPeriodValue === 'hk2' ? 'Học kỳ II (Tuần 19-35)' : 'Học kỳ I (Tuần 1-18)';
+    } else if (this.statsPeriodType === 'year') {
+      periodLabel = 'Cả Năm Học (Tuần 1-35)';
+    }
+
+    const stats = window.classData.getCriteriaStatistics({
+      periodType: this.statsPeriodType,
+      periodValue: this.statsPeriodValue,
+      groupId: groupId,
+      studentId: studentId
+    });
+
+    const printArea = document.getElementById('stats-print-area');
+    if (!printArea) return;
+
+    let html = `
+      <div style="text-align: center; margin-bottom: 20px;">
+        <table style="width: 100%; border: none; margin-bottom: 15px;">
+          <tr>
+            <td style="width: 45%; text-align: center; vertical-align: top;">
+              <div style="font-size: 10pt; font-weight: bold;">${settings.schoolName.toUpperCase()}</div>
+              <div style="font-size: 11pt; font-weight: bold; color: #1e3a8a;">LỚP CHỦ NHIỆM ${settings.className.toUpperCase()}</div>
+              <div style="font-size: 9pt;">Niên khóa: ${settings.academicYear}</div>
+            </td>
+            <td style="width: 55%; text-align: center; vertical-align: top;">
+              <div style="font-size: 10pt; font-weight: bold;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+              <div style="font-size: 10pt; font-weight: bold;">Độc lập – Tự do – Hạnh phúc</div>
+              <div style="letter-spacing: 2px;">-------***-------</div>
+            </td>
+          </tr>
+        </table>
+
+        <h2 style="font-size: 15pt; font-weight: bold; margin: 15px 0 6px 0; text-transform: uppercase;">
+          BÁO CÁO THỐNG KÊ SỐ LƯỢT VI PHẠM & THỰC HIỆN TỐT THEO TIÊU CHÍ
+        </h2>
+        <div style="font-size: 11pt; font-style: italic;">
+          (Đợt đánh giá: <b>${periodLabel}</b> – Phạm vi: <b>${scopeTitle}</b>)
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px; border: 1px solid #333; padding: 10px; border-radius: 4px;">
+        <b>I. TỔNG HỢP CHỈ SỐ THI ĐUA:</b>
+        <div style="display: flex; justify-content: space-around; margin-top: 6px; font-size: 10.5pt;">
+          <span>• Tổng lượt thực hiện tốt: <b>${stats.summary.totalPlusCount} lượt</b> (+${stats.summary.totalPlusPoints}đ - ${stats.summary.ratioPlusPercent}%)</span>
+          <span>• Tổng lượt vi phạm: <b>${stats.summary.totalMinusCount} lượt</b> (-${stats.summary.totalMinusPoints}đ - ${stats.summary.ratioMinusPercent}%)</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <b style="font-size: 11pt;">II. BẢNG THỐNG KÊ CHI TIẾT CÁC TIÊU CHÍ VI PHẠM (ĐIỂM TRỪ):</b>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10pt;" border="1">
+          <thead>
+            <tr style="background: #f1f5f9;">
+              <th style="width: 35px; padding: 6px; text-align: center;">STT</th>
+              <th style="padding: 6px; text-align: left;">Tiêu Chí Vi Phạm</th>
+              <th style="width: 90px; padding: 6px; text-align: center;">Phân Loại</th>
+              <th style="width: 65px; padding: 6px; text-align: center;">Mức Trừ</th>
+              <th style="width: 75px; padding: 6px; text-align: center;">Số Lượt</th>
+              <th style="width: 80px; padding: 6px; text-align: center;">Tổng Điểm</th>
+              <th style="width: 140px; padding: 6px; text-align: center;">Số Lượt 4 Tổ (T1-T4)</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    stats.minusCriteriaList.forEach((item, idx) => {
+      const c = item.criteria;
+      html += `
+        <tr>
+          <td style="text-align: center; padding: 5px;">${idx + 1}</td>
+          <td style="padding: 5px;">${c.name}</td>
+          <td style="text-align: center; padding: 5px;">${c.category}</td>
+          <td style="text-align: center; padding: 5px;">-${c.points}đ</td>
+          <td style="text-align: center; padding: 5px; font-weight: bold;">${item.count}</td>
+          <td style="text-align: center; padding: 5px; color: #b91c1c; font-weight: bold;">-${item.totalPoints}đ</td>
+          <td style="text-align: center; padding: 5px;">T1: ${item.groupCounts[1]} | T2: ${item.groupCounts[2]} | T3: ${item.groupCounts[3]} | T4: ${item.groupCounts[4]}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <b style="font-size: 11pt;">III. BẢNG THỐNG KÊ CHI TIẾT CÁC TIÊU CHÍ THỰC HIỆN TỐT (ĐIỂM CỘNG):</b>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10pt;" border="1">
+          <thead>
+            <tr style="background: #f1f5f9;">
+              <th style="width: 35px; padding: 6px; text-align: center;">STT</th>
+              <th style="padding: 6px; text-align: left;">Tiêu Chí Khen Thưởng</th>
+              <th style="width: 90px; padding: 6px; text-align: center;">Phân Loại</th>
+              <th style="width: 65px; padding: 6px; text-align: center;">Mức Thưởng</th>
+              <th style="width: 75px; padding: 6px; text-align: center;">Số Lượt</th>
+              <th style="width: 80px; padding: 6px; text-align: center;">Tổng Điểm</th>
+              <th style="width: 140px; padding: 6px; text-align: center;">Số Lượt 4 Tổ (T1-T4)</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    stats.plusCriteriaList.forEach((item, idx) => {
+      const c = item.criteria;
+      html += `
+        <tr>
+          <td style="text-align: center; padding: 5px;">${idx + 1}</td>
+          <td style="padding: 5px;">${c.name}</td>
+          <td style="text-align: center; padding: 5px;">${c.category}</td>
+          <td style="text-align: center; padding: 5px;">+${c.points}đ</td>
+          <td style="text-align: center; padding: 5px; font-weight: bold;">${item.count}</td>
+          <td style="text-align: center; padding: 5px; color: #15803d; font-weight: bold;">+${item.totalPoints}đ</td>
+          <td style="text-align: center; padding: 5px;">T1: ${item.groupCounts[1]} | T2: ${item.groupCounts[2]} | T3: ${item.groupCounts[3]} | T4: ${item.groupCounts[4]}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 30px;">
+        <table style="width: 100%; border: none;">
+          <tr>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+              <div style="font-weight: bold;">LỚP TRƯỞNG</div>
+              <div style="font-size: 9pt; font-style: italic;">(Ký và ghi rõ họ tên)</div>
+              <div style="height: 65px;"></div>
+              <div style="font-weight: bold;">Nguyễn Văn Bảo</div>
+            </td>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+              <div style="font-size: 10pt; font-style: italic;">Tây Phú, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</div>
+              <div style="font-weight: bold;">GIÁO VIÊN CHỦ NHIỆM</div>
+              <div style="font-size: 9pt; font-style: italic;">(Ký và ghi rõ họ tên)</div>
+              <div style="height: 65px;"></div>
+              <div style="font-weight: bold;">${settings.teacherName}</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
+
+    printArea.innerHTML = html;
+    document.body.classList.add('printing-criteria-stats');
+
+    window.print();
+
+    setTimeout(() => {
+      document.body.classList.remove('printing-criteria-stats');
+    }, 1000);
   }
 
   // --- RENDER MAILBOX (HỘP THƯ) ---

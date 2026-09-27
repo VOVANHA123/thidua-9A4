@@ -1788,6 +1788,256 @@ class ClassDataManager {
     this.pushToCloud(true, { recentAction: 'SCORE_DELETE', recentData: { eventId } });
   }
 
+  getWeeksInMonth(month) {
+    const m = parseInt(month, 10);
+    const map = {
+      9: [1, 2, 3, 4],
+      10: [5, 6, 7, 8],
+      11: [9, 10, 11, 12, 13],
+      12: [14, 15, 16, 17],
+      1: [18, 19, 20, 21],
+      2: [22, 23],
+      3: [24, 25, 26, 27],
+      4: [28, 29, 30, 31, 32],
+      5: [33, 34, 35]
+    };
+    return map[m] || [1, 2, 3, 4];
+  }
+
+  isEventInPeriod(event, periodType, periodValue) {
+    if (!event) return false;
+    const weekNum = parseInt(event.week, 10) || 1;
+
+    if (periodType === 'week') {
+      const targetWeek = parseInt(periodValue, 10);
+      return isNaN(targetWeek) ? true : weekNum === targetWeek;
+    }
+
+    if (periodType === 'month') {
+      const targetMonth = parseInt(periodValue, 10);
+      const weeksInMonth = this.getWeeksInMonth(targetMonth);
+      if (weeksInMonth.includes(weekNum)) return true;
+
+      // Also check timestamp / recordedAt if available
+      if (event.timestamp) {
+        const d = new Date(event.timestamp);
+        if (!isNaN(d.getTime()) && (d.getMonth() + 1) === targetMonth) return true;
+      }
+      if (event.recordedAt) {
+        const m = event.recordedAt.match(/\/0?(\d{1,2})\/\d{4}/);
+        if (m && parseInt(m[1], 10) === targetMonth) return true;
+      }
+      return false;
+    }
+
+    if (periodType === 'semester') {
+      if (periodValue === 'hk2' || periodValue === '2' || periodValue === 2) {
+        return weekNum >= 19 && weekNum <= 35;
+      }
+      return weekNum >= 1 && weekNum <= 18;
+    }
+
+    if (periodType === 'year' || periodType === 'all-year') {
+      return weekNum >= 1 && weekNum <= 35;
+    }
+
+    return true;
+  }
+
+  getFilteredEvents({ periodType = 'week', periodValue = 1, groupId = 'all', studentId = 'all', criteriaType = 'all', criteriaId = null } = {}) {
+    const studentsMap = {};
+    (this.data.students || []).forEach(s => {
+      studentsMap[s.id] = s;
+    });
+
+    return (this.data.events || []).filter(e => {
+      // 1. Period filter
+      if (!this.isEventInPeriod(e, periodType, periodValue)) return false;
+
+      // 2. Student / Group filter
+      if (studentId && studentId !== 'all') {
+        if (e.studentId !== studentId) return false;
+      } else if (groupId && groupId !== 'all') {
+        const st = studentsMap[e.studentId];
+        const g = parseInt(groupId, 10);
+        if (!st || st.group !== g) return false;
+      }
+
+      // 3. Criteria Type filter
+      if (criteriaType && criteriaType !== 'all') {
+        if (e.type !== criteriaType) return false;
+      }
+
+      // 4. Criteria ID filter
+      if (criteriaId) {
+        if (e.criteriaId !== criteriaId) return false;
+      }
+
+      return true;
+    });
+  }
+
+  getCriteriaStatistics({ periodType = 'week', periodValue = 1, groupId = 'all', studentId = 'all' } = {}) {
+    const allCriteria = this.getCriteria();
+    const filteredEvents = this.getFilteredEvents({ periodType, periodValue, groupId, studentId, criteriaType: 'all' });
+    const studentsMap = {};
+    (this.data.students || []).forEach(s => {
+      studentsMap[s.id] = s;
+    });
+
+    let totalPlusCount = 0;
+    let totalMinusCount = 0;
+    let totalPlusPoints = 0;
+    let totalMinusPoints = 0;
+
+    const groupStats = {
+      1: { plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0 },
+      2: { plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0 },
+      3: { plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0 },
+      4: { plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0 }
+    };
+
+    const categoryStats = {};
+
+    // Map criteria to accumulators
+    const criteriaStatsMap = {};
+    allCriteria.forEach(c => {
+      criteriaStatsMap[c.id] = {
+        criteria: c,
+        count: 0,
+        totalPoints: 0,
+        groupCounts: { 1: 0, 2: 0, 3: 0, 4: 0 },
+        groupPoints: { 1: 0, 2: 0, 3: 0, 4: 0 },
+        studentCounts: {},
+        events: []
+      };
+
+      if (!categoryStats[c.category]) {
+        categoryStats[c.category] = { category: c.category, plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0, totalCount: 0 };
+      }
+    });
+
+    filteredEvents.forEach(e => {
+      const isPlus = e.type === 'plus';
+      const pts = parseFloat(e.points) || 0;
+      const st = studentsMap[e.studentId];
+      const g = st ? st.group : 1;
+
+      if (isPlus) {
+        totalPlusCount++;
+        totalPlusPoints += pts;
+        if (groupStats[g]) {
+          groupStats[g].plusCount++;
+          groupStats[g].plusPoints += pts;
+        }
+      } else {
+        totalMinusCount++;
+        totalMinusPoints += pts;
+        if (groupStats[g]) {
+          groupStats[g].minusCount++;
+          groupStats[g].minusPoints += pts;
+        }
+      }
+
+      // Criteria accumulator
+      if (!criteriaStatsMap[e.criteriaId]) {
+        // Fallback for custom or deleted criteria
+        criteriaStatsMap[e.criteriaId] = {
+          criteria: {
+            id: e.criteriaId,
+            name: e.criteriaName || (isPlus ? 'Thực hiện tốt khác' : 'Vi phạm khác'),
+            type: e.type,
+            points: pts,
+            icon: isPlus ? '🌸' : '⚠️',
+            category: isPlus ? 'Khen thưởng' : 'Kỷ luật'
+          },
+          count: 0,
+          totalPoints: 0,
+          groupCounts: { 1: 0, 2: 0, 3: 0, 4: 0 },
+          groupPoints: { 1: 0, 2: 0, 3: 0, 4: 0 },
+          studentCounts: {},
+          events: []
+        };
+      }
+
+      const cs = criteriaStatsMap[e.criteriaId];
+      cs.count++;
+      cs.totalPoints += pts;
+      cs.events.push(e);
+      if (cs.groupCounts[g] !== undefined) {
+        cs.groupCounts[g]++;
+        cs.groupPoints[g] += pts;
+      }
+
+      if (!cs.studentCounts[e.studentId]) {
+        cs.studentCounts[e.studentId] = { student: st || { id: e.studentId, name: 'Học sinh', group: g }, count: 0, points: 0 };
+      }
+      cs.studentCounts[e.studentId].count++;
+      cs.studentCounts[e.studentId].points += pts;
+
+      const catName = cs.criteria.category || (isPlus ? 'Khen thưởng' : 'Kỷ luật');
+      if (!categoryStats[catName]) {
+        categoryStats[catName] = { category: catName, plusCount: 0, minusCount: 0, plusPoints: 0, minusPoints: 0, totalCount: 0 };
+      }
+      categoryStats[catName].totalCount++;
+      if (isPlus) {
+        categoryStats[catName].plusCount++;
+        categoryStats[catName].plusPoints += pts;
+      } else {
+        categoryStats[catName].minusCount++;
+        categoryStats[catName].minusPoints += pts;
+      }
+    });
+
+    const criteriaList = Object.values(criteriaStatsMap).map(item => {
+      const topStudents = Object.values(item.studentCounts).sort((a, b) => b.count - a.count);
+      const isPlus = item.criteria.type === 'plus';
+      const denominator = isPlus ? totalPlusCount : totalMinusCount;
+      const percentage = denominator > 0 ? Math.round((item.count / denominator) * 100) : 0;
+      return {
+        ...item,
+        topStudents,
+        percentage
+      };
+    });
+
+    // Sort by count descending
+    criteriaList.sort((a, b) => b.count - a.count);
+
+    const plusCriteriaList = criteriaList.filter(c => c.criteria.type === 'plus');
+    const minusCriteriaList = criteriaList.filter(c => c.criteria.type === 'minus');
+
+    const topPlus = plusCriteriaList.find(c => c.count > 0) || null;
+    const topMinus = minusCriteriaList.find(c => c.count > 0) || null;
+
+    const totalEvents = filteredEvents.length;
+    const ratioPlusPercent = totalEvents > 0 ? Math.round((totalPlusCount / totalEvents) * 100) : 100;
+    const ratioMinusPercent = totalEvents > 0 ? 100 - ratioPlusPercent : 0;
+
+    return {
+      periodType,
+      periodValue,
+      groupId,
+      studentId,
+      summary: {
+        totalEvents,
+        totalPlusCount,
+        totalMinusCount,
+        totalPlusPoints,
+        totalMinusPoints,
+        ratioPlusPercent,
+        ratioMinusPercent,
+        topPlusCriteria: topPlus ? { ...topPlus.criteria, count: topPlus.count, totalPoints: topPlus.totalPoints } : null,
+        topMinusCriteria: topMinus ? { ...topMinus.criteria, count: topMinus.count, totalPoints: topMinus.totalPoints } : null,
+        groupStats
+      },
+      criteriaList,
+      plusCriteriaList,
+      minusCriteriaList,
+      categoryStats: Object.values(categoryStats).sort((a, b) => b.totalCount - a.totalCount)
+    };
+  }
+
   getStudentEvents(studentId, period = null) {
     return this.data.events.filter(e => {
       if (e.studentId !== studentId) return false;
@@ -1795,6 +2045,10 @@ class ClassDataManager {
       if (period === 'hk1') return e.week >= 1 && e.week <= 18;
       if (period === 'hk2') return e.week >= 19 && e.week <= 35;
       if (period === 'all-year' || period === 'year') return e.week >= 1 && e.week <= 35;
+      if (typeof period === 'string' && period.startsWith('month-')) {
+        const m = parseInt(period.replace('month-', ''), 10);
+        return this.isEventInPeriod(e, 'month', m);
+      }
       const w = parseInt(period, 10);
       if (!isNaN(w) && e.week !== w) return false;
       return true;

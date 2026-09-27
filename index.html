@@ -16,13 +16,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Thi Đua 9A4">
-  <link rel="manifest" href="manifest.json?v=20260924_v45">
+  <link rel="manifest" href="manifest.json?v=20260927_v48">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <link rel="apple-touch-icon" href="assets/images/logo.png">
 
   <!-- Stylesheets with Cache-busting -->
-  <link rel="stylesheet" href="css/style.css?v=20260924_v45">
-  <link rel="stylesheet" href="css/print.css?v=20260924_v45" media="print">
+  <link rel="stylesheet" href="css/style.css?v=20260927_v48">
+  <link rel="stylesheet" href="css/print.css?v=20260927_v48" media="print">
 </head>
 <body>
 
@@ -471,15 +471,114 @@
       </div>
     </section>
 
-    <!-- ================= TAB 3: STATS & CHARTS ================= -->
+    <!-- ================= TAB 3: CRITERIA STATISTICS & ANALYTICS ================= -->
     <section id="tab-stats" class="tab-pane">
-      <div style="background: white; border-radius: var(--radius-lg); border: 2px solid #e2e8f0; padding: 24px; box-shadow: var(--shadow-md);">
-        <h2 style="font-family: 'Quicksand'; font-weight: 900; font-size: 1.3rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-          <span>📈</span> THỐNG KÊ & SO SÁNH ĐIỂM THI ĐUA 4 TỔ
-        </h2>
-        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 24px;">Biểu đồ điểm trung bình và tỷ lệ đạt danh hiệu Xuất Sắc (5 sao)</p>
-        
-        <div id="stats-bars-container"></div>
+      <div class="stats-dashboard-card">
+        <!-- Dashboard Header & Actions -->
+        <div class="stats-header-row">
+          <div>
+            <h2 class="stats-main-title">
+              <span>📈</span> BÁO CÁO THỐNG KÊ VI PHẠM & THỰC HIỆN TỐT THEO TIÊU CHÍ
+            </h2>
+            <p class="stats-sub-title">
+              Theo dõi chi tiết số lượt vi phạm, số lượt thực hiện tốt theo từng tiêu chí đánh giá thi đua theo Tuần / Tháng / Học kỳ / Cả năm học.
+            </p>
+          </div>
+          <div class="stats-action-btns no-print">
+            <button type="button" class="btn-hero btn-emerald" onclick="window.appController.exportCriteriaStatsExcel()" title="Tải file Excel/CSV chuẩn tiếng Việt UTF-8 BOM">
+              <span>📊</span> Xuất Excel Thống Kê
+            </button>
+            <button type="button" class="btn-hero btn-purple" onclick="window.appController.printCriteriaStats()" title="Xem và in báo cáo chuẩn giấy A4">
+              <span>🖨️</span> In Báo Cáo A4
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Controls Toolbar -->
+        <div class="stats-filter-bar no-print">
+          <!-- Time Period Row -->
+          <div class="stats-filter-group">
+            <div class="stats-filter-label">
+              <span>🗓️</span> <b>Thời gian đánh giá:</b>
+            </div>
+            <div class="stats-period-pills">
+              <button type="button" class="stats-period-btn active" data-period-type="week" onclick="window.appController.setStatsPeriodType('week')">
+                🗓️ Theo Tuần
+              </button>
+              <button type="button" class="stats-period-btn" data-period-type="month" onclick="window.appController.setStatsPeriodType('month')">
+                📅 Theo Tháng
+              </button>
+              <button type="button" class="stats-period-btn" data-period-type="semester" onclick="window.appController.setStatsPeriodType('semester')">
+                🏆 Theo Học Kỳ
+              </button>
+              <button type="button" class="stats-period-btn" data-period-type="year" onclick="window.appController.setStatsPeriodType('year')">
+                👑 Cả Năm Học
+              </button>
+            </div>
+
+            <!-- Dynamic Sub-selectors -->
+            <div class="stats-subselector-box" id="stats-subselector-container">
+              <!-- Rendered via AppController: select-week / select-month / select-semester / year badge -->
+            </div>
+          </div>
+
+          <!-- Scope & Type Filter Row -->
+          <div class="stats-filter-row-secondary">
+            <!-- Scope Selector (Toàn lớp / Tổ 1-4 / Học sinh) -->
+            <div class="stats-scope-group">
+              <label for="stats-select-scope"><span>👥</span> <b>Phạm vi:</b></label>
+              <select id="stats-select-scope" class="select-custom" onchange="window.appController.onStatsScopeChange()">
+                <option value="all" selected>🏫 Toàn Lớp 9A4 (29 Học Sinh)</option>
+                <option value="group-1">👥 Tổ 1</option>
+                <option value="group-2">👥 Tổ 2</option>
+                <option value="group-3">👥 Tổ 3</option>
+                <option value="group-4">👥 Tổ 4</option>
+                <optgroup label="👤 Từng Học Sinh (29 bạn)" id="stats-select-students-optgroup">
+                  <!-- Populated dynamically -->
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Type Filter Tabs (Tất cả / Chỉ vi phạm / Chỉ điểm cộng) -->
+            <div class="stats-type-pills">
+              <button type="button" class="stats-type-btn active" data-type="all" onclick="window.appController.setStatsTypeFilter('all')">
+                🌈 Tất Cả Tiêu Chí
+              </button>
+              <button type="button" class="stats-type-btn" data-type="minus" onclick="window.appController.setStatsTypeFilter('minus')">
+                ⚠️ Chỉ Vi Phạm (Điểm Trừ)
+              </button>
+              <button type="button" class="stats-type-btn" data-type="plus" onclick="window.appController.setStatsTypeFilter('plus')">
+                🌸 Chỉ Thực Hiện Tốt (Điểm Cộng)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Cards Summary Grid -->
+        <div class="stats-kpi-grid" id="stats-kpi-container">
+          <!-- Rendered dynamically via renderStats() -->
+        </div>
+
+        <!-- Ratio Balance Bar (Tương quan Tích cực vs Nhắc nhở) -->
+        <div class="stats-balance-card" id="stats-balance-container">
+          <!-- Rendered dynamically via renderStats() -->
+        </div>
+
+        <!-- Criteria Analytics Content Area -->
+        <div id="stats-criteria-content">
+          <!-- Rendered dynamically via renderStats() -->
+        </div>
+
+        <!-- 4 Groups Comparison Chart Section -->
+        <div class="stats-groups-card" style="margin-top: 24px;">
+          <h3 style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.15rem; color: #1e3a8a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span>🏆</span> SO SÁNH ĐIỂM THI ĐUA & DANH HIỆU 4 TỔ (THEO ĐỢT CHỌN)
+          </h3>
+          <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 16px;">
+            Biểu đồ điểm trung bình và tỷ lệ học sinh đạt danh hiệu Xuất Sắc (5 sao) của 4 Tổ trong đợt đánh giá này.
+          </p>
+          <div id="stats-bars-container"></div>
+        </div>
       </div>
     </section>
 
@@ -1104,7 +1203,35 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: CHI TIẾT SỰ KIỆN TIÊU CHÍ ================= -->
+  <div class="modal-backdrop" id="modal-criteria-detail">
+    <div class="modal-content" style="max-width: 850px; width: 95%;">
+      <div class="modal-header header-primary" id="criteria-detail-modal-header" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+        <div class="modal-title" id="criteria-detail-modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>🔍</span> Chi Tiết Ghi Nhận Tiêu Chí
+        </div>
+        <button type="button" class="btn-close-modal" onclick="window.appController.closeAllModals()">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 72vh; overflow-y: auto; padding: 18px;">
+        <div id="criteria-detail-summary-badge" style="margin-bottom: 14px;"></div>
+        <div style="margin-bottom: 14px;">
+          <input type="text" id="criteria-detail-search-input" class="form-control" placeholder="🔍 Nhập tên học sinh, tổ, người chấm hoặc ghi chú để tìm nhanh..." oninput="window.appController.filterCriteriaDetailEvents(this.value)" style="border-radius: 9999px; padding-left: 16px;">
+        </div>
+        <div id="criteria-detail-table-container">
+          <!-- Populated dynamically via AppController -->
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <span style="font-size: 0.82rem; color: #64748b;" id="criteria-detail-footer-count"></span>
+        <button type="button" class="btn-hero btn-white btn-close-modal" onclick="window.appController.closeAllModals()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   </div> <!-- /#view-app -->
+
+  <!-- ================= CRITERIA STATS PRINT AREA ================= -->
+  <div id="stats-print-area" class="stats-print-area"></div>
 
   <!-- ================= BIEN BAN PRINT AREA (A4 PORTRAIT ONLY) ================= -->
   <div id="bienban-print-area" class="bienban-print-area"></div>
@@ -1117,13 +1244,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <!-- Scripts with Cache-busting -->
-  <script src="js/firebase-sync.js?v=20260924_v45"></script>
-  <script src="js/data.js?v=20260924_v45"></script>
-  <script src="js/sound.js?v=20260924_v45"></script>
-  <script src="js/confetti.js?v=20260924_v45"></script>
-  <script src="js/notifications.js?v=20260924_v45"></script>
-  <script src="js/auth.js?v=20260924_v45"></script>
-  <script src="js/html2pdf.bundle.min.js?v=20260924_v45"></script>
-  <script src="js/app.js?v=20260924_v45"></script>
+  <script src="js/firebase-sync.js?v=20260927_v48"></script>
+  <script src="js/data.js?v=20260927_v48"></script>
+  <script src="js/sound.js?v=20260927_v48"></script>
+  <script src="js/confetti.js?v=20260927_v48"></script>
+  <script src="js/notifications.js?v=20260927_v48"></script>
+  <script src="js/auth.js?v=20260927_v48"></script>
+  <script src="js/html2pdf.bundle.min.js?v=20260927_v48"></script>
+  <script src="js/app.js?v=20260927_v48"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@
 
 const STORAGE_KEY = 'CHIBI_THIDUA_9A4_DATA_V6';
 const STORAGE_BACKUP_KEY = 'CHIBI_THIDUA_SAFETY_BACKUP_V6';
+const API_SYNC_SECRET = 'THIDUA9A4_SECURE_TOKEN_2026_TP';
 
 // Default 12 Criteria based on the original template
 const DEFAULT_CRITERIA = [
@@ -135,6 +136,14 @@ const DEFAULT_CRITERIA = [
     "points": 20,
     "icon": "⚠️",
     "category": "Kỷ luật"
+  },
+  {
+    "id": "c717156",
+    "name": "Không trực vệ sinh theo phân công",
+    "type": "minus",
+    "points": 3,
+    "icon": "🧹",
+    "category": "Lao động"
   }
 ];
 
@@ -612,6 +621,14 @@ class ClassDataManager {
     }
   }
 
+  getSyncHeaders(extra = {}) {
+    return {
+      'Content-Type': 'application/json',
+      'x-sync-secret': API_SYNC_SECRET,
+      ...extra
+    };
+  }
+
   getSyncApiUrl() {
     if (this.data && this.data.settings && this.data.settings.customServerUrl) {
       return this.data.settings.customServerUrl.trim();
@@ -655,7 +672,7 @@ class ClassDataManager {
     // PRIMARY CLOUD SOURCE: Google Firebase Realtime Database
     try {
       const fbController = new AbortController();
-      const fbTimeout = setTimeout(() => fbController.abort(), 7000);
+      const fbTimeout = setTimeout(() => fbController.abort(), 12000);
       const fbRes = await fetch(fbDirectUrl + '?t=' + Date.now(), {
         signal: fbController.signal,
         cache: 'no-cache'
@@ -682,14 +699,20 @@ class ClassDataManager {
 
           const isServerConfigNewer = serverUpdated > localUpdated;
           const hasNewServerEvents = serverEventsLen > localEventsLen;
-          const shouldUpdate = force || this.isFreshDevice || isServerConfigNewer || hasNewServerEvents || (localEventsLen === 0 && serverEventsLen > 0);
+          const hasMoreServerCriteria = Array.isArray(fbData.criteria) && fbData.criteria.length > (this.data.criteria || []).length;
+          const shouldUpdate = force || this.isFreshDevice || isServerConfigNewer || hasNewServerEvents || hasMoreServerCriteria || (localEventsLen === 0 && serverEventsLen > 0);
 
           if (shouldUpdate) {
             if (isServerConfigNewer || this.isFreshDevice || force) {
               // Server có cấu hình mới hơn hoặc người dùng chủ động bấm Tải: nhận toàn bộ
               this.data = this.mergeWithDefaults(fbData);
             } else {
-              // Server chỉ có thêm sự kiện điểm số (học sinh khác chấm): hợp nhất điểm số, giữ nguyên cấu hình lớp này
+              // Server chỉ có thêm sự kiện điểm số hoặc tiêu chí: bảo toàn tiêu chí mới nhất từ server
+              if (Array.isArray(fbData.criteria) && fbData.criteria.length > 0) {
+                if (fbData.criteria.length > (this.data.criteria || []).length || this.isFreshDevice) {
+                  this.data.criteria = fbData.criteria;
+                }
+              }
               if (Array.isArray(fbData.events)) {
                 const eventMap = new Map();
                 const deletedSet = new Set([
@@ -744,6 +767,43 @@ class ClassDataManager {
       }
     } catch(fbErr) {
       console.warn('Firebase sync notice:', fbErr);
+    }
+
+    // SECONDARY CLOUD SOURCE: Vercel Secure Serverless API Fallback
+    try {
+      const apiUrl = this.getSyncApiUrl();
+      const apiController = new AbortController();
+      const apiTimeout = setTimeout(() => apiController.abort(), 6000);
+      const apiRes = await fetch(apiUrl, {
+        signal: apiController.signal,
+        headers: this.getSyncHeaders(),
+        cache: 'no-cache'
+      });
+      clearTimeout(apiTimeout);
+      if (apiRes.ok) {
+        const apiJson = await apiRes.json();
+        if (apiJson && apiJson.success && apiJson.data) {
+          const apiData = apiJson.data;
+          const apiUpdated = (apiData.settings && apiData.settings.updatedAt) || 0;
+          const localUpdated = (this.data.settings && this.data.settings.updatedAt) || 0;
+          this.isCloudConnected = true;
+          this.hasSuccessfullySyncedWithCloud = true;
+          if (this.isFreshDevice || apiUpdated > localUpdated) {
+            this.data = this.mergeWithDefaults(apiData);
+            this.saveToStorageLocal();
+          } else {
+            if (Array.isArray(apiData.criteria) && apiData.criteria.length > (this.data.criteria || []).length) {
+              this.data.criteria = apiData.criteria;
+              this.saveToStorageLocal();
+            }
+          }
+          this.lastSyncTime = Date.now();
+          this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
+          return { success: true, updated: true, data: this.data, source: 'vercel_secure_api' };
+        }
+      }
+    } catch (apiErr) {
+      console.warn('Vercel secure API sync notice:', apiErr);
     }
 
     this.lastSyncTime = Date.now();
@@ -877,6 +937,18 @@ class ClassDataManager {
       } catch (fbErr) {
         console.warn('Firebase direct push warning:', fbErr);
       }
+
+      // 3. ĐỒNG BỘ LÊN VERCEL SECURE SERVERLESS API (ĐÍNH KÈM SECRET KEY)
+      try {
+        const apiUrl = this.getSyncApiUrl();
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: this.getSyncHeaders(),
+          body: JSON.stringify(payload)
+        }).catch(err => console.warn('Vercel API push notice:', err));
+      } catch (apiPushErr) {
+        console.warn('Vercel API push error:', apiPushErr);
+      }
     };
 
     if (immediate) {
@@ -986,12 +1058,18 @@ class ClassDataManager {
 
             const isServerConfigNewer = serverUpdated > localUpdated;
             const hasNewEvents = serverEventsLen > localEventsLen;
-            const needsSync = this.isFreshDevice || hasNewEvents || (localEventsLen === 0 && serverEventsLen > 0) || isServerConfigNewer;
+            const hasMoreCriteria = Array.isArray(fbData.criteria) && fbData.criteria.length > (this.data.criteria || []).length;
+            const needsSync = this.isFreshDevice || hasNewEvents || hasMoreCriteria || (localEventsLen === 0 && serverEventsLen > 0) || isServerConfigNewer;
 
             if (needsSync) {
               if (isServerConfigNewer || this.isFreshDevice) {
                 this.data = this.mergeWithDefaults(fbData);
               } else {
+                if (Array.isArray(fbData.criteria) && fbData.criteria.length > 0) {
+                  if (fbData.criteria.length > (this.data.criteria || []).length || this.isFreshDevice) {
+                    this.data.criteria = fbData.criteria;
+                  }
+                }
                 // Chỉ hợp nhất điểm số, giữ nguyên cấu hình lớp của máy này
                 if (Array.isArray(fbData.events)) {
                   const eventMap = new Map();
@@ -1444,6 +1522,7 @@ class ClassDataManager {
     }
     if (newCriteria && Array.isArray(newCriteria) && newCriteria.length > 0) {
       this.data.criteria = newCriteria;
+      this.syncCriteriaDirectly();
     }
     this.data.settings.updatedAt = Date.now();
     this.hasUserModification = true;
@@ -1693,6 +1772,40 @@ class ClassDataManager {
     return this.getCriteria().find(c => c.id === id);
   }
 
+  async syncCriteriaDirectly() {
+    const criteria = this.data.criteria || [];
+    const fbBaseUrl = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4';
+    const now = Date.now();
+    if (!this.data.settings) this.data.settings = {};
+    this.data.settings.updatedAt = now;
+
+    // 1. WebSocket SDK: Gửi trực tiếp nhánh criteria & settings siêu tốc
+    if (window.firebaseSyncEngine && typeof window.firebaseSyncEngine.syncCriteriaDirectly === 'function') {
+      window.firebaseSyncEngine.syncCriteriaDirectly(criteria, this.data.settings);
+    }
+
+    // 2. Direct atomic REST PUT tới criteria.json & settings.json (bảo đảm 100% lưu vĩnh viễn không phụ thuộc kích thước events)
+    try {
+      await Promise.all([
+        fetch(`${fbBaseUrl}/criteria.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(criteria)
+        }),
+        fetch(`${fbBaseUrl}/settings.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ updatedAt: now })
+        })
+      ]);
+      this.lastSyncTime = now;
+      this.hasSuccessfullySyncedWithCloud = true;
+      this.updateCloudStatusUI(true, 'Đã Lưu Tiêu Chí ⚡');
+    } catch (err) {
+      console.warn('Direct criteria REST sync notice:', err);
+    }
+  }
+
   addCriteria(criteria) {
     const list = this.getCriteria();
     const newId = 'c' + Date.now().toString().slice(-6);
@@ -1708,6 +1821,7 @@ class ClassDataManager {
     if (!this.data.settings) this.data.settings = {};
     this.data.settings.updatedAt = Date.now();
     this.saveToStorage(this.data, true, true);
+    this.syncCriteriaDirectly();
     this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return newCrit;
   }
@@ -1723,6 +1837,7 @@ class ClassDataManager {
       if (!this.data.settings) this.data.settings = {};
       this.data.settings.updatedAt = Date.now();
       this.saveToStorage(this.data, true, true);
+      this.syncCriteriaDirectly();
       this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
       return this.data.criteria[idx];
     }
@@ -1738,6 +1853,7 @@ class ClassDataManager {
     if (!this.data.settings) this.data.settings = {};
     this.data.settings.updatedAt = Date.now();
     this.saveToStorage(this.data, true, true);
+    this.syncCriteriaDirectly();
     this.pushToCloud(true, { actionType: 'SETTINGS_UPDATE', allowSettingsOverwrite: true });
     return { success: true };
   }

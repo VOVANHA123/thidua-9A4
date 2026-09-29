@@ -154,6 +154,10 @@
         const serverUpdated = (cloudData.settings && cloudData.settings.updatedAt) || 0;
         const localUpdated = (dm.data && dm.data.settings && dm.data.settings.updatedAt) || 0;
 
+        // Đánh dấu thiết bị đã đồng bộ thành công với Cloud
+        dm.hasSuccessfullySyncedWithCloud = true;
+        dm.isCloudConnected = true;
+
         // Chỉ cập nhật cài đặt/danh sách học sinh từ cloud khi server thực sự mới hơn hoặc máy mới tinh
         if (serverUpdated > localUpdated || dm.isFreshDevice) {
           if (typeof dm.mergeWithDefaults === 'function') {
@@ -162,6 +166,12 @@
             dm.data = cloudData;
           }
         } else {
+          // Bảo đảm tiêu chí từ cloud không bị mất nếu server có tiêu chí mới
+          if (Array.isArray(cloudData.criteria) && cloudData.criteria.length > 0) {
+            if (cloudData.criteria.length > (dm.data.criteria || []).length || dm.isFreshDevice) {
+              dm.data.criteria = cloudData.criteria;
+            }
+          }
           // Chỉ hợp nhất sự kiện điểm số (giữ nguyên cấu hình của máy này)
           if (Array.isArray(cloudData.events)) {
             const eventMap = new Map();
@@ -214,6 +224,26 @@
     }
 
     /**
+     * Đồng bộ trực tiếp tiêu chí thi đua qua WebSocket SDK siêu nhanh
+     */
+    syncCriteriaDirectly(criteria, settings) {
+      if (!this.dbRef) return;
+      try {
+        const now = (settings && settings.updatedAt) || Date.now();
+        this.dbRef.child('criteria').set(criteria);
+        this.dbRef.child('settings/updatedAt').set(now);
+        this.dbRef.child('lastSenderClientId').set((window.classData && window.classData.CLIENT_SESSION_ID) || 'admin_web');
+        this.dbRef.child('lastPushedAt').set(now);
+        this.updateStatusBadge('connected', 'Đã Lưu Tiêu Chí ⚡');
+        setTimeout(() => {
+          this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢');
+        }, 2000);
+      } catch (e) {
+        console.warn('Firebase SDK criteria direct sync error:', e);
+      }
+    }
+
+    /**
      * Đẩy dữ liệu mới lên Firebase Realtime Database
      */
     async pushToCloud(data, extraMeta = {}) {
@@ -223,13 +253,17 @@
 
       const dm = window.classData || window.dataManager;
 
-      // SAFEGUARD: Chặn tuyệt đối thiết bị chưa từng đồng bộ thành công hoặc máy mới tinh ghi đè lên Firebase
-      if (dm && (!dm.hasSuccessfullySyncedWithCloud || dm.isFreshDevice) && (!extraMeta || !extraMeta.allowEmptyReset)) {
+      const isScoreOnlyAction = Boolean(extraMeta && (extraMeta.recentAction === 'SCORE_ADD' || extraMeta.recentAction === 'SCORE_DELETE'));
+      const isSettingsChange = !isScoreOnlyAction;
+      const isExplicitSettingsSave = isSettingsChange || (extraMeta && (extraMeta.allowSettingsOverwrite || extraMeta.actionType === 'SETTINGS_UPDATE'));
+
+      // SAFEGUARD: Chặn tuyệt đối thiết bị chưa từng đồng bộ thành công hoặc máy mới tinh ghi đè lên Firebase (NGOẠI TRỪ hành động sửa cài đặt/tiêu chí của Thầy Cô)
+      if (dm && (!dm.hasSuccessfullySyncedWithCloud || dm.isFreshDevice) && !isExplicitSettingsSave && (!extraMeta || !extraMeta.allowEmptyReset)) {
         console.warn('[FIREBASE SAFEGUARD] Prevented un-synced or fresh device from pushing to Firebase.');
         return { success: false, blocked: true };
       }
       const eventsCount = (data && Array.isArray(data.events)) ? data.events.length : 0;
-      if (eventsCount === 0 && (!extraMeta || !extraMeta.allowEmptyReset)) {
+      if (eventsCount === 0 && !isExplicitSettingsSave && (!extraMeta || !extraMeta.allowEmptyReset)) {
         if (dm && (!dm.hasUserModification || (dm.data && dm.data.settings && dm.data.settings.updatedAt === 0))) {
           console.warn('[FIREBASE SAFEGUARD] Prevented 0-event unverified push to Firebase.');
           return { success: false, blocked: true };
@@ -237,9 +271,6 @@
       }
 
       const cleanUrl = this.getCleanDatabaseUrl();
-
-      const isScoreOnlyAction = Boolean(extraMeta && (extraMeta.recentAction === 'SCORE_ADD' || extraMeta.recentAction === 'SCORE_DELETE'));
-      const isSettingsChange = !isScoreOnlyAction;
 
       let payloadSettings = (data && data.settings) ? { ...data.settings } : {};
       let payloadStudents = (data && data.students) ? [...data.students] : [];
@@ -312,7 +343,29 @@
         ...extraMeta
       };
 
-      // Cách 1: Thử đẩy qua Firebase SDK WebSocket
+      // Nếu là sửa cài đặt/tiêu chí: Gửi trực tiếp nhánh criteria & settings trước để đảm bảo lưu tức thì
+      if (isSettingsChange && payloadCriteria && payloadCriteria.length > 0) {
+        if (this.dbRef) {
+          try {
+            this.dbRef.child('criteria').set(payloadCriteria);
+            this.dbRef.child('settings').set(payloadSettings);
+          } catch(e) {}
+        }
+        try {
+          fetch(`${cleanUrl}/classes/lop9a4/criteria.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadCriteria)
+          }).catch(() => {});
+          fetch(`${cleanUrl}/classes/lop9a4/settings.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadSettings)
+          }).catch(() => {});
+        } catch(e) {}
+      }
+
+      // Cách 1: Thử đẩy toàn bộ qua Firebase SDK WebSocket
       if (this.dbRef) {
         try {
           await this.dbRef.set(payload);

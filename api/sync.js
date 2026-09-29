@@ -1,7 +1,7 @@
 /**
  * Vercel Serverless Function: Cloud Data Sync for Thi Đua 9A4
  * Handles persistent storage & multi-device synchronization for Teachers and Students
- * With Multi-tier Anti-Overwrite Safeguards
+ * With Multi-tier Anti-Overwrite Safeguards & Security Shield (Secret Key, Rate Limiter, Payload Guard)
  */
 
 const STORAGE_KEY = 'thidua9a4_master_class_database_v2026';
@@ -10,6 +10,14 @@ const FIREBASE_URL = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.
 const FALLBACK_SET_URL = `https://setget.net/set/${STORAGE_KEY}`;
 const FALLBACK_GET_URL = `https://setget.net/get/${STORAGE_KEY}`;
 const NTFY_URL = 'https://ntfy.sh/thidua9a4_tayphu_2026_sync';
+
+// Khóa bảo mật API (Ưu tiên biến môi trường Vercel SYNC_SECRET_KEY, có mã khóa mặc định an toàn cho lớp 9A4)
+const SYNC_SECRET_KEY = process.env.SYNC_SECRET_KEY || 'THIDUA9A4_SECURE_TOKEN_2026_TP';
+
+// Bộ nhớ Rate Limiting trên RAM máy chủ (Chống spam / DoS)
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // Khung thời gian 1 phút
+const MAX_REQUESTS_PER_MINUTE = 60; // Tối đa 60 requests/phút/IP
 
 function setCorsHeaders(req, res) {
   const origin = (req.headers && req.headers.origin) || '*';
@@ -22,8 +30,58 @@ function setCorsHeaders(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-sync-secret, Authorization'
   );
+}
+
+/**
+ * Lớp phòng vệ 1: Kiểm tra khóa bí mật & Chống Spam Request
+ */
+function verifyRequestSecurity(req, res) {
+  const forwarded = req.headers['x-forwarded-for'];
+  const clientIp = (forwarded ? forwarded.split(',')[0] : (req.socket && req.socket.remoteAddress) || '127.0.0.1').trim();
+  const now = Date.now();
+
+  // 1. Kiểm tra giới hạn tần suất (Rate Limiting)
+  let record = rateLimitMap.get(clientIp);
+  if (!record || now > record.resetTime) {
+    record = { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS };
+    rateLimitMap.set(clientIp, record);
+  } else {
+    record.count++;
+  }
+
+  // Tự động dọn dẹp bộ nhớ nếu lưu trữ trên 1000 IP
+  if (rateLimitMap.size > 1000) {
+    for (const [ip, item] of rateLimitMap.entries()) {
+      if (now > item.resetTime) rateLimitMap.delete(ip);
+    }
+  }
+
+  if (record.count > MAX_REQUESTS_PER_MINUTE) {
+    res.status(429).json({
+      success: false,
+      code: 'RATE_LIMIT_EXCEEDED',
+      error: '⚠️ Tần suất gửi yêu cầu quá nhanh (Spam Protection). Vui lòng thử lại sau 1 phút!'
+    });
+    return false;
+  }
+
+  // 2. Kiểm tra mã xác thực bảo mật bí mật (API Secret Key)
+  const incomingSecret = req.headers['x-sync-secret'] || 
+                         (req.headers['authorization'] ? req.headers['authorization'].replace(/^Bearer\s+/i, '') : '') ||
+                         (req.query && req.query.secret);
+
+  if (!incomingSecret || incomingSecret !== SYNC_SECRET_KEY) {
+    res.status(401).json({
+      success: false,
+      code: 'UNAUTHORIZED',
+      error: '⛔ Truy cập bị từ chối: Yêu cầu bị chặn do thiếu hoặc sai khóa bảo mật API (x-sync-secret)!'
+    });
+    return false;
+  }
+
+  return true;
 }
 
 module.exports = async (req, res) => {
@@ -31,6 +89,11 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // Kích hoạt khiên bảo mật chặn request trái phép
+  if (!verifyRequestSecurity(req, res)) {
+    return;
   }
 
   // --- GET: RETRIEVE LATEST DATA FROM SERVER ---
@@ -54,7 +117,7 @@ module.exports = async (req, res) => {
         console.warn('Firebase GET warning:', fbErr);
       }
 
-      // 3. Fallback to setget.net
+      // 2. Fallback to setget.net
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
 
@@ -98,6 +161,16 @@ module.exports = async (req, res) => {
   // --- POST: SAVE / PUSH DATA TO SERVER ---
   if (req.method === 'POST') {
     try {
+      // Lớp phòng vệ 3: Kiểm tra dung lượng gói tin (Chặn payload rác/quá tải)
+      const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
+      if (rawBody.length > 3 * 1024 * 1024) {
+        return res.status(413).json({
+          success: false,
+          code: 'PAYLOAD_TOO_LARGE',
+          error: '⛔ Gói dữ liệu vượt quá dung lượng an toàn cho phép (tối đa 3MB)!'
+        });
+      }
+
       let payload = req.body;
       if (typeof payload === 'string') {
         try { payload = JSON.parse(payload); } catch(e) {}

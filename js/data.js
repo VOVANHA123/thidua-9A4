@@ -769,43 +769,6 @@ class ClassDataManager {
       console.warn('Firebase sync notice:', fbErr);
     }
 
-    // SECONDARY CLOUD SOURCE: Vercel Secure Serverless API Fallback
-    try {
-      const apiUrl = this.getSyncApiUrl();
-      const apiController = new AbortController();
-      const apiTimeout = setTimeout(() => apiController.abort(), 6000);
-      const apiRes = await fetch(apiUrl, {
-        signal: apiController.signal,
-        headers: this.getSyncHeaders(),
-        cache: 'no-cache'
-      });
-      clearTimeout(apiTimeout);
-      if (apiRes.ok) {
-        const apiJson = await apiRes.json();
-        if (apiJson && apiJson.success && apiJson.data) {
-          const apiData = apiJson.data;
-          const apiUpdated = (apiData.settings && apiData.settings.updatedAt) || 0;
-          const localUpdated = (this.data.settings && this.data.settings.updatedAt) || 0;
-          this.isCloudConnected = true;
-          this.hasSuccessfullySyncedWithCloud = true;
-          if (this.isFreshDevice || apiUpdated > localUpdated) {
-            this.data = this.mergeWithDefaults(apiData);
-            this.saveToStorageLocal();
-          } else {
-            if (Array.isArray(apiData.criteria) && apiData.criteria.length > (this.data.criteria || []).length) {
-              this.data.criteria = apiData.criteria;
-              this.saveToStorageLocal();
-            }
-          }
-          this.lastSyncTime = Date.now();
-          this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
-          return { success: true, updated: true, data: this.data, source: 'vercel_secure_api' };
-        }
-      }
-    } catch (apiErr) {
-      console.warn('Vercel secure API sync notice:', apiErr);
-    }
-
     this.lastSyncTime = Date.now();
     this.updateCloudStatusUI(this.hasSuccessfullySyncedWithCloud, this.hasSuccessfullySyncedWithCloud ? 'Đã Đồng Bộ ⚡' : 'Ngoại Tuyến');
     return { success: true, updated: false, data: this.data };
@@ -936,18 +899,6 @@ class ClassDataManager {
         }
       } catch (fbErr) {
         console.warn('Firebase direct push warning:', fbErr);
-      }
-
-      // 3. ĐỒNG BỘ LÊN VERCEL SECURE SERVERLESS API (ĐÍNH KÈM SECRET KEY)
-      try {
-        const apiUrl = this.getSyncApiUrl();
-        fetch(apiUrl, {
-          method: 'POST',
-          headers: this.getSyncHeaders(),
-          body: JSON.stringify(payload)
-        }).catch(err => console.warn('Vercel API push notice:', err));
-      } catch (apiPushErr) {
-        console.warn('Vercel API push error:', apiPushErr);
       }
     };
 

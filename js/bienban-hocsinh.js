@@ -706,12 +706,6 @@ var StudentBienBanController = {
     this.currentPeriodValue = settings.currentWeek || 1;
     this.currentPeriodType = 'week';
 
-    var modal = document.getElementById('modal-student-bienban');
-    if (modal) {
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
     this._populateStudentSelect(this.currentStudentId);
     this._updatePeriodValueOptions('week');
 
@@ -719,6 +713,11 @@ var StudentBienBanController = {
     if (typeSelect) typeSelect.value = 'week';
 
     this.render();
+
+    var modal = document.getElementById('modal-student-bienban');
+    if (modal) {
+      modal.classList.add('show');
+    }
   },
 
   /**
@@ -727,9 +726,9 @@ var StudentBienBanController = {
   close: function() {
     var modal = document.getElementById('modal-student-bienban');
     if (modal) {
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
+      modal.classList.remove('show');
     }
+    document.body.style.overflow = '';
   },
 
   _populateStudentSelect: function(selectedId) {
@@ -843,7 +842,7 @@ var StudentBienBanController = {
   },
 
   /**
-   * In biên bản A4 chuẩn (qua iframe ẩn không làm ảnh hưởng giao diện chính)
+   * In biên bản A4 dọc chuẩn trực tiếp qua chế độ in hệ thống
    */
   print: function() {
     if (!this._checkAdmin()) {
@@ -854,35 +853,34 @@ var StudentBienBanController = {
     }
 
     var container = document.getElementById('sb-paper-container');
-    var student = window.classData.getStudentById(this.currentStudentId);
+    var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
     if (!container || !student) return;
 
-    try {
-      var iframe = document.getElementById('sb-print-iframe');
-      if (iframe) iframe.remove();
+    if (window.chibiSound) window.chibiSound.playClick();
 
-      iframe = document.createElement('iframe');
-      iframe.id = 'sb-print-iframe';
-      iframe.style.cssText = 'position:fixed; top:-9999px; left:-9999px; width:0; height:0; border:none;';
-      document.body.appendChild(iframe);
-
-      var doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8">' +
-        '<title>Biên Bản Thi Đua - ' + student.name + '</title>' +
-        '<style>' + SB_PRINT_CSS + '</style>' +
-        '</head><body>' +
-        container.innerHTML +
-        '</body></html>');
-      doc.close();
-
-      setTimeout(function() {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      }, 400);
-    } catch (err) {
-      window.print();
+    // 1. Đưa nội dung vào print-area chuyên biệt cho biên bản cá nhân
+    var printArea = document.getElementById('student-bienban-print-area');
+    if (printArea) {
+      printArea.innerHTML = container.innerHTML;
     }
+
+    // 2. Kích hoạt lớp in ấn trên thẻ body
+    document.body.classList.add('printing-student-bienban');
+
+    // 3. Tự động dọn dẹp sau khi in xong
+    var cleanup = function() {
+      document.body.classList.remove('printing-student-bienban');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+
+    // Bộ hẹn giờ dự phòng dọn dẹp nếu trình duyệt không bắn sự kiện afterprint
+    setTimeout(cleanup, 5000);
+
+    // 4. Kích hoạt lệnh in gốc
+    setTimeout(function() {
+      window.print();
+    }, 150);
   },
 
   /**
@@ -898,12 +896,12 @@ var StudentBienBanController = {
 
     var self = this;
     var container = document.getElementById('sb-paper-container');
-    var student = window.classData.getStudentById(this.currentStudentId);
+    var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
     if (!container || !student) return;
 
     if (typeof window.html2pdf === 'undefined') {
       if (window.chibiNotifications) {
-        window.chibiNotifications.showToast('Đang mở hộp thoại In...', 'Thư viện PDF đang tải, chuyển hướng sang chế độ In A4.', 'info');
+        window.chibiNotifications.showToast('Chế độ In A4', 'Đang mở hộp thoại In để lưu thành PDF...', 'info');
       }
       return this.print();
     }
@@ -917,24 +915,21 @@ var StudentBienBanController = {
       el.removeAttribute('contenteditable');
     });
 
-    var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; width:794px; background:#ffffff; color:#000000; font-family:"Times New Roman",Times,serif;';
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
-
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
     var cleanPeriod = periodLabel.replace(/\s+/g, '_');
     var fname = 'BienBan_ThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
 
-    window.html2pdf().set({
-      margin: [12, 12, 12, 15],
+    var opt = {
+      margin: [10, 10, 10, 12],
       filename: fname,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    }).from(wrapper).save()
+    };
+
+    window.html2pdf().set(opt).from(clone).save()
       .then(function() {
         if (window.chibiSound) window.chibiSound.playPlus();
         if (window.chibiNotifications) {
@@ -942,11 +937,8 @@ var StudentBienBanController = {
         }
       })
       .catch(function(err) {
-        console.error('PDF error:', err);
+        console.warn('PDF error:', err);
         self.print();
-      })
-      .finally(function() {
-        if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
       });
   },
 
@@ -988,7 +980,10 @@ var StudentBienBanController = {
     link.download = fname;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(function() {
+      if (link.parentNode) link.parentNode.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }, 150);
 
     if (window.chibiSound) window.chibiSound.playPlus();
     if (window.chibiNotifications) {
@@ -1041,7 +1036,10 @@ var StudentBienBanController = {
     link.download = fname;
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(function() {
+      if (link.parentNode) link.parentNode.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }, 150);
 
     if (window.chibiSound) window.chibiSound.playPlus();
     if (window.chibiNotifications) {

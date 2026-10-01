@@ -411,11 +411,11 @@ class AppController {
     // Nếu không phải Admin mà modal biên bản học sinh TT22 đang mở thì đóng ngay lập tức
     if (!canSB) {
       const modalSB = document.getElementById('modal-student-bienban');
-      if (modalSB && modalSB.style.display !== 'none') {
+      if (modalSB && modalSB.classList.contains('show')) {
         if (window.studentBienBanCtrl) {
           window.studentBienBanCtrl.close();
         } else {
-          modalSB.style.display = 'none';
+          modalSB.classList.remove('show');
         }
       }
     }
@@ -3247,6 +3247,9 @@ class AppController {
 
   closeAllModals() {
     document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('show'));
+    document.body.style.overflow = '';
+    document.body.classList.remove('printing-bienban');
+    document.body.classList.remove('printing-student-bienban');
   }
 
   // --- FORCE APP UPDATE & PURGE CACHE (FOR MOBILE PHONES) ---

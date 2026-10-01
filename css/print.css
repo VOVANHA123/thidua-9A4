@@ -219,7 +219,8 @@
    PRINT STYLES FOR BIÊN BẢN SINH HOẠT CHỦ NHIỆM TUẦN (A4 PORTRAIT)
    ========================================================================== */
 @media print {
-  body.printing-bienban {
+  body.printing-bienban,
+  body.printing-student-bienban {
     page: bienban;
     background: #ffffff !important;
     color: #000000 !important;
@@ -235,12 +236,18 @@
   body.printing-bienban #cloud-boot-overlay,
   body.printing-bienban #confetti-canvas,
   body.printing-bienban .modal-backdrop,
-  body.printing-bienban .no-print {
+  body.printing-bienban .no-print,
+  body.printing-student-bienban #view-app,
+  body.printing-student-bienban #cloud-boot-overlay,
+  body.printing-student-bienban #confetti-canvas,
+  body.printing-student-bienban .modal-backdrop,
+  body.printing-student-bienban .no-print {
     display: none !important;
   }
 
   /* Show solely the bien ban print area */
-  body.printing-bienban #bienban-print-area {
+  body.printing-bienban #bienban-print-area,
+  body.printing-student-bienban #student-bienban-print-area {
     display: block !important;
     width: 100% !important;
     background: #ffffff !important;
@@ -249,7 +256,8 @@
     margin: 0 !important;
   }
 
-  body.printing-bienban .bienban-page {
+  body.printing-bienban .bienban-page,
+  body.printing-student-bienban .bienban-page {
     min-height: auto !important;
     box-shadow: none !important;
     padding: 0 !important;
@@ -258,45 +266,53 @@
     background: transparent !important;
   }
 
-  body.printing-bienban .bb-page-break {
+  body.printing-bienban .bb-page-break,
+  body.printing-student-bienban .bb-page-break {
     page-break-before: always !important;
     break-before: page !important;
     margin-top: 20px !important;
     padding-top: 10px !important;
   }
 
-  body.printing-bienban .bb-keep-together {
+  body.printing-bienban .bb-keep-together,
+  body.printing-student-bienban .bb-keep-together {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  body.printing-bienban .bienban-table {
+  body.printing-bienban .bienban-table,
+  body.printing-student-bienban .bienban-table {
     width: 100% !important;
     border-collapse: collapse !important;
     margin: 6px 0 12px 0 !important;
     page-break-inside: auto !important;
   }
 
-  body.printing-bienban .bienban-table tr {
+  body.printing-bienban .bienban-table tr,
+  body.printing-student-bienban .bienban-table tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
   body.printing-bienban .bienban-table th,
-  body.printing-bienban .bienban-table td {
+  body.printing-bienban .bienban-table td,
+  body.printing-student-bienban .bienban-table th,
+  body.printing-student-bienban .bienban-table td {
     border: 1px solid #000000 !important;
     color: #000000 !important;
     padding: 4px 6px !important;
     background: transparent !important;
   }
 
-  body.printing-bienban .bb-signatures {
+  body.printing-bienban .bb-signatures,
+  body.printing-student-bienban .bb-signatures {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     margin-top: 24px !important;
   }
 
-  body.printing-bienban [contenteditable="true"] {
+  body.printing-bienban [contenteditable="true"],
+  body.printing-student-bienban [contenteditable="true"] {
     outline: none !important;
     background: transparent !important;
   }

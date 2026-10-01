@@ -411,53 +411,58 @@ function sbBuildTT22Block(td22, periodLabel) {
 var SB_WORD_CSS = '@page{size:21.0cm 29.7cm;margin:1.8cm 1.5cm 1.8cm 2.0cm;mso-page-orientation:portrait;}' +
   'body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.35;color:#000000;}' +
   '.bb-header-grid{display:table;width:100%;margin-bottom:12px;}' +
-  '.bb-header-left{display:table-cell;width:40%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:60%;text-align:center;vertical-align:top;}' +
+  '.bb-header-left{display:table-cell;width:44%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:56%;text-align:center;vertical-align:top;}' +
   '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
   '.bb-motto{font-weight:bold;font-size:12pt;}' +
-  '.bb-line-short{border-top:1px solid #000;width:80px;margin:3px auto;height:1px;}' +
+  '.bb-line-short{border-top:1px solid #000;width:75px;margin:3px auto;height:1px;}' +
   '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
-  '.bb-title-block{text-align:center;margin:12px 0 14px 0;}' +
-  '.bb-main-title{font-size:15pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:12pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:11.5pt;font-weight:bold;margin-top:12px;margin-bottom:5px;text-transform:uppercase;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:5px 0 10px 0;}' +
+  '.bb-title-block{text-align:center;margin:10px 0 12px 0;}' +
+  '.bb-main-title{font-size:14pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:11pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:11pt;font-weight:bold;margin-top:10px;margin-bottom:4px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10pt;margin:4px 0 8px 0;}' +
   'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:20px;page-break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:16px;page-break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
   '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:10pt;color:#334155;}' +
-  '.bb-sign-space{height:55px;}' +
+  '.bb-sign-sub{font-style:italic;font-size:9pt;color:#334155;}' +
+  '.bb-sign-space{height:50px;}' +
   '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
-  '.bb-keep-together{page-break-inside:avoid;}';
+  '.bb-keep-together{page-break-inside:avoid;}' +
+  '.bb-page-break{page-break-before:always;mso-special-character:line-break;clear:both;height:0;margin:0;padding:0;}' +
+  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:8px;font-size:9.5pt;}';
 
 var SB_PRINT_CSS = '@page{size:A4 portrait;margin:12mm 15mm 12mm 18mm;}' +
   '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
-  'body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.35;color:#000;background:#fff;margin:0;padding:0;}' +
-  '.bb-header-grid{display:table;width:100%;margin-bottom:12px;}' +
-  '.bb-header-left{display:table-cell;width:40%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:60%;text-align:center;vertical-align:top;}' +
+  'body{font-family:"Times New Roman",Times,serif;font-size:11.5pt;line-height:1.3;color:#000;background:#fff;margin:0;padding:0;}' +
+  '.bb-header-grid{display:table;width:100%;margin-bottom:10px;}' +
+  '.bb-header-left{display:table-cell;width:44%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:56%;text-align:center;vertical-align:top;}' +
   '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
   '.bb-motto{font-weight:bold;font-size:12pt;}' +
-  '.bb-line-short{border-top:1px solid #000;width:80px;margin:3px auto;height:1px;}' +
+  '.bb-line-short{border-top:1px solid #000;width:75px;margin:3px auto;height:1px;}' +
   '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
-  '.bb-title-block{text-align:center;margin:12px 0 14px 0;}' +
-  '.bb-main-title{font-size:15pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:12pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:11.5pt;font-weight:bold;margin-top:12px;margin-bottom:5px;text-transform:uppercase;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:5px 0 10px 0;}' +
+  '.bb-title-block{text-align:center;margin:8px 0 12px 0;}' +
+  '.bb-main-title{font-size:14pt;font-weight:bold;margin:2px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:11pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:11pt;font-weight:bold;margin-top:10px;margin-bottom:4px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10pt;margin:4px 0 8px 0;}' +
   'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
+  'table.bienban-table tr{page-break-inside:avoid;break-inside:avoid;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:20px;page-break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:16px;page-break-inside:avoid;break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
   '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:10pt;color:#334155;}' +
-  '.bb-sign-space{height:55px;}' +
+  '.bb-sign-sub{font-style:italic;font-size:9pt;color:#334155;}' +
+  '.bb-sign-space{height:50px;}' +
   '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
-  '.bb-keep-together{page-break-inside:avoid;}' +
+  '.bb-keep-together{page-break-inside:avoid;break-inside:avoid;}' +
+  '.bb-page-break{page-break-before:always!important;break-before:page!important;clear:both!important;height:0!important;margin:0!important;padding:0!important;border:none!important;}' +
+  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:8px;font-size:9.5pt;}' +
   '[contenteditable]{outline:none;}';
 
 /**
@@ -526,11 +531,11 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
   // Lời nhận xét sư phạm gợi ý tự động cho GVCN
   var teacherComment = '';
   if (totalMinus === 0 && totalPlus > 0) {
-    teacherComment = 'Em ' + student.name + ' có tinh thần tự giác rất cao, chấp hành nghiêm túc nội quy trường lớp trong ' + periodLabel + ', tích cực xây dựng bài và làm nhiều việc tốt. GVCN biểu dương em trước tập thể lớp 9A4.';
+    teacherComment = 'Em ' + student.name + ' có ý thức tự giác rất tốt, chấp hành nghiêm túc mọi nội quy trường lớp trong ' + periodLabel + ', tích cực xây dựng bài và đạt nhiều điểm cộng. Thầy biểu dương em và mong gia đình tiếp tục khích lệ để em phát huy hơn nữa.';
   } else if (totalMinus > 0) {
-    teacherComment = 'Em ' + student.name + ' cơ bản hoàn thành nhiệm vụ rèn luyện trong ' + periodLabel + ', tuy nhiên cần nghiêm túc khắc phục các lỗi vi phạm nội quy đã được nhắc nhở để đạt kết quả tốt hơn trong kỳ tới.';
+    teacherComment = 'Em ' + student.name + ' có nhiều cố gắng trong học tập và rèn luyện, tích cực phát biểu xây dựng bài. Tuy nhiên, em vẫn còn vi phạm nội quy (' + totalMinus + ' điểm trừ - cụ thể như bảng chi tiết ở trên). Đề nghị quý Phụ huynh phối hợp nhắc nhở, động viên để em nghiêm túc khắc phục, rèn luyện tốt hơn trong thời gian tới.';
   } else {
-    teacherComment = 'Em ' + student.name + ' duy trì nề nếp thi đua ổn định trong ' + periodLabel + ', chấp hành tốt nội quy nhà trường. GVCN đề nghị em tiếp tục nỗ lực rèn luyện để vươn lên thành tích cao hơn.';
+    teacherComment = 'Em ' + student.name + ' duy trì nề nếp tương đối ổn định trong ' + periodLabel + '. GVCN đề nghị em tích cực hơn nữa trong các hoạt động phong trào và học tập để đạt kết quả rèn luyện cao hơn.';
   }
 
   // Ngày tháng năm xuất biên bản
@@ -618,121 +623,197 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
     ? '<thead><tr><th style="width:6%;">TT</th><th style="width:36%;">Nội dung việc tốt</th><th style="width:14%;">Buổi</th><th style="width:32%;">Ghi chú</th><th style="width:12%;" class="center">Điểm cộng</th></tr></thead>'
     : '<thead><tr><th style="width:6%;">TT</th><th style="width:44%;">Nội dung việc tốt / Biểu dương khen thưởng</th><th style="width:16%;" class="center">Số lượt</th><th style="width:16%;" class="center">Điểm cộng</th><th style="width:18%;">Ghi chú</th></tr></thead>';
 
-  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:12pt; line-height:1.35; color:#000000; background:#ffffff; padding:0; margin:0;">' +
-    // Quốc hiệu, Tiêu ngữ chuẩn Nghị định 30/2020/NĐ-CP
-    '<div class="bb-header-grid" style="display:table; width:100%; margin-bottom:12px;">' +
-      '<div class="bb-header-left" style="display:table-cell; width:40%; text-align:center; vertical-align:top;">' +
-        '<div class="bb-school" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">' + schoolName + '</div>' +
-        '<div class="bb-class" style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">LỚP: <span>' + className + '</span></div>' +
-        '<div class="bb-line-short" style="border-top:1px solid #000; width:75px; margin:3px auto; height:1px;"></div>' +
-      '</div>' +
-      '<div class="bb-header-right" style="display:table-cell; width:60%; text-align:center; vertical-align:top;">' +
-        '<div class="bb-country" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
-        '<div class="bb-motto" style="font-size:12pt; font-weight:bold;">Độc lập - Tự do - Hạnh phúc</div>' +
-        '<div class="bb-line-long" style="border-top:1px solid #000; width:140px; margin:3px auto; height:1px;"></div>' +
+  // Khối chữ ký chuẩn 3 bên
+  var signaturesHtml = '<div class="bb-signatures bb-keep-together" style="margin-top:16px; width:100%; display:table; page-break-inside:avoid;">' +
+    '<div style="display:table-cell; width:32%; text-align:center; vertical-align:top;">' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">HỌC SINH</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:50px;"></div>' +
+      '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + student.name + '</div>' +
+    '</div>' +
+    '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:50px;"></div>' +
+      '<div style="font-style:italic; font-size:9.5pt; color:#64748b;">(Phụ huynh ký xác nhận)</div>' +
+    '</div>' +
+    '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
+      '<div style="text-align:center; font-size:10pt; font-style:italic; margin-bottom:2px;">Tây Phú, ' + todayDateStr + '</div>' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:50px;"></div>' +
+      '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + teacherName + '</div>' +
+    '</div>' +
+  '</div>';
+
+  // Khung nhận xét của GVCN
+  var teacherCommentBox = '<div class="bb-keep-together" style="margin-top:12px; page-break-inside:avoid;">' +
+    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">' +
+      (periodType === 'week' ? 'V. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:' : 'VI. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:') +
+    '</div>' +
+    '<div style="border:1px solid #000000; min-height:55px; padding:6px 10px; font-style:italic; line-height:1.5; font-size:10.5pt; background:#ffffff;">' +
+      '<span contenteditable="true" title="Bấm vào để chỉnh sửa lời nhận xét trước khi in hoặc xuất file">' + teacherComment + '</span>' +
+    '</div>' +
+  '</div>';
+
+  // Header Quốc hiệu, Tiêu ngữ chuẩn Nghị định 30/2020/NĐ-CP
+  var docHeaderHtml = '<div class="bb-header-grid" style="display:table; width:100%; margin-bottom:10px;">' +
+    '<div class="bb-header-left" style="display:table-cell; width:44%; text-align:center; vertical-align:top;">' +
+      '<div style="font-size:10pt; font-weight:normal; text-transform:uppercase; color:#1e293b;">PHÒNG GD&amp;ĐT HUYỆN TÂY SƠN</div>' +
+      '<div class="bb-school" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">' + schoolName + '</div>' +
+      '<div class="bb-class" style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">LỚP: <span>' + className + '</span></div>' +
+      '<div class="bb-line-short" style="border-top:1px solid #000; width:75px; margin:3px auto; height:1px;"></div>' +
+    '</div>' +
+    '<div class="bb-header-right" style="display:table-cell; width:56%; text-align:center; vertical-align:top;">' +
+      '<div class="bb-country" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
+      '<div class="bb-motto" style="font-size:12pt; font-weight:bold;">Độc lập - Tự do - Hạnh phúc</div>' +
+      '<div class="bb-line-long" style="border-top:1px solid #000; width:140px; margin:3px auto; height:1px;"></div>' +
+    '</div>' +
+  '</div>';
+
+  // Tiêu đề biên bản
+  var titleBlockHtml = '<div class="bb-title-block" style="text-align:center; margin:8px 0 12px 0;">' +
+    '<div class="bb-main-title" style="font-size:14pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">' +
+      'PHIẾU THEO DÕI THI ĐUA &amp; RÈN LUYỆN CÁ NHÂN' +
+    '</div>' +
+    '<div class="bb-sub-title" style="font-size:11pt; font-weight:bold; color:#1e293b; margin-top:2px;">' +
+      'Kỳ đánh giá: ' + periodLabel + ' • Năm học ' + (settings.academicYear || '2026 - 2027') +
+    '</div>' +
+    '<div style="font-size:9.5pt; font-style:italic; color:#475569; margin-top:1px;">' +
+      '(' + dateRangeText + ')' +
+    '</div>' +
+  '</div>';
+
+  // Phần I: Thông tin học sinh
+  var studentInfoHtml = '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">I. THÔNG TIN HỌC SINH:</div>' +
+  '<table class="bienban-table" style="font-size:10.5pt; margin-bottom:8px;">' +
+    '<tbody>' +
+      '<tr>' +
+        '<td style="width:20%; font-weight:bold;">Họ và tên học sinh:</td>' +
+        '<td style="width:40%; font-weight:bold; font-size:11.5pt; text-transform:uppercase;">' + student.name + '</td>' +
+        '<td style="width:16%; font-weight:bold;">Mã số HS:</td>' +
+        '<td style="width:24%; font-weight:bold;">' + studentCode + '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="font-weight:bold;">Lớp:</td>' +
+        '<td>' + (settings.className || 'Lớp 9A4') + '</td>' +
+        '<td style="font-weight:bold;">Tổ sinh hoạt:</td>' +
+        '<td>Tổ ' + student.group + '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="font-weight:bold;">Chức vụ trong lớp:</td>' +
+        '<td>' + (student.roleName || 'Thành viên') + '</td>' +
+        '<td style="font-weight:bold;">GV chủ nhiệm:</td>' +
+        '<td>' + teacherName + '</td>' +
+      '</tr>' +
+    '</tbody>' +
+  '</table>';
+
+  // ================= TRƯỜNG HỢP 1: BÁO CÁO TUẦN (GỌN GÀNG TRỌN VẸN TRONG 1 TRANG A4) =================
+  if (periodType === 'week') {
+    return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.3; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+      docHeaderHtml +
+      titleBlockHtml +
+      studentInfoHtml +
+
+      // Phần II: Điểm thi đua tuần
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">II. KẾT QUẢ ĐIỂM THI ĐUA TUẦN:</div>' +
+      scoreTableHtml +
+
+      // Phần III: Chi tiết việc tốt tuần
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">III. CHI TIẾT VIỆC TỐT ĐẠT ĐIỂM CỘNG TRONG TUẦN:</div>' +
+      '<table class="bienban-table" style="font-size:10pt;">' +
+        plusTableHeader +
+        '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
+      '</table>' +
+
+      // Phần IV: Chi tiết vi phạm nội quy tuần
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY TRONG TUẦN:</div>' +
+      '<table class="bienban-table" style="font-size:10pt;">' +
+        '<thead>' +
+          '<tr>' +
+            '<th style="width:6%;">TT</th>' +
+            '<th style="width:20%;">Thời gian</th>' +
+            '<th style="width:10%;">Buổi</th>' +
+            '<th style="width:34%;">Nội dung vi phạm</th>' +
+            '<th style="width:20%;">Ghi chú</th>' +
+            '<th style="width:10%;" class="center">Điểm trừ</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' + sbBuildMinusDetailRows(minusEvents, criteria) + '</tbody>' +
+      '</table>' +
+
+      // Phần V: Nhận xét GVCN & Chữ ký
+      teacherCommentBox +
+      signaturesHtml +
+
+    '</div>';
+  }
+
+  // ================= TRƯỜNG HỢP 2: THÁNG, HỌC KỲ, CẢ NĂM (PHÂN TRANG 2 TRANG A4 CHUẨN XÁC) =================
+  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.3; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+
+    // -------- TRANG 1 --------
+    '<div class="bb-page bb-page-1">' +
+      docHeaderHtml +
+      titleBlockHtml +
+      studentInfoHtml +
+
+      // Phần II: Kết quả điểm thi đua kỳ
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">II. TỔNG HỢP KẾT QUẢ ĐIỂM THI ĐUA:</div>' +
+      scoreTableHtml +
+
+      // Bảng điểm từng tuần
+      sbBuildWeekTable(student.id, periodType, periodValue) +
+
+      // Phần III: Tổng hợp việc tốt / điểm cộng (gom theo tiêu chí)
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:10px; margin-bottom:4px;">III. TỔNG HỢP CÁC MẶT TÍCH CỰC &amp; VIỆC TỐT ĐẠT ĐIỂM CỘNG:</div>' +
+      '<table class="bienban-table" style="font-size:10pt;">' +
+        plusTableHeader +
+        '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
+      '</table>' +
+
+      // Chú thích chân trang 1
+      '<div style="text-align:right; font-size:9pt; font-style:italic; color:#64748b; margin-top:6px;">' +
+        '(Phiếu gồm 02 trang • Xem tiếp Trang 2: Chi tiết vi phạm nội quy, Dự kiến xếp loại TT22, Nhận xét GVCN &amp; Chữ ký xác nhận)' +
       '</div>' +
     '</div>' +
 
-    // Tiêu đề biên bản trang trọng
-    '<div class="bb-title-block" style="text-align:center; margin:10px 0 14px 0;">' +
-      '<div class="bb-main-title" style="font-size:14.5pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">' +
-        'PHIẾU THEO DÕI THI ĐUA &amp; RÈN LUYỆN CÁ NHÂN' +
+    // -------- NGẮT TRANG A4 BẮT BUỘC (GIỮA TRANG 1 VÀ TRANG 2) --------
+    '<div class="bb-page-break html2pdf__page-break" style="page-break-before:always; break-before:page; clear:both; mso-special-character:line-break;"></div>' +
+
+    // -------- TRANG 2 --------
+    '<div class="bb-page bb-page-2">' +
+      // Tiêu đề phụ đầu trang 2
+      '<div class="bb-page2-subhead" style="display:table; width:100%; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:8px; font-size:9.5pt;">' +
+        '<div style="display:table-cell; width:45%; text-align:left;"><b>TRƯỜNG THCS TÂY PHÚ - LỚP ' + className + '</b></div>' +
+        '<div style="display:table-cell; width:55%; text-align:right;"><b>PHIẾU THEO DÕI RÈN LUYỆN (Trang 2/2)</b> - HS: <b>' + student.name + '</b></div>' +
       '</div>' +
-      '<div class="bb-sub-title" style="font-size:11.5pt; font-weight:bold; color:#1e293b; margin-top:2px;">' +
-        'Kỳ đánh giá: ' + periodLabel + ' • Năm học ' + (settings.academicYear || '2026 - 2027') +
-      '</div>' +
-      '<div style="font-size:10pt; font-style:italic; color:#475569; margin-top:1px;">' +
-        '(' + dateRangeText + ')' +
-      '</div>' +
-    '</div>' +
 
-    // Phần I: Thông tin học sinh (độ rộng cột cân đối chuẩn để họ tên không bị gãy dòng)
-    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">I. THÔNG TIN HỌC SINH:</div>' +
-    '<table class="bienban-table" style="font-size:10.5pt; margin-bottom:8px;">' +
-      '<tbody>' +
-        '<tr>' +
-          '<td style="width:20%; font-weight:bold;">Họ và tên học sinh:</td>' +
-          '<td style="width:40%; font-weight:bold; font-size:11.5pt; text-transform:uppercase;">' + student.name + '</td>' +
-          '<td style="width:16%; font-weight:bold;">Mã số HS:</td>' +
-          '<td style="width:24%; font-weight:bold;">' + studentCode + '</td>' +
-        '</tr>' +
-        '<tr>' +
-          '<td style="font-weight:bold;">Lớp:</td>' +
-          '<td>' + (settings.className || 'Lớp 9A4') + '</td>' +
-          '<td style="font-weight:bold;">Tổ sinh hoạt:</td>' +
-          '<td>Tổ ' + student.group + '</td>' +
-        '</tr>' +
-        '<tr>' +
-          '<td style="font-weight:bold;">Chức vụ trong lớp:</td>' +
-          '<td>' + (student.roleName || 'Thành viên') + '</td>' +
-          '<td style="font-weight:bold;">GV chủ nhiệm:</td>' +
-          '<td>' + teacherName + '</td>' +
-        '</tr>' +
-      '</tbody>' +
-    '</table>' +
+      // Phần IV: Chi tiết các lần vi phạm nội quy (Toàn bộ vi phạm nằm đầu trang 2)
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY CẦN KHẮC PHỤC:</div>' +
+      '<table class="bienban-table" style="font-size:10pt;">' +
+        '<thead>' +
+          '<tr>' +
+            '<th style="width:6%;">TT</th>' +
+            '<th style="width:20%;">Thời gian ghi nhận</th>' +
+            '<th style="width:10%;">Buổi</th>' +
+            '<th style="width:32%;">Nội dung vi phạm</th>' +
+            '<th style="width:22%;">Ghi chú cụ thể</th>' +
+            '<th style="width:10%;" class="center">Điểm trừ</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' + sbBuildMinusDetailRows(minusEvents, criteria) + '</tbody>' +
+      '</table>' +
 
-    // Phần II: Kết quả điểm thi đua
-    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:10px; margin-bottom:4px;">II. KẾT QUẢ ĐIỂM THI ĐUA:</div>' +
-    scoreTableHtml +
+      // Phần V: Dự kiến xếp loại TT22
+      sbBuildTT22Block(td22, periodLabel) +
 
-    // Bảng tuần (nếu xem Tháng, HK, Cả năm)
-    sbBuildWeekTable(student.id, periodType, periodValue) +
+      // Phần VI: Ý kiến / Nhận xét của Giáo viên chủ nhiệm
+      teacherCommentBox +
 
-    // Phần III: Chi tiết vi phạm nội quy
-    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:12px; margin-bottom:4px;">III. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY:</div>' +
-    '<table class="bienban-table" style="font-size:10pt;">' +
-      '<thead>' +
-        '<tr>' +
-          '<th style="width:6%;">TT</th>' +
-          '<th style="width:20%;">Thời gian</th>' +
-          '<th style="width:10%;">Buổi</th>' +
-          '<th style="width:32%;">Nội dung vi phạm</th>' +
-          '<th style="width:22%;">Ghi chú</th>' +
-          '<th style="width:10%;" class="center">Điểm trừ</th>' +
-        '</tr>' +
-      '</thead>' +
-      '<tbody>' + sbBuildMinusDetailRows(minusEvents, criteria) + '</tbody>' +
-    '</table>' +
-
-    // Phần IV: Tổng hợp việc tốt / điểm cộng (súc tích, không làm tràn trang)
-    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:12px; margin-bottom:4px;">IV. TỔNG HỢP CÁC MẶT TÍCH CỰC &amp; VIỆC TỐT ĐẠT ĐIỂM CỘNG:</div>' +
-    '<table class="bienban-table" style="font-size:10pt;">' +
-      plusTableHeader +
-      '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
-    '</table>' +
-
-    // Khối dự kiến xếp loại rèn luyện TT22 (nếu có)
-    sbBuildTT22Block(td22, periodLabel) +
-
-    // Phần VI: Nhận xét của Giáo viên chủ nhiệm
-    '<div class="bb-keep-together" style="margin-top:12px; page-break-inside:avoid;">' +
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">VI. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:</div>' +
-      '<div style="border:1px solid #000000; min-height:55px; padding:6px 10px; font-style:italic; line-height:1.5; font-size:11pt; background:#ffffff;">' +
-        '<span contenteditable="true" title="Bấm vào để chỉnh sửa lời nhận xét trước khi in hoặc xuất file">' + teacherComment + '</span>' +
-      '</div>' +
-    '</div>' +
-
-    // Phần VII: Chữ ký 3 bên (Bọc trong avoid page-break)
-    '<div class="bb-signatures bb-keep-together" style="margin-top:16px; width:100%; display:table; page-break-inside:avoid;">' +
-      '<div style="display:table-cell; width:32%; text-align:center; vertical-align:top;">' +
-        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">HỌC SINH</div>' +
-        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-        '<div class="bb-sign-space" style="height:55px;"></div>' +
-        '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + student.name + '</div>' +
-      '</div>' +
-      '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
-        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH</div>' +
-        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-        '<div class="bb-sign-space" style="height:55px;"></div>' +
-        '<div style="font-style:italic; font-size:10pt; color:#64748b;">(Phụ huynh ký xác nhận)</div>' +
-      '</div>' +
-      '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
-        '<div style="text-align:center; font-size:10.5pt; font-style:italic; margin-bottom:2px;">Tây Phú, ' + todayDateStr + '</div>' +
-        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>' +
-        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-        '<div class="bb-sign-space" style="height:55px;"></div>' +
-        '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + teacherName + '</div>' +
-      '</div>' +
+      // Phần VII: Chữ ký 3 bên
+      signaturesHtml +
     '</div>' +
 
   '</div>';
@@ -920,6 +1001,16 @@ var StudentBienBanController = {
 
     if (window.chibiSound) window.chibiSound.playClick();
 
+    // Ép buộc hướng in A4 portrait bằng style động
+    var styleId = 'dynamic-bienban-print-style';
+    var existStyle = document.getElementById(styleId);
+    if (!existStyle) {
+      existStyle = document.createElement('style');
+      existStyle.id = styleId;
+      existStyle.innerHTML = '@page { size: A4 portrait !important; margin: 12mm 15mm 12mm 18mm !important; }';
+      document.head.appendChild(existStyle);
+    }
+
     // Đưa nội dung vào print-area chuyên biệt cho biên bản cá nhân
     var printArea = document.getElementById('student-bienban-print-area');
     if (printArea) {
@@ -932,12 +1023,14 @@ var StudentBienBanController = {
     // Tự động dọn dẹp sau khi in xong
     var cleanup = function() {
       document.body.classList.remove('printing-student-bienban');
+      var s = document.getElementById(styleId);
+      if (s && s.parentNode) s.parentNode.removeChild(s);
       window.removeEventListener('afterprint', cleanup);
     };
     window.addEventListener('afterprint', cleanup);
 
     // Bộ hẹn giờ dự phòng dọn dẹp nếu trình duyệt không phát sự kiện afterprint
-    setTimeout(cleanup, 5000);
+    setTimeout(cleanup, 6000);
 
     // Kích hoạt lệnh in gốc
     setTimeout(function() {
@@ -972,12 +1065,21 @@ var StudentBienBanController = {
       window.chibiNotifications.showToast('Đang tạo file PDF...', 'Vui lòng chờ trong giây lát...', 'info');
     }
 
-    // Nhân bản phần tử và xóa các khoảng đệm thừa trên màn hình để PDF dàn trang hoàn hảo
+    // Tạo host tạm gắn vào DOM thực tế để html2canvas đo đạc kích thước và font chuẩn xác
+    var tempHost = document.createElement('div');
+    tempHost.id = 'temp-html2pdf-host';
+    tempHost.style.position = 'fixed';
+    tempHost.style.left = '-9999px';
+    tempHost.style.top = '0';
+    tempHost.style.width = '780px';
+    tempHost.style.background = '#ffffff';
+    tempHost.style.zIndex = '-9999';
+
     var clone = container.cloneNode(true);
+    clone.style.width = '780px';
+    clone.style.maxWidth = '780px';
     clone.style.padding = '0';
     clone.style.margin = '0';
-    clone.style.maxWidth = '100%';
-    clone.style.width = '100%';
     clone.style.boxShadow = 'none';
     clone.style.border = 'none';
     clone.style.background = '#ffffff';
@@ -986,34 +1088,47 @@ var StudentBienBanController = {
       el.removeAttribute('contenteditable');
     });
 
+    tempHost.appendChild(clone);
+    document.body.appendChild(tempHost);
+
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
     var cleanPeriod = periodLabel.replace(/\s+/g, '_');
     var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
 
     var opt = {
-      margin: [12, 12, 12, 14],
+      margin: [10, 10, 10, 12],
       filename: fname,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
         logging: false,
-        letterRendering: true
+        letterRendering: true,
+        width: 780,
+        windowWidth: 780,
+        scrollX: 0,
+        scrollY: 0
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'], avoid: ['.bb-keep-together', '.bb-signatures', 'tr'] }
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
     window.html2pdf().set(opt).from(clone).save()
       .then(function() {
+        if (tempHost && tempHost.parentNode) {
+          tempHost.parentNode.removeChild(tempHost);
+        }
         if (window.chibiSound) window.chibiSound.playPlus();
         if (window.chibiNotifications) {
           window.chibiNotifications.showToast('Xuất PDF thành công! 📕', 'Đã tải về: ' + fname, 'success');
         }
       })
       .catch(function(err) {
-        console.warn('PDF error:', err);
+        console.warn('PDF export error:', err);
+        if (tempHost && tempHost.parentNode) {
+          tempHost.parentNode.removeChild(tempHost);
+        }
         self.print();
       });
   },

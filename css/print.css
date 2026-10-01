@@ -270,8 +270,16 @@
   body.printing-student-bienban .bb-page-break {
     page-break-before: always !important;
     break-before: page !important;
-    margin-top: 20px !important;
-    padding-top: 10px !important;
+    clear: both !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  body.printing-bienban .bb-page-break::after,
+  body.printing-student-bienban .bb-page-break::after {
+    display: none !important;
   }
 
   body.printing-bienban .bb-keep-together,

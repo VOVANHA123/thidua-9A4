@@ -2824,4 +2824,34 @@ body.is-gvcn #btn-open-bienban-table {
   }
 }
 
+/* ==========================================================================
+   BIÊN BẢN THI ĐUA CÁ NHÂN HỌC SINH (PHÂN TRANG MÀN HÌNH PREVIEW)
+   ========================================================================== */
+#sb-paper-container .bb-page-break {
+  border-top: 2px dashed #94a3b8;
+  margin: 28px -30px 22px;
+  position: relative;
+  text-align: center;
+  height: auto;
+}
+
+#sb-paper-container .bb-page-break::after {
+  content: "--- HẾT TRANG 1 • BẮT ĐẦU TRANG 2 ---";
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 8.5pt;
+  font-weight: 700;
+  padding: 3px 14px;
+  border-radius: 9999px;
+  position: relative;
+  top: -10px;
+  letter-spacing: 0.5px;
+  font-family: system-ui, -apple-system, sans-serif;
+  border: 1px solid #cbd5e1;
+}
+
+.student-bienban-print-area {
+  display: none;
+}
+
 

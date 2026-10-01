@@ -408,61 +408,65 @@ function sbBuildTT22Block(td22, periodLabel) {
 }
 
 // ================= CSS ĐẶC THÙ CHO IN ẤN VÀ FILE WORD =================
-var SB_WORD_CSS = '@page{size:21.0cm 29.7cm;margin:1.8cm 1.5cm 1.8cm 2.0cm;mso-page-orientation:portrait;}' +
-  'body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.35;color:#000000;}' +
-  '.bb-header-grid{display:table;width:100%;margin-bottom:12px;}' +
-  '.bb-header-left{display:table-cell;width:44%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:56%;text-align:center;vertical-align:top;}' +
-  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
-  '.bb-motto{font-weight:bold;font-size:12pt;}' +
-  '.bb-line-short{border-top:1px solid #000;width:75px;margin:3px auto;height:1px;}' +
-  '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
-  '.bb-title-block{text-align:center;margin:10px 0 12px 0;}' +
-  '.bb-main-title{font-size:14pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:11pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:11pt;font-weight:bold;margin-top:10px;margin-bottom:4px;text-transform:uppercase;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10pt;margin:4px 0 8px 0;}' +
-  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
+var SB_WORD_CSS = '@page{size:21.0cm 29.7cm;margin:1.5cm 1.5cm 1.5cm 1.8cm;mso-page-orientation:portrait;}' +
+  'body{font-family:"Times New Roman",Times,serif;font-size:11.5pt;line-height:1.3;color:#000000;}' +
+  '.bb-header-grid{display:table;width:100%;margin-bottom:8px;}' +
+  '.bb-header-left{display:table-cell;width:46%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:54%;text-align:center;vertical-align:top;}' +
+  '.bb-agency{font-weight:bold;font-size:10.5pt;text-transform:uppercase;}' +
+  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:10.5pt;}' +
+  '.bb-motto{font-weight:bold;font-size:11.5pt;}' +
+  '.bb-line-short{border-top:1px solid #000;width:70px;margin:3px auto;height:1px;}' +
+  '.bb-line-long{border-top:1px solid #000;width:135px;margin:3px auto;height:1px;}' +
+  '.bb-title-block{text-align:center;margin:6px 0 10px 0;}' +
+  '.bb-main-title{font-size:13.5pt;font-weight:bold;margin:2px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:10.5pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:10.5pt;font-weight:bold;margin-top:8px;margin-bottom:3px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:3px 0 6px 0;}' +
+  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:3px 5px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:16px;page-break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:12px;page-break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
-  '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:9pt;color:#334155;}' +
-  '.bb-sign-space{height:50px;}' +
-  '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
+  '.bb-sign-role{font-weight:bold;font-size:10.5pt;text-transform:uppercase;}' +
+  '.bb-sign-sub{font-style:italic;font-size:8.5pt;color:#334155;}' +
+  '.bb-sign-space{height:40px;}' +
+  '.bb-sign-name{font-weight:bold;font-size:10.5pt;}' +
   '.bb-keep-together{page-break-inside:avoid;}' +
-  '.bb-page-break{page-break-before:always;mso-special-character:line-break;clear:both;height:0;margin:0;padding:0;}' +
-  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:8px;font-size:9.5pt;}';
+  '.sb-screen-only-divider{display:none;}' +
+  '.html2pdf__page-break{page-break-before:always;mso-special-character:line-break;clear:both;height:0;margin:0;padding:0;}' +
+  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:6px;font-size:9pt;}';
 
-var SB_PRINT_CSS = '@page{size:A4 portrait;margin:12mm 15mm 12mm 18mm;}' +
+var SB_PRINT_CSS = '@page{size:A4 portrait;margin:10mm 12mm 10mm 15mm;}' +
   '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
-  'body{font-family:"Times New Roman",Times,serif;font-size:11.5pt;line-height:1.3;color:#000;background:#fff;margin:0;padding:0;}' +
-  '.bb-header-grid{display:table;width:100%;margin-bottom:10px;}' +
-  '.bb-header-left{display:table-cell;width:44%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:56%;text-align:center;vertical-align:top;}' +
-  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
-  '.bb-motto{font-weight:bold;font-size:12pt;}' +
-  '.bb-line-short{border-top:1px solid #000;width:75px;margin:3px auto;height:1px;}' +
-  '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
-  '.bb-title-block{text-align:center;margin:8px 0 12px 0;}' +
-  '.bb-main-title{font-size:14pt;font-weight:bold;margin:2px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:11pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:11pt;font-weight:bold;margin-top:10px;margin-bottom:4px;text-transform:uppercase;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10pt;margin:4px 0 8px 0;}' +
-  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
+  'body{font-family:"Times New Roman",Times,serif;font-size:11.5pt;line-height:1.25;color:#000;background:#fff;margin:0;padding:0;}' +
+  '.bb-header-grid{display:table;width:100%;margin-bottom:8px;}' +
+  '.bb-header-left{display:table-cell;width:46%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:54%;text-align:center;vertical-align:top;}' +
+  '.bb-agency{font-weight:bold;font-size:10.5pt;text-transform:uppercase;}' +
+  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:10.5pt;}' +
+  '.bb-motto{font-weight:bold;font-size:11.5pt;}' +
+  '.bb-line-short{border-top:1px solid #000;width:70px;margin:3px auto;height:1px;}' +
+  '.bb-line-long{border-top:1px solid #000;width:135px;margin:3px auto;height:1px;}' +
+  '.bb-title-block{text-align:center;margin:6px 0 10px 0;}' +
+  '.bb-main-title{font-size:13.5pt;font-weight:bold;margin:2px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:10.5pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:10.5pt;font-weight:bold;margin-top:8px;margin-bottom:3px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:3px 0 6px 0;}' +
+  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:3px 5px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
   'table.bienban-table tr{page-break-inside:avoid;break-inside:avoid;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:16px;page-break-inside:avoid;break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:12px;page-break-inside:avoid;break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
-  '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:9pt;color:#334155;}' +
-  '.bb-sign-space{height:50px;}' +
-  '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
+  '.bb-sign-role{font-weight:bold;font-size:10.5pt;text-transform:uppercase;}' +
+  '.bb-sign-sub{font-style:italic;font-size:8.5pt;color:#334155;}' +
+  '.bb-sign-space{height:38px;}' +
+  '.bb-sign-name{font-weight:bold;font-size:10.5pt;}' +
   '.bb-keep-together{page-break-inside:avoid;break-inside:avoid;}' +
-  '.bb-page-break{page-break-before:always!important;break-before:page!important;clear:both!important;height:0!important;margin:0!important;padding:0!important;border:none!important;}' +
-  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:8px;font-size:9.5pt;}' +
+  '.sb-screen-only-divider{display:none!important;}' +
+  '.html2pdf__page-break{page-break-before:always!important;break-before:page!important;clear:both!important;height:0!important;margin:0!important;padding:0!important;border:none!important;}' +
+  '.bb-page2-subhead{display:table;width:100%;border-bottom:1px solid #000;padding-bottom:3px;margin-bottom:6px;font-size:9pt;}' +
   '[contenteditable]{outline:none;}';
 
 /**
@@ -624,73 +628,73 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
     : '<thead><tr><th style="width:6%;">TT</th><th style="width:44%;">Nội dung việc tốt / Biểu dương khen thưởng</th><th style="width:16%;" class="center">Số lượt</th><th style="width:16%;" class="center">Điểm cộng</th><th style="width:18%;">Ghi chú</th></tr></thead>';
 
   // Khối chữ ký chuẩn 3 bên
-  var signaturesHtml = '<div class="bb-signatures bb-keep-together" style="margin-top:16px; width:100%; display:table; page-break-inside:avoid;">' +
+  var signaturesHtml = '<div class="bb-signatures bb-keep-together" style="margin-top:12px; width:100%; display:table; page-break-inside:avoid; break-inside:avoid;">' +
     '<div style="display:table-cell; width:32%; text-align:center; vertical-align:top;">' +
-      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">HỌC SINH</div>' +
-      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-      '<div class="bb-sign-space" style="height:50px;"></div>' +
-      '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + student.name + '</div>' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:10.5pt; text-transform:uppercase;">HỌC SINH</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:8.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:38px;"></div>' +
+      '<div class="bb-sign-name" style="font-weight:bold; font-size:10.5pt;">' + student.name + '</div>' +
     '</div>' +
     '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
-      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH</div>' +
-      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-      '<div class="bb-sign-space" style="height:50px;"></div>' +
-      '<div style="font-style:italic; font-size:9.5pt; color:#64748b;">(Phụ huynh ký xác nhận)</div>' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:10.5pt; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:8.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:38px;"></div>' +
+      '<div style="font-style:italic; font-size:9pt; color:#64748b;">(Phụ huynh ký xác nhận)</div>' +
     '</div>' +
     '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
-      '<div style="text-align:center; font-size:10pt; font-style:italic; margin-bottom:2px;">Tây Phú, ' + todayDateStr + '</div>' +
-      '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>' +
-      '<div class="bb-sign-sub" style="font-style:italic; font-size:9pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
-      '<div class="bb-sign-space" style="height:50px;"></div>' +
-      '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + teacherName + '</div>' +
+      '<div style="text-align:center; font-size:9.5pt; font-style:italic; margin-bottom:2px;">Tây Phú, ' + todayDateStr + '</div>' +
+      '<div class="bb-sign-role" style="font-weight:bold; font-size:10.5pt; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>' +
+      '<div class="bb-sign-sub" style="font-style:italic; font-size:8.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+      '<div class="bb-sign-space" style="height:38px;"></div>' +
+      '<div class="bb-sign-name" style="font-weight:bold; font-size:10.5pt;">' + teacherName + '</div>' +
     '</div>' +
   '</div>';
 
   // Khung nhận xét của GVCN
-  var teacherCommentBox = '<div class="bb-keep-together" style="margin-top:12px; page-break-inside:avoid;">' +
-    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">' +
+  var teacherCommentBox = '<div class="bb-keep-together" style="margin-top:10px; page-break-inside:avoid; break-inside:avoid;">' +
+    '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-bottom:3px;">' +
       (periodType === 'week' ? 'V. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:' : 'VI. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:') +
     '</div>' +
-    '<div style="border:1px solid #000000; min-height:55px; padding:6px 10px; font-style:italic; line-height:1.5; font-size:10.5pt; background:#ffffff;">' +
+    '<div style="border:1px solid #000000; min-height:42px; padding:5px 8px; font-style:italic; line-height:1.4; font-size:10pt; background:#ffffff;">' +
       '<span contenteditable="true" title="Bấm vào để chỉnh sửa lời nhận xét trước khi in hoặc xuất file">' + teacherComment + '</span>' +
     '</div>' +
   '</div>';
 
-  // Header Quốc hiệu, Tiêu ngữ chuẩn Nghị định 30/2020/NĐ-CP
-  var docHeaderHtml = '<div class="bb-header-grid" style="display:table; width:100%; margin-bottom:10px;">' +
-    '<div class="bb-header-left" style="display:table-cell; width:44%; text-align:center; vertical-align:top;">' +
-      '<div style="font-size:10pt; font-weight:normal; text-transform:uppercase; color:#1e293b;">PHÒNG GD&amp;ĐT HUYỆN TÂY SƠN</div>' +
-      '<div class="bb-school" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">' + schoolName + '</div>' +
-      '<div class="bb-class" style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">LỚP: <span>' + className + '</span></div>' +
-      '<div class="bb-line-short" style="border-top:1px solid #000; width:75px; margin:3px auto; height:1px;"></div>' +
+  // Header Quốc hiệu, Tiêu ngữ chuẩn Nghị định 30/2020/NĐ-CP (Đúng chuẩn UBND XÃ TÂY PHÚ)
+  var docHeaderHtml = '<div class="bb-header-grid" style="display:table; width:100%; margin-bottom:8px;">' +
+    '<div class="bb-header-left" style="display:table-cell; width:46%; text-align:center; vertical-align:top;">' +
+      '<div class="bb-agency" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; color:#000000;">UBND XÃ TÂY PHÚ</div>' +
+      '<div class="bb-school" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; color:#000000;">' + schoolName + '</div>' +
+      '<div class="bb-class" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; color:#000000;">LỚP: <span>' + className + '</span></div>' +
+      '<div class="bb-line-short" style="border-top:1px solid #000; width:70px; margin:3px auto; height:1px;"></div>' +
     '</div>' +
-    '<div class="bb-header-right" style="display:table-cell; width:56%; text-align:center; vertical-align:top;">' +
-      '<div class="bb-country" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
-      '<div class="bb-motto" style="font-size:12pt; font-weight:bold;">Độc lập - Tự do - Hạnh phúc</div>' +
-      '<div class="bb-line-long" style="border-top:1px solid #000; width:140px; margin:3px auto; height:1px;"></div>' +
+    '<div class="bb-header-right" style="display:table-cell; width:54%; text-align:center; vertical-align:top;">' +
+      '<div class="bb-country" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; color:#000000;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
+      '<div class="bb-motto" style="font-size:11.5pt; font-weight:bold; color:#000000;">Độc lập - Tự do - Hạnh phúc</div>' +
+      '<div class="bb-line-long" style="border-top:1px solid #000; width:135px; margin:3px auto; height:1px;"></div>' +
     '</div>' +
   '</div>';
 
   // Tiêu đề biên bản
-  var titleBlockHtml = '<div class="bb-title-block" style="text-align:center; margin:8px 0 12px 0;">' +
-    '<div class="bb-main-title" style="font-size:14pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">' +
+  var titleBlockHtml = '<div class="bb-title-block" style="text-align:center; margin:6px 0 10px 0;">' +
+    '<div class="bb-main-title" style="font-size:13.5pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">' +
       'PHIẾU THEO DÕI THI ĐUA &amp; RÈN LUYỆN CÁ NHÂN' +
     '</div>' +
-    '<div class="bb-sub-title" style="font-size:11pt; font-weight:bold; color:#1e293b; margin-top:2px;">' +
+    '<div class="bb-sub-title" style="font-size:10.5pt; font-weight:bold; color:#1e293b; margin-top:2px;">' +
       'Kỳ đánh giá: ' + periodLabel + ' • Năm học ' + (settings.academicYear || '2026 - 2027') +
     '</div>' +
-    '<div style="font-size:9.5pt; font-style:italic; color:#475569; margin-top:1px;">' +
+    '<div style="font-size:9pt; font-style:italic; color:#475569; margin-top:1px;">' +
       '(' + dateRangeText + ')' +
     '</div>' +
   '</div>';
 
   // Phần I: Thông tin học sinh
-  var studentInfoHtml = '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">I. THÔNG TIN HỌC SINH:</div>' +
-  '<table class="bienban-table" style="font-size:10.5pt; margin-bottom:8px;">' +
+  var studentInfoHtml = '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-bottom:3px;">I. THÔNG TIN HỌC SINH:</div>' +
+  '<table class="bienban-table" style="font-size:10pt; margin-bottom:6px;">' +
     '<tbody>' +
       '<tr>' +
         '<td style="width:20%; font-weight:bold;">Họ và tên học sinh:</td>' +
-        '<td style="width:40%; font-weight:bold; font-size:11.5pt; text-transform:uppercase;">' + student.name + '</td>' +
+        '<td style="width:40%; font-weight:bold; font-size:11pt; text-transform:uppercase;">' + student.name + '</td>' +
         '<td style="width:16%; font-weight:bold;">Mã số HS:</td>' +
         '<td style="width:24%; font-weight:bold;">' + studentCode + '</td>' +
       '</tr>' +
@@ -711,25 +715,25 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
 
   // ================= TRƯỜNG HỢP 1: BÁO CÁO TUẦN (GỌN GÀNG TRỌN VẸN TRONG 1 TRANG A4) =================
   if (periodType === 'week') {
-    return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.3; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+    return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0;">' +
       docHeaderHtml +
       titleBlockHtml +
       studentInfoHtml +
 
       // Phần II: Điểm thi đua tuần
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">II. KẾT QUẢ ĐIỂM THI ĐUA TUẦN:</div>' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-top:6px; margin-bottom:3px;">II. KẾT QUẢ ĐIỂM THI ĐUA TUẦN:</div>' +
       scoreTableHtml +
 
       // Phần III: Chi tiết việc tốt tuần
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">III. CHI TIẾT VIỆC TỐT ĐẠT ĐIỂM CỘNG TRONG TUẦN:</div>' +
-      '<table class="bienban-table" style="font-size:10pt;">' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-top:6px; margin-bottom:3px;">III. CHI TIẾT VIỆC TỐT ĐẠT ĐIỂM CỘNG TRONG TUẦN:</div>' +
+      '<table class="bienban-table" style="font-size:9.5pt;">' +
         plusTableHeader +
         '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
       '</table>' +
 
       // Phần IV: Chi tiết vi phạm nội quy tuần
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY TRONG TUẦN:</div>' +
-      '<table class="bienban-table" style="font-size:10pt;">' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-top:6px; margin-bottom:3px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY TRONG TUẦN:</div>' +
+      '<table class="bienban-table" style="font-size:9.5pt;">' +
         '<thead>' +
           '<tr>' +
             '<th style="width:6%;">TT</th>' +
@@ -751,7 +755,7 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
   }
 
   // ================= TRƯỜNG HỢP 2: THÁNG, HỌC KỲ, CẢ NĂM (PHÂN TRANG 2 TRANG A4 CHUẨN XÁC) =================
-  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.3; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0;">' +
 
     // -------- TRANG 1 --------
     '<div class="bb-page bb-page-1">' +
@@ -760,39 +764,44 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
       studentInfoHtml +
 
       // Phần II: Kết quả điểm thi đua kỳ
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:4px;">II. TỔNG HỢP KẾT QUẢ ĐIỂM THI ĐUA:</div>' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-top:6px; margin-bottom:3px;">II. TỔNG HỢP KẾT QUẢ ĐIỂM THI ĐUA:</div>' +
       scoreTableHtml +
 
       // Bảng điểm từng tuần
       sbBuildWeekTable(student.id, periodType, periodValue) +
 
       // Phần III: Tổng hợp việc tốt / điểm cộng (gom theo tiêu chí)
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:10px; margin-bottom:4px;">III. TỔNG HỢP CÁC MẶT TÍCH CỰC &amp; VIỆC TỐT ĐẠT ĐIỂM CỘNG:</div>' +
-      '<table class="bienban-table" style="font-size:10pt;">' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-top:8px; margin-bottom:3px;">III. TỔNG HỢP CÁC MẶT TÍCH CỰC &amp; VIỆC TỐT ĐẠT ĐIỂM CỘNG:</div>' +
+      '<table class="bienban-table" style="font-size:9.5pt;">' +
         plusTableHeader +
         '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
       '</table>' +
 
       // Chú thích chân trang 1
-      '<div style="text-align:right; font-size:9pt; font-style:italic; color:#64748b; margin-top:6px;">' +
+      '<div style="text-align:right; font-size:8.5pt; font-style:italic; color:#64748b; margin-top:4px;">' +
         '(Phiếu gồm 02 trang • Xem tiếp Trang 2: Chi tiết vi phạm nội quy, Dự kiến xếp loại TT22, Nhận xét GVCN &amp; Chữ ký xác nhận)' +
       '</div>' +
     '</div>' +
 
-    // -------- NGẮT TRANG A4 BẮT BUỘC (GIỮA TRANG 1 VÀ TRANG 2) --------
-    '<div class="bb-page-break html2pdf__page-break" style="page-break-before:always; break-before:page; clear:both; mso-special-character:line-break;"></div>' +
+    // -------- ĐƯỜNG PHÂN CÁCH TRỰC QUAN MÀN HÌNH PREVIEW --------
+    '<div class="sb-screen-only-divider" style="border-top:2px dashed #94a3b8; margin:22px -30px 18px; text-align:center;">' +
+      '<span style="background:#f1f5f9; color:#475569; font-size:8.5pt; font-weight:bold; padding:2px 14px; border-radius:999px; position:relative; top:-9px; border:1px solid #cbd5e1; font-family:sans-serif; letter-spacing:0.5px;">--- HẾT TRANG 1 • BẮT ĐẦU TRANG 2 ---</span>' +
+    '</div>' +
+
+    // -------- NGẮT TRANG PDF / IN ẤN THỰC TẾ --------
+    '<div class="html2pdf__page-break"></div>' +
 
     // -------- TRANG 2 --------
     '<div class="bb-page bb-page-2">' +
       // Tiêu đề phụ đầu trang 2
-      '<div class="bb-page2-subhead" style="display:table; width:100%; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:8px; font-size:9.5pt;">' +
-        '<div style="display:table-cell; width:45%; text-align:left;"><b>TRƯỜNG THCS TÂY PHÚ - LỚP ' + className + '</b></div>' +
-        '<div style="display:table-cell; width:55%; text-align:right;"><b>PHIẾU THEO DÕI RÈN LUYỆN (Trang 2/2)</b> - HS: <b>' + student.name + '</b></div>' +
+      '<div class="bb-page2-subhead" style="display:table; width:100%; border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:6px; font-size:9pt;">' +
+        '<div style="display:table-cell; width:50%; text-align:left;"><b>UBND XÃ TÂY PHÚ - TRƯỜNG THCS TÂY PHÚ</b></div>' +
+        '<div style="display:table-cell; width:50%; text-align:right;"><b>PHIẾU THEO DÕI RÈN LUYỆN (Trang 2/2)</b> - HS: <b>' + student.name + '</b></div>' +
       '</div>' +
 
       // Phần IV: Chi tiết các lần vi phạm nội quy (Toàn bộ vi phạm nằm đầu trang 2)
-      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY CẦN KHẮC PHỤC:</div>' +
-      '<table class="bienban-table" style="font-size:10pt;">' +
+      '<div class="bb-section-title" style="font-size:10.5pt; font-weight:bold; text-transform:uppercase; margin-bottom:3px;">IV. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY CẦN KHẮC PHỤC:</div>' +
+      '<table class="bienban-table" style="font-size:9.5pt;">' +
         '<thead>' +
           '<tr>' +
             '<th style="width:6%;">TT</th>' +
@@ -1007,7 +1016,7 @@ var StudentBienBanController = {
     if (!existStyle) {
       existStyle = document.createElement('style');
       existStyle.id = styleId;
-      existStyle.innerHTML = '@page { size: A4 portrait !important; margin: 12mm 15mm 12mm 18mm !important; }';
+      existStyle.innerHTML = '@page { size: A4 portrait !important; margin: 10mm 12mm 10mm 15mm !important; }';
       document.head.appendChild(existStyle);
     }
 
@@ -1015,6 +1024,10 @@ var StudentBienBanController = {
     var printArea = document.getElementById('student-bienban-print-area');
     if (printArea) {
       printArea.innerHTML = container.innerHTML;
+      // Xóa triệt để đường phân cách màn hình preview
+      printArea.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
     }
 
     // Kích hoạt lớp in ấn trên thẻ body
@@ -1065,31 +1078,33 @@ var StudentBienBanController = {
       window.chibiNotifications.showToast('Đang tạo file PDF...', 'Vui lòng chờ trong giây lát...', 'info');
     }
 
-    // Tạo host tạm gắn vào DOM thực tế để html2canvas đo đạc kích thước và font chuẩn xác
-    var tempHost = document.createElement('div');
-    tempHost.id = 'temp-html2pdf-host';
-    tempHost.style.position = 'fixed';
-    tempHost.style.left = '-9999px';
-    tempHost.style.top = '0';
-    tempHost.style.width = '780px';
-    tempHost.style.background = '#ffffff';
-    tempHost.style.zIndex = '-9999';
+    // Tạo overlay căn giữa màn hình (0,0) - TUYỆT ĐỐI KHÔNG DÙNG left:-9999px gây lệch toạ độ
+    var overlay = document.createElement('div');
+    overlay.id = 'pdf-render-overlay';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; overflow-y:auto; padding:20px; box-sizing:border-box;';
 
-    var clone = container.cloneNode(true);
-    clone.style.width = '780px';
-    clone.style.maxWidth = '780px';
-    clone.style.padding = '0';
-    clone.style.margin = '0';
-    clone.style.boxShadow = 'none';
-    clone.style.border = 'none';
-    clone.style.background = '#ffffff';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'color:#fde047; font-weight:800; font-size:13pt; margin-bottom:12px; font-family:sans-serif; text-align:center;';
+    msg.innerHTML = '📄 Đang tạo file PDF chuẩn A4 cho em ' + student.name + '...';
+    overlay.appendChild(msg);
 
-    clone.querySelectorAll('[contenteditable]').forEach(function(el) {
+    var paper = document.createElement('div');
+    paper.id = 'pdf-paper-render';
+    paper.style.cssText = 'width:760px; min-width:760px; max-width:760px; background:#ffffff; padding:0; margin:0; box-sizing:border-box; color:#000000; box-shadow:0 10px 30px rgba(0,0,0,0.5);';
+    paper.innerHTML = container.innerHTML;
+
+    // Xóa triệt để đường phân cách màn hình preview khỏi bản in PDF
+    paper.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+
+    // Bỏ contenteditable
+    paper.querySelectorAll('[contenteditable]').forEach(function(el) {
       el.removeAttribute('contenteditable');
     });
 
-    tempHost.appendChild(clone);
-    document.body.appendChild(tempHost);
+    overlay.appendChild(paper);
+    document.body.appendChild(overlay);
 
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
@@ -1097,7 +1112,7 @@ var StudentBienBanController = {
     var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
 
     var opt = {
-      margin: [10, 10, 10, 12],
+      margin: [8, 8, 8, 8],
       filename: fname,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
@@ -1105,8 +1120,8 @@ var StudentBienBanController = {
         useCORS: true,
         logging: false,
         letterRendering: true,
-        width: 780,
-        windowWidth: 780,
+        width: 760,
+        windowWidth: 760,
         scrollX: 0,
         scrollY: 0
       },
@@ -1114,10 +1129,10 @@ var StudentBienBanController = {
       pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    window.html2pdf().set(opt).from(clone).save()
+    window.html2pdf().set(opt).from(paper).save()
       .then(function() {
-        if (tempHost && tempHost.parentNode) {
-          tempHost.parentNode.removeChild(tempHost);
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
         }
         if (window.chibiSound) window.chibiSound.playPlus();
         if (window.chibiNotifications) {
@@ -1126,8 +1141,8 @@ var StudentBienBanController = {
       })
       .catch(function(err) {
         console.warn('PDF export error:', err);
-        if (tempHost && tempHost.parentNode) {
-          tempHost.parentNode.removeChild(tempHost);
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
         }
         self.print();
       });
@@ -1160,6 +1175,11 @@ var StudentBienBanController = {
     clone.style.margin = '0';
     clone.style.boxShadow = 'none';
 
+    // Xóa đường phân cách preview
+    clone.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+
     clone.querySelectorAll('[contenteditable]').forEach(function(el) {
       el.removeAttribute('contenteditable');
     });
@@ -1169,7 +1189,12 @@ var StudentBienBanController = {
     var cleanPeriod = periodLabel.replace(/\s+/g, '_');
     var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.doc';
 
-    var blob = this._makeWordBlob(clone.innerHTML, fname);
+    var docHtml = clone.innerHTML.replace(
+      /<div class="html2pdf__page-break"><\/div>/g,
+      '<br clear="all" style="page-break-before:always; mso-special-character:line-break;">'
+    );
+
+    var blob = this._makeWordBlob(docHtml, fname);
     var link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = fname;

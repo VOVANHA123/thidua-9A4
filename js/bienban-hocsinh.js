@@ -3,11 +3,12 @@
  * Lớp 9A4 - Trường THCS Tây Phú | Năm học 2026 - 2027
  * Giáo viên chủ nhiệm: Thầy Võ Văn Hà
  *
- * CHỨC NĂNG CHÍNH:
- * 1. Xuất biên bản thi đua cá nhân theo Tuần, Tháng, Học kỳ (HK1, HK2) và Cả năm học.
- * 2. Tự động tính toán dự kiến xếp loại kết quả rèn luyện học sinh theo Thông tư 22/2021/TT-BGDĐT (Điều 8 & 9).
- * 3. Hỗ trợ in ấn khổ giấy chuẩn A4 portrait, xuất file PDF, file Microsoft Word (.doc) cá nhân và toàn bộ 29 học sinh.
- * 4. BẢO MẬT & PHÂN QUYỀN: CHỈ TÀI KHOẢN ADMIN (GVCN THẦY VÕ VĂN HÀ) MỚI ĐƯỢC XEM VÀ THỰC HIỆN TÍNH NĂNG NÀY.
+ * QUY CHUẨN THỂ THỨC VĂN BẢN:
+ * - Chuẩn thể thức văn bản hành chính theo Nghị định 30/2020/NĐ-CP.
+ * - Chuẩn đánh giá xếp loại rèn luyện học sinh THCS theo Thông tư 22/2021/TT-BGDĐT (Điều 8, Điều 9).
+ * - Bố cục tối ưu, trang trọng để gửi phụ huynh học sinh (gọn gàng trong 1-2 trang A4, không tràn lan).
+ * - Tự động tổng hợp nhóm các việc tốt/khen thưởng giúp phụ huynh dễ theo dõi, không lặp dòng.
+ * - Bảo mật: Chỉ tài khoản Admin (Thầy Võ Văn Hà - GVCN) mới có quyền xem và xuất biên bản.
  */
 
 // ================= BẢNG TIÊU CHUẨN XẾP LOẠI RÈN LUYỆN TT22 =================
@@ -17,46 +18,41 @@ var TT22_RANKING_RULES = [
     label: 'Tốt',
     display: 'TỐT',
     color: '#15803d',
-    bg: '#dcfce7',
-    borderColor: '#86efac',
-    icon: '🌟',
-    tt22Note: 'Điểm TB thi đua ≥ 140 điểm; không có tuần nào bị xếp loại "Cần cố gắng"; tỷ lệ tuần đạt Tốt/Xuất sắc ≥ 70%; không có bất kỳ vi phạm kỷ luật nghiêm trọng nào (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
+    bg: '#f0fdf4',
+    borderColor: '#16a34a',
+    tt22Note: 'Điểm TB thi đua ≥ 140 điểm; không có tuần xếp loại "Cần cố gắng"; tỷ lệ tuần đạt Tốt/Xuất sắc ≥ 70%; không vi phạm kỷ luật nghiêm trọng (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
   },
   {
     id: 'kha',
     label: 'Khá',
     display: 'KHÁ',
     color: '#0369a1',
-    bg: '#e0f2fe',
-    borderColor: '#7dd3fc',
-    icon: '⭐',
-    tt22Note: 'Điểm TB thi đua ≥ 120 điểm; tỷ lệ tuần đạt Tốt/Xuất sắc ≥ 50%; không có vi phạm kỷ luật nghiêm trọng (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
+    bg: '#f0f9ff',
+    borderColor: '#0284c7',
+    tt22Note: 'Điểm TB thi đua ≥ 120 điểm; tỷ lệ tuần đạt Tốt/Xuất sắc ≥ 50%; không vi phạm kỷ luật nghiêm trọng (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
   },
   {
     id: 'dat',
     label: 'Đạt',
     display: 'ĐẠT',
     color: '#b45309',
-    bg: '#fef3c7',
-    borderColor: '#fcd34d',
-    icon: '👍',
-    tt22Note: 'Điểm TB thi đua ≥ 100 điểm; cơ bản chấp hành tốt nội quy; các lỗi vi phạm đã được khắc phục và có ý thức rèn luyện tiến bộ (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
+    bg: '#fffbeb',
+    borderColor: '#d97706',
+    tt22Note: 'Điểm TB thi đua ≥ 100 điểm; cơ bản chấp hành tốt nội quy; các khuyết điểm đã khắc phục và có tiến bộ (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
   },
   {
     id: 'chua_dat',
     label: 'Chưa đạt',
     display: 'CHƯA ĐẠT',
     color: '#b91c1c',
-    bg: '#fee2e2',
-    borderColor: '#fca5a5',
-    icon: '⚠️',
+    bg: '#fef2f2',
+    borderColor: '#dc2626',
     tt22Note: 'Điểm TB thi đua dưới 100 điểm hoặc có vi phạm nội quy nghiêm trọng chưa tích cực khắc phục (Theo Điều 8, 9 Thông tư 22/2021/TT-BGDĐT).'
   }
 ];
 
 /**
  * Tính toán xếp loại rèn luyện dự kiến theo Thông tư 22/2021/TT-BGDĐT
- * Dành cho các kỳ: Tháng, Học kỳ I, Học kỳ II, Cả năm học
  */
 function calcTT22Ranking(studentId, periodType, periodValue) {
   var data = window.classData;
@@ -91,7 +87,6 @@ function calcTT22Ranking(studentId, periodType, periodValue) {
     };
   });
 
-  // Xác định các tuần có phát sinh sự kiện hoặc tính toàn bộ các tuần của kỳ
   var activeWeeks = weekResults.filter(function(w) {
     return data.getStudentEvents(studentId, w.week).length > 0;
   });
@@ -171,9 +166,9 @@ function sbGetPeriodLabel(periodType, periodValue) {
     return names[parseInt(periodValue, 10)] || ('Tháng ' + periodValue);
   }
   if (periodType === 'semester') {
-    return (periodValue === 'hk1' || periodValue === '1' || periodValue === 1) ? 'Học Kỳ I' : 'Học Kỳ II';
+    return (periodValue === 'hk1' || periodValue === '1' || periodValue === 1) ? 'Học kỳ I' : 'Học kỳ II';
   }
-  return 'Cả Năm Học';
+  return 'Cả năm học';
 }
 
 /**
@@ -194,36 +189,118 @@ function sbGetWeekDateRange(weekNum) {
 }
 
 /**
- * Xây dựng danh sách bảng chi tiết các sự kiện (Điểm trừ / Điểm cộng)
+ * Làm sạch tên tiêu chí, loại bỏ icon emoji để đảm bảo chuẩn văn bản hành chính
  */
-function sbBuildDetailRows(events, isPlus, criteria) {
+function sbCleanText(str) {
+  if (!str) return '';
+  return str.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+}
+
+/**
+ * Bảng chi tiết các lần vi phạm nội quy (Điểm trừ)
+ */
+function sbBuildMinusDetailRows(events, criteria) {
   if (!events || events.length === 0) {
-    var msg = isPlus
-      ? 'Trong kỳ đánh giá này, chưa có ghi nhận điểm cộng nào.'
-      : 'Trong kỳ đánh giá này, học sinh thực hiện rất tốt nội quy, không có vi phạm nào.';
-    var clr = isPlus ? '#15803d' : '#059669';
-    return '<tr><td colspan="6" style="text-align:center; padding:10px; font-style:italic; color:' + clr + '; font-weight:600;">' + msg + '</td></tr>';
+    return '<tr><td colspan="6" style="text-align:center; padding:12px; font-style:italic; color:#15803d; font-weight:bold;">' +
+      'Trong kỳ này, học sinh chấp hành rất tốt nội quy, không có vi phạm nào.' +
+    '</td></tr>';
   }
 
   return events.map(function(ev, idx) {
     var crit = (criteria || []).find(function(c) { return c.id === ev.criteriaId; }) || {
-      name: isPlus ? 'Việc tốt / Tuyên dương' : 'Vi phạm nội quy',
-      icon: isPlus ? '✅' : '⚠️'
+      name: 'Vi phạm nội quy'
     };
     var dayLabel = ev.day ? 'Thứ ' + ev.day.replace('T', '') : '';
-    var pts = isPlus ? ('+' + ev.points) : ('-' + ev.points);
-    var ptsColor = isPlus ? '#15803d' : '#dc2626';
-    var weekNote = ev.week ? (' (Tuần ' + ev.week + ')') : '';
+    var weekNote = ev.week ? (' (T' + ev.week + ')') : '';
+    var cleanName = sbCleanText(crit.name);
+    var cleanNote = sbCleanText(ev.note) || 'Đã nhắc nhở rút kinh nghiệm';
 
     return '<tr>' +
-      '<td class="center" style="font-weight:700;">' + (idx + 1) + '</td>' +
+      '<td class="center" style="font-weight:bold;">' + (idx + 1) + '</td>' +
       '<td style="white-space:nowrap;">' + (ev.recordedAt || '') + weekNote + '</td>' +
       '<td class="center">' + dayLabel + '</td>' +
-      '<td>' + (crit.icon || '') + ' ' + crit.name + '</td>' +
-      '<td style="font-style:italic; color:#334155;">' + (ev.note || 'Không có ghi chú thêm') + '</td>' +
-      '<td class="center" style="font-weight:800; font-size:11.5pt; color:' + ptsColor + ';">' + pts + '</td>' +
+      '<td>' + cleanName + '</td>' +
+      '<td style="font-style:italic; color:#334155;">' + cleanNote + '</td>' +
+      '<td class="center" style="font-weight:bold; color:#dc2626;">-' + ev.points + '</td>' +
     '</tr>';
   }).join('');
+}
+
+/**
+ * Nhóm và tổng hợp các việc tốt / điểm cộng theo tiêu chí
+ * Giải quyết triệt để lỗi tài liệu bị kéo dài 4-5 trang do 78 lần lặp lại!
+ */
+function sbBuildPlusSummaryRows(events, criteria, periodType) {
+  if (!events || events.length === 0) {
+    return '<tr><td colspan="5" style="text-align:center; padding:12px; font-style:italic; color:#64748b;">' +
+      'Chưa có lượt ghi nhận việc tốt trong kỳ đánh giá này.' +
+    '</td></tr>';
+  }
+
+  // Nếu là theo Tuần và số sự kiện ít (<= 8 sự kiện), hiển thị theo từng lượt
+  if (periodType === 'week' && events.length <= 8) {
+    return events.map(function(ev, idx) {
+      var crit = (criteria || []).find(function(c) { return c.id === ev.criteriaId; }) || { name: 'Thực hiện việc tốt' };
+      var dayLabel = ev.day ? 'Thứ ' + ev.day.replace('T', '') : '';
+      var cleanName = sbCleanText(crit.name);
+      var cleanNote = sbCleanText(ev.note) || 'Phát huy tinh thần tốt';
+
+      return '<tr>' +
+        '<td class="center" style="font-weight:bold;">' + (idx + 1) + '</td>' +
+        '<td>' + cleanName + '</td>' +
+        '<td class="center">' + dayLabel + '</td>' +
+        '<td style="font-style:italic; color:#334155;">' + cleanNote + '</td>' +
+        '<td class="center" style="font-weight:bold; color:#15803d;">+' + ev.points + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Nếu là Tháng, Học kỳ, Cả năm: TỰ ĐỘNG TỔNG HỢP THEO TIÊU CHÍ (GROUP BY CRITERIA)
+  var map = {};
+  events.forEach(function(ev) {
+    var cid = ev.criteriaId || 'other';
+    if (!map[cid]) {
+      var crit = (criteria || []).find(function(c) { return c.id === cid; }) || { name: 'Việc tốt, hoạt động phong trào' };
+      map[cid] = {
+        name: sbCleanText(crit.name),
+        count: 0,
+        totalPoints: 0,
+        notes: []
+      };
+    }
+    map[cid].count++;
+    map[cid].totalPoints += (ev.points || 0);
+    if (ev.note && ev.note.trim() && map[cid].notes.length < 2) {
+      var n = sbCleanText(ev.note.trim());
+      if (n && !map[cid].notes.includes(n)) {
+        map[cid].notes.push(n);
+      }
+    }
+  });
+
+  var list = Object.values(map).sort(function(a, b) { return b.count - a.count; });
+  var totalPlusPoints = events.reduce(function(s, e) { return s + (e.points || 0); }, 0);
+
+  var rowsHtml = list.map(function(item, idx) {
+    var noteStr = item.notes.length > 0 ? item.notes.join('; ') : 'Thực hiện tích cực, gương mẫu';
+    return '<tr>' +
+      '<td class="center" style="font-weight:bold;">' + (idx + 1) + '</td>' +
+      '<td style="font-weight:600;">' + item.name + '</td>' +
+      '<td class="center" style="font-weight:bold;">' + item.count + ' lượt</td>' +
+      '<td class="center" style="font-weight:bold; color:#15803d;">+' + item.totalPoints + '</td>' +
+      '<td style="font-style:italic; color:#334155;">' + noteStr + '</td>' +
+    '</tr>';
+  }).join('');
+
+  // Hàng tổng kết điểm cộng
+  rowsHtml += '<tr style="background:#f8fafc; font-weight:bold;">' +
+    '<td colspan="2" style="text-align:right; padding-right:12px; font-weight:bold;">TỔNG CỘNG ĐIỂM CỘNG ĐẠT ĐƯỢC:</td>' +
+    '<td class="center" style="font-weight:bold;">' + events.length + ' lượt</td>' +
+    '<td class="center" style="font-weight:bold; color:#15803d; font-size:11pt;">+' + totalPlusPoints + '</td>' +
+    '<td style="font-style:italic; color:#15803d; font-weight:bold;">Tích cực rèn luyện</td>' +
+  '</tr>';
+
+  return rowsHtml;
 }
 
 /**
@@ -254,12 +331,12 @@ function sbBuildWeekTable(studentId, periodType, periodValue) {
 
     if (evts.length === 0) {
       return '<tr style="color:#64748b;">' +
-        '<td class="center" style="font-weight:700;">' + w + '</td>' +
+        '<td class="center" style="font-weight:bold;">Tuần ' + w + '</td>' +
         '<td style="font-size:9.5pt;">' + dr.from + ' - ' + dr.to + '</td>' +
         '<td class="center">+0</td>' +
         '<td class="center">-0</td>' +
-        '<td class="center" style="font-weight:700;">100</td>' +
-        '<td class="center" style="color:#0369a1; font-weight:600;">Chuẩn nội quy</td>' +
+        '<td class="center" style="font-weight:bold;">100</td>' +
+        '<td class="center">Đạt chuẩn</td>' +
       '</tr>';
     }
 
@@ -270,25 +347,25 @@ function sbBuildWeekTable(studentId, periodType, periodValue) {
       : '#dc2626';
 
     return '<tr>' +
-      '<td class="center" style="font-weight:700;">Tuần ' + w + '</td>' +
+      '<td class="center" style="font-weight:bold;">Tuần ' + w + '</td>' +
       '<td style="font-size:9.5pt;">' + dr.from + ' - ' + dr.to + '</td>' +
-      '<td class="center" style="color:#15803d; font-weight:700;">+' + sc.plus + '</td>' +
-      '<td class="center" style="color:#dc2626; font-weight:700;">-' + sc.minus + '</td>' +
-      '<td class="center" style="font-weight:800; font-size:11pt;">' + sc.total + '</td>' +
-      '<td class="center" style="font-weight:800; color:' + rankColor + ';">' + sc.rank + '</td>' +
+      '<td class="center" style="color:#15803d; font-weight:bold;">+' + sc.plus + '</td>' +
+      '<td class="center" style="color:#dc2626; font-weight:bold;">-' + sc.minus + '</td>' +
+      '<td class="center" style="font-weight:bold; font-size:10.5pt;">' + sc.total + '</td>' +
+      '<td class="center" style="font-weight:bold; color:' + rankColor + ';">' + sc.rank + '</td>' +
     '</tr>';
   });
 
-  return '<div class="bb-section-title" style="margin-top:14px;">BẢNG TỔNG HỢP ĐIỂM THI ĐUA TỪNG TUẦN:</div>' +
+  return '<div class="bb-section-title" style="margin-top:12px;">BẢNG TỔNG HỢP ĐIỂM THI ĐUA TỪNG TUẦN:</div>' +
     '<table class="bienban-table" style="font-size:10pt;">' +
       '<thead>' +
         '<tr>' +
-          '<th style="width:12%;">Tuần học</th>' +
-          '<th style="width:26%;">Thời gian thực hiện</th>' +
+          '<th style="width:14%;">Tuần học</th>' +
+          '<th style="width:28%;">Thời gian thực hiện</th>' +
           '<th style="width:14%;">Điểm cộng</th>' +
           '<th style="width:14%;">Điểm trừ</th>' +
           '<th style="width:14%;">Tổng điểm</th>' +
-          '<th style="width:20%;">Xếp loại tuần</th>' +
+          '<th style="width:16%;">Xếp loại</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' + rows.join('') + '</tbody>' +
@@ -297,95 +374,89 @@ function sbBuildWeekTable(studentId, periodType, periodValue) {
 
 /**
  * Xây dựng khối hiển thị Dự kiến xếp loại rèn luyện theo Thông tư 22
+ * Thể thức chuẩn văn bản sư phạm, không sử dụng icon emoji
  */
 function sbBuildTT22Block(td22, periodLabel) {
   if (!td22) return '';
   var rv = td22.ranking;
 
-  return '<div class="bb-keep-together" style="margin-top:16px; border:2.5px solid ' + rv.color + '; border-radius:8px; background:' + rv.bg + '; padding:14px 16px;">' +
-    '<div class="bb-sub-section-title" style="margin:0 0 10px 0; color:' + rv.color + '; font-size:13pt; display:flex; align-items:center; gap:8px;">' +
-      '<span>📋</span> DỰ KIẾN XẾP LOẠI KẾT QUẢ RÈN LUYỆN (Theo Thông tư 22/2021/TT-BGDĐT)' +
+  return '<div class="bb-keep-together" style="margin-top:14px; border:1.5px solid #000000; border-radius:4px; padding:10px 14px; background:#fafafa;">' +
+    '<div style="font-weight:bold; font-size:11.5pt; text-transform:uppercase; color:#000000; margin-bottom:6px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">' +
+      'V. DỰ KIẾN KẾT QUẢ XẾP LOẠI RÈN LUYỆN (THEO THÔNG TƯ 22/2021/TT-BGDĐT)' +
     '</div>' +
-    '<table style="width:100%; border-collapse:collapse; font-size:11.5pt;">' +
+    '<table style="width:100%; border-collapse:collapse; font-size:10.5pt;">' +
       '<tr>' +
-        '<td style="width:40%; vertical-align:middle; padding:6px 10px 6px 0;">' +
-          '<b>Điểm TB thi đua ' + periodLabel + ':</b><br>' +
-          '<span style="font-size:18pt; font-weight:900; color:' + rv.color + ';">' + td22.avgScore + '</span> <span style="font-size:11pt; color:#475569;">điểm / tuần</span>' +
+        '<td style="width:64%; vertical-align:top; padding:4px 8px 4px 0; line-height:1.5;">' +
+          '• Điểm trung bình thi đua tuần: <b>' + td22.avgScore + ' điểm / tuần</b><br>' +
+          '• Số tuần học theo dõi: <b>' + td22.totalEvalWeeks + ' tuần</b> (' +
+            'Tốt/Xuất sắc: <b>' + td22.weekStats.countTot + '</b> tuần [' + td22.pctTot + '%]; ' +
+            'Cố gắng: <b>' + td22.weekStats.countCG + '</b> tuần; ' +
+            'Cần cố gắng: <b>' + td22.weekStats.countKCG + '</b> tuần' +
+          ')<br>' +
+          '• <i>Căn cứ đánh giá: ' + rv.tt22Note + '</i>' +
+          (td22.hasSevereViolation ? '<br><b style="color:#b91c1c;">Lưu ý: Có vi phạm nội quy nghiêm trọng cần tiếp tục uốn nắn, rèn luyện.</b>' : '') +
         '</td>' +
-        '<td style="width:32%; vertical-align:middle; padding:6px 10px;">' +
-          '<b>Số tuần theo dõi:</b> ' + td22.totalEvalWeeks + ' tuần<br>' +
-          '<span style="font-size:10pt; color:#475569;">' +
-            '• Tốt/Xuất sắc: <b>' + td22.weekStats.countTot + '</b> tuần (' + td22.pctTot + '%)<br>' +
-            '• Cố gắng: <b>' + td22.weekStats.countCG + '</b> tuần | Cần cố gắng: <b>' + td22.weekStats.countKCG + '</b> tuần' +
-          '</span>' +
-        '</td>' +
-        '<td style="width:28%; text-align:center; vertical-align:middle; padding:6px;">' +
-          '<div style="font-size:10pt; font-weight:700; color:#475569; margin-bottom:4px;">DỰ KIẾN XẾP LOẠI:</div>' +
-          '<div style="display:inline-block; background:' + rv.color + '; color:#ffffff; border-radius:8px; padding:8px 18px; font-size:15pt; font-weight:900; letter-spacing:1px; box-shadow:0 3px 8px rgba(0,0,0,0.15);">' +
-            rv.icon + ' ' + rv.display +
+        '<td style="width:36%; text-align:center; vertical-align:middle; border-left:1px dashed #94a3b8; padding:4px 8px;">' +
+          '<div style="font-size:10pt; font-weight:bold; color:#475569; text-transform:uppercase; margin-bottom:4px;">Xếp loại rèn luyện:</div>' +
+          '<div style="font-size:15pt; font-weight:bold; color:#000000; border:2px solid #000000; border-radius:4px; padding:6px 14px; display:inline-block; letter-spacing:1px;">' +
+            rv.display +
           '</div>' +
         '</td>' +
       '</tr>' +
     '</table>' +
-    '<div style="margin-top:10px; font-size:10.5pt; color:#334155; border-top:1px dashed ' + rv.borderColor + '; padding-top:8px; line-height:1.5;">' +
-      '<b>Căn cứ đánh giá:</b> ' + rv.tt22Note +
-      (td22.hasSevereViolation ? '<br><b style="color:#b91c1c;">⚠️ Lưu ý: Có phát sinh vi phạm nội quy nghiêm trọng cần tiếp tục theo dõi, uốn nắn.</b>' : '') +
-    '</div>' +
   '</div>';
 }
 
 // ================= CSS ĐẶC THÙ CHO IN ẤN VÀ FILE WORD =================
-var SB_WORD_CSS = '@page{size:21.0cm 29.7cm;margin:2.0cm 1.5cm 2.0cm 2.5cm;mso-page-orientation:portrait;}' +
-  'body{font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.4;color:#000000;}' +
-  '.bb-header-grid{display:table;width:100%;margin-bottom:16px;}' +
-  '.bb-header-left{display:table-cell;width:42%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:58%;text-align:center;vertical-align:top;}' +
-  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:12pt;}' +
-  '.bb-motto{font-weight:bold;font-size:13pt;}' +
-  '.bb-line-short{border-bottom:1px solid #000;width:90px;margin:4px auto;}' +
-  '.bb-line-long{border-bottom:1px solid #000;width:150px;margin:4px auto;}' +
-  '.bb-title-block{text-align:center;margin:16px 0 12px 0;}' +
-  '.bb-main-title{font-size:16pt;font-weight:bold;margin:4px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:13pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:13pt;font-weight:bold;margin-top:14px;margin-bottom:6px;text-transform:uppercase;}' +
-  '.bb-sub-section-title{font-size:12pt;font-weight:bold;margin-top:8px;margin-bottom:4px;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:11pt;margin:6px 0 10px 0;}' +
-  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:5px 7px;vertical-align:top;}' +
+var SB_WORD_CSS = '@page{size:21.0cm 29.7cm;margin:1.8cm 1.5cm 1.8cm 2.0cm;mso-page-orientation:portrait;}' +
+  'body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.35;color:#000000;}' +
+  '.bb-header-grid{display:table;width:100%;margin-bottom:12px;}' +
+  '.bb-header-left{display:table-cell;width:40%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:60%;text-align:center;vertical-align:top;}' +
+  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
+  '.bb-motto{font-weight:bold;font-size:12pt;}' +
+  '.bb-line-short{border-top:1px solid #000;width:80px;margin:3px auto;height:1px;}' +
+  '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
+  '.bb-title-block{text-align:center;margin:12px 0 14px 0;}' +
+  '.bb-main-title{font-size:15pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:12pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:11.5pt;font-weight:bold;margin-top:12px;margin-bottom:5px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:5px 0 10px 0;}' +
+  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:28px;page-break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:20px;page-break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
-  '.bb-sign-role{font-weight:bold;font-size:12pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:11pt;}' +
-  '.bb-sign-space{height:60px;}' +
-  '.bb-sign-name{font-weight:bold;font-size:12pt;}' +
+  '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
+  '.bb-sign-sub{font-style:italic;font-size:10pt;color:#334155;}' +
+  '.bb-sign-space{height:55px;}' +
+  '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
   '.bb-keep-together{page-break-inside:avoid;}';
 
-var SB_PRINT_CSS = '@page{size:A4 portrait;margin:15mm 15mm 15mm 20mm;}' +
+var SB_PRINT_CSS = '@page{size:A4 portrait;margin:12mm 15mm 12mm 18mm;}' +
   '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}' +
-  'body{font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.4;color:#000;background:#fff;margin:0;padding:0;}' +
-  '.bb-header-grid{display:table;width:100%;margin-bottom:16px;}' +
-  '.bb-header-left{display:table-cell;width:42%;text-align:center;vertical-align:top;}' +
-  '.bb-header-right{display:table-cell;width:58%;text-align:center;vertical-align:top;}' +
-  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:12pt;}' +
-  '.bb-motto{font-weight:bold;font-size:13pt;}' +
-  '.bb-line-short{border-bottom:1px solid #000;width:90px;margin:4px auto;}' +
-  '.bb-line-long{border-bottom:1px solid #000;width:150px;margin:4px auto;}' +
-  '.bb-title-block{text-align:center;margin:16px 0 12px 0;}' +
-  '.bb-main-title{font-size:16pt;font-weight:bold;margin:4px 0;text-transform:uppercase;}' +
-  '.bb-sub-title,.bb-year{font-size:13pt;font-weight:bold;}' +
-  '.bb-section-title{font-size:13pt;font-weight:bold;margin-top:14px;margin-bottom:6px;text-transform:uppercase;}' +
-  '.bb-sub-section-title{font-size:12pt;font-weight:bold;margin-top:8px;margin-bottom:4px;}' +
-  'table.bienban-table{border-collapse:collapse;width:100%;font-size:11pt;margin:6px 0 10px 0;}' +
-  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:5px 7px;vertical-align:top;}' +
+  'body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.35;color:#000;background:#fff;margin:0;padding:0;}' +
+  '.bb-header-grid{display:table;width:100%;margin-bottom:12px;}' +
+  '.bb-header-left{display:table-cell;width:40%;text-align:center;vertical-align:top;}' +
+  '.bb-header-right{display:table-cell;width:60%;text-align:center;vertical-align:top;}' +
+  '.bb-school,.bb-class,.bb-country{font-weight:bold;font-size:11pt;}' +
+  '.bb-motto{font-weight:bold;font-size:12pt;}' +
+  '.bb-line-short{border-top:1px solid #000;width:80px;margin:3px auto;height:1px;}' +
+  '.bb-line-long{border-top:1px solid #000;width:140px;margin:3px auto;height:1px;}' +
+  '.bb-title-block{text-align:center;margin:12px 0 14px 0;}' +
+  '.bb-main-title{font-size:15pt;font-weight:bold;margin:3px 0;text-transform:uppercase;}' +
+  '.bb-sub-title,.bb-year{font-size:12pt;font-weight:bold;}' +
+  '.bb-section-title{font-size:11.5pt;font-weight:bold;margin-top:12px;margin-bottom:5px;text-transform:uppercase;}' +
+  'table.bienban-table{border-collapse:collapse;width:100%;font-size:10.5pt;margin:5px 0 10px 0;}' +
+  'table.bienban-table th,table.bienban-table td{border:1px solid #000;padding:4px 6px;vertical-align:middle;}' +
   'table.bienban-table th{background-color:#f2f2f2;font-weight:bold;text-align:center;}' +
   '.center{text-align:center;}' +
-  '.bb-signatures{display:table;width:100%;margin-top:28px;page-break-inside:avoid;}' +
+  '.bb-signatures{display:table;width:100%;margin-top:20px;page-break-inside:avoid;}' +
   '.bb-signatures>div{display:table-cell;width:33.33%;text-align:center;vertical-align:top;}' +
-  '.bb-sign-role{font-weight:bold;font-size:12pt;text-transform:uppercase;}' +
-  '.bb-sign-sub{font-style:italic;font-size:11pt;}' +
-  '.bb-sign-space{height:60px;}' +
-  '.bb-sign-name{font-weight:bold;font-size:12pt;}' +
+  '.bb-sign-role{font-weight:bold;font-size:11pt;text-transform:uppercase;}' +
+  '.bb-sign-sub{font-style:italic;font-size:10pt;color:#334155;}' +
+  '.bb-sign-space{height:55px;}' +
+  '.bb-sign-name{font-weight:bold;font-size:11pt;}' +
   '.bb-keep-together{page-break-inside:avoid;}' +
   '[contenteditable]{outline:none;}';
 
@@ -413,20 +484,19 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
   var totalMinus = minusEvents.reduce(function(s, e) { return s + (e.points || 0); }, 0);
 
   var periodLabel = sbGetPeriodLabel(periodType, periodValue);
-  var typeUpperLabel = { week: 'TUẦN', month: 'THÁNG', semester: 'HỌC KỲ', year: 'CẢ NĂM HỌC' }[periodType] || '';
 
   // Khoảng thời gian cụ thể
   var dateRangeText = '';
   if (periodType === 'week') {
     var dr = sbGetWeekDateRange(parseInt(periodValue, 10));
-    dateRangeText = 'Từ ngày <b>' + dr.from + '</b> đến ngày <b>' + dr.to + '</b>';
+    dateRangeText = 'Từ ngày ' + dr.from + ' đến ngày ' + dr.to;
   } else if (periodType === 'month') {
-    dateRangeText = 'Trong <b>' + periodLabel + '</b> năm học ' + (settings.academicYear || '2026 - 2027');
+    dateRangeText = 'Thực hiện trong ' + periodLabel + ' năm học ' + (settings.academicYear || '2026 - 2027');
   } else if (periodType === 'semester') {
     var hkRange = (periodValue === 'hk1' || periodValue === '1' || periodValue === 1) ? 'Tuần 1 đến Tuần 18' : 'Tuần 19 đến Tuần 35';
-    dateRangeText = 'Trong <b>' + periodLabel + '</b> (' + hkRange + ') năm học ' + (settings.academicYear || '2026 - 2027');
+    dateRangeText = periodLabel + ' (' + hkRange + ') năm học ' + (settings.academicYear || '2026 - 2027');
   } else {
-    dateRangeText = 'Trong cả năm học ' + (settings.academicYear || '2026 - 2027') + ' (Tuần 1 đến Tuần 35)';
+    dateRangeText = 'Toàn bộ năm học ' + (settings.academicYear || '2026 - 2027') + ' (Tuần 1 đến Tuần 35)';
   }
 
   // Dự kiến xếp loại rèn luyện TT22 (áp dụng cho Tháng, Học kỳ, Cả năm)
@@ -439,226 +509,229 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
   if (periodType === 'week') {
     totalScore = 100 + totalPlus - totalMinus;
     if (totalScore >= 150) {
-      rankBand = { label: 'XUẤT SẮC', stars: '⭐⭐⭐⭐⭐', color: '#7c3aed' };
+      rankBand = { label: 'XUẤT SẮC', color: '#7c3aed' };
     } else if (totalScore >= 130) {
-      rankBand = { label: 'TỐT', stars: '⭐⭐⭐⭐', color: '#0369a1' };
+      rankBand = { label: 'TỐT', color: '#0369a1' };
     } else if (totalScore >= 110) {
-      rankBand = { label: 'CỐ GẮNG', stars: '⭐⭐⭐', color: '#b45309' };
+      rankBand = { label: 'CỐ GẮNG', color: '#b45309' };
     } else {
-      rankBand = { label: 'CẦN CỐ GẮNG', stars: '⭐⭐', color: '#dc2626' };
+      rankBand = { label: 'CẦN CỐ GẮNG', color: '#dc2626' };
     }
   } else {
-    // Tháng / Học kỳ / Cả năm: Dựa theo điểm trung bình tuần
     totalScore = td22 ? td22.avgScore : (100 + totalPlus - totalMinus);
     var r = td22 ? td22.ranking : null;
-    rankBand = r ? { label: r.display, stars: r.icon, color: r.color } : { label: 'ĐANG CẬP NHẬT', stars: '⭐', color: '#0369a1' };
+    rankBand = r ? { label: r.display, color: r.color } : { label: 'ĐẠT', color: '#0369a1' };
   }
 
   // Lời nhận xét sư phạm gợi ý tự động cho GVCN
   var teacherComment = '';
   if (totalMinus === 0 && totalPlus > 0) {
-    teacherComment = 'Em ' + student.name + ' có ý thức tự giác rất cao, chấp hành nghiêm túc nội quy trường lớp trong ' + periodLabel + ', tích cực rèn luyện và làm nhiều việc tốt. Giáo viên chủ nhiệm biểu dương em trước tập thể lớp 9A4.';
+    teacherComment = 'Em ' + student.name + ' có tinh thần tự giác rất cao, chấp hành nghiêm túc nội quy trường lớp trong ' + periodLabel + ', tích cực xây dựng bài và làm nhiều việc tốt. GVCN biểu dương em trước tập thể lớp 9A4.';
   } else if (totalMinus > 0) {
-    teacherComment = 'Em ' + student.name + ' cơ bản hoàn thành nhiệm vụ rèn luyện trong ' + periodLabel + ', tuy nhiên cần nghiêm túc rút kinh nghiệm và khắc phục dứt điểm các lỗi vi phạm nội quy để đạt kết quả rèn luyện cao hơn trong kỳ tới.';
+    teacherComment = 'Em ' + student.name + ' cơ bản hoàn thành nhiệm vụ rèn luyện trong ' + periodLabel + ', tuy nhiên cần nghiêm túc khắc phục các lỗi vi phạm nội quy đã được nhắc nhở để đạt kết quả tốt hơn trong kỳ tới.';
   } else {
-    teacherComment = 'Em ' + student.name + ' duy trì nề nếp ổn định trong ' + periodLabel + ', chấp hành tốt các quy định của nhà trường. Giáo viên chủ nhiệm ghi nhận và khuyến khích em tiếp tục phát huy hơn nữa.';
+    teacherComment = 'Em ' + student.name + ' duy trì nề nếp thi đua ổn định trong ' + periodLabel + ', chấp hành tốt nội quy nhà trường. GVCN đề nghị em tiếp tục nỗ lực rèn luyện để vươn lên thành tích cao hơn.';
   }
 
   // Ngày tháng năm xuất biên bản
   var today = new Date();
   function pad2(n) { return n.toString().padStart(2, '0'); }
-  var todayDateStr = 'Ngày ' + pad2(today.getDate()) + ' tháng ' + pad2(today.getMonth() + 1) + ' năm ' + today.getFullYear();
+  var todayDateStr = 'ngày ' + pad2(today.getDate()) + ' tháng ' + pad2(today.getMonth() + 1) + ' năm ' + today.getFullYear();
 
   var teacherName = settings.teacherName || 'Thầy Võ Văn Hà';
   var schoolName = (settings.schoolName || 'TRƯỜNG THCS TÂY PHÚ').toUpperCase();
   var className = (settings.className || 'Lớp 9A4').toUpperCase().replace('LỚP ', '');
+  var studentCode = student.code || ('9A4' + (student.id.replace('hs', '').padStart(2, '0')));
 
-  // Nội dung bảng kết quả điểm thi đua
+  // Cấu trúc bảng kết quả điểm thi đua
   var scoreTableHtml = '';
   if (periodType === 'week') {
-    scoreTableHtml = '<table class="bienban-table" style="font-size:12pt;">' +
+    scoreTableHtml = '<table class="bienban-table">' +
       '<thead>' +
         '<tr>' +
-          '<th style="width:40%;">Chỉ tiêu đánh giá</th>' +
+          '<th style="width:45%;">Nội dung theo dõi thi đua</th>' +
           '<th style="width:20%;" class="center">Điểm số</th>' +
-          '<th style="width:40%;">Ghi chú</th>' +
+          '<th style="width:35%;">Ghi chú</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' +
         '<tr>' +
           '<td>Điểm cơ sở đầu tuần</td>' +
-          '<td class="center" style="font-weight:800;">100</td>' +
+          '<td class="center" style="font-weight:bold;">100</td>' +
           '<td style="font-style:italic; color:#475569;">Mức điểm khởi đầu tiêu chuẩn</td>' +
         '</tr>' +
         '<tr>' +
-          '<td>Tổng điểm <b style="color:#15803d;">CỘNG</b> (thực hiện việc tốt)</td>' +
-          '<td class="center" style="font-weight:800; color:#15803d;">+' + totalPlus + '</td>' +
-          '<td style="font-style:italic; color:#475569;">' + plusEvents.length + ' lần ghi nhận điểm cộng</td>' +
+          '<td>Tổng điểm CỘNG (thực hiện việc tốt, khen thưởng)</td>' +
+          '<td class="center" style="font-weight:bold; color:#15803d;">+' + totalPlus + '</td>' +
+          '<td style="font-style:italic; color:#475569;">' + plusEvents.length + ' lượt ghi nhận</td>' +
         '</tr>' +
         '<tr>' +
-          '<td>Tổng điểm <b style="color:#dc2626;">TRỪ</b> (vi phạm nội quy)</td>' +
-          '<td class="center" style="font-weight:800; color:#dc2626;">-' + totalMinus + '</td>' +
-          '<td style="font-style:italic; color:#475569;">' + minusEvents.length + ' lần ghi nhận vi phạm</td>' +
+          '<td>Tổng điểm TRỪ (vi phạm nội quy trường lớp)</td>' +
+          '<td class="center" style="font-weight:bold; color:#dc2626;">-' + totalMinus + '</td>' +
+          '<td style="font-style:italic; color:#475569;">' + minusEvents.length + ' lượt ghi nhận</td>' +
         '</tr>' +
         '<tr style="background:#f8fafc;">' +
-          '<td style="font-weight:800; font-size:13pt;">TỔNG ĐIỂM THI ĐUA TUẦN:</td>' +
-          '<td class="center" style="font-weight:900; font-size:16pt; color:' + rankBand.color + ';">' + totalScore + '</td>' +
-          '<td style="font-weight:800; color:' + rankBand.color + ';">' + rankBand.stars + ' ' + rankBand.label + '</td>' +
+          '<td style="font-weight:bold;">TỔNG ĐIỂM THI ĐUA TUẦN:</td>' +
+          '<td class="center" style="font-weight:bold; font-size:12pt; color:' + rankBand.color + ';">' + totalScore + '</td>' +
+          '<td style="font-weight:bold; color:' + rankBand.color + ';">Xếp loại tuần: ' + rankBand.label + '</td>' +
         '</tr>' +
       '</tbody>' +
     '</table>';
   } else {
     // Tháng / Học kỳ / Cả năm
-    scoreTableHtml = '<table class="bienban-table" style="font-size:12pt;">' +
+    var evalWeeksCount = td22 ? td22.totalEvalWeeks : 1;
+    scoreTableHtml = '<table class="bienban-table">' +
       '<thead>' +
         '<tr>' +
-          '<th style="width:40%;">Chỉ tiêu đánh giá ' + periodLabel + '</th>' +
+          '<th style="width:48%;">Nội dung theo dõi thi đua (' + periodLabel + ')</th>' +
           '<th style="width:20%;" class="center">Kết quả</th>' +
-          '<th style="width:40%;">Ghi chú</th>' +
+          '<th style="width:32%;">Ghi chú</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' +
         '<tr>' +
           '<td>Số tuần học theo dõi trong kỳ</td>' +
-          '<td class="center" style="font-weight:800;">' + (td22 ? td22.totalEvalWeeks : 1) + ' tuần</td>' +
+          '<td class="center" style="font-weight:bold;">' + evalWeeksCount + ' tuần</td>' +
           '<td style="font-style:italic; color:#475569;">Điểm cơ sở 100 điểm / tuần</td>' +
         '</tr>' +
         '<tr>' +
-          '<td>Tổng điểm <b style="color:#15803d;">CỘNG</b> tích lũy toàn kỳ</td>' +
-          '<td class="center" style="font-weight:800; color:#15803d;">+' + totalPlus + '</td>' +
-          '<td style="font-style:italic; color:#475569;">' + plusEvents.length + ' lần ghi nhận việc tốt</td>' +
+          '<td>Tổng điểm CỘNG tích lũy trong kỳ</td>' +
+          '<td class="center" style="font-weight:bold; color:#15803d;">+' + totalPlus + '</td>' +
+          '<td style="font-style:italic; color:#475569;">' + plusEvents.length + ' lượt việc tốt</td>' +
         '</tr>' +
         '<tr>' +
-          '<td>Tổng điểm <b style="color:#dc2626;">TRỪ</b> tích lũy toàn kỳ</td>' +
-          '<td class="center" style="font-weight:800; color:#dc2626;">-' + totalMinus + '</td>' +
-          '<td style="font-style:italic; color:#475569;">' + minusEvents.length + ' lần vi phạm nội quy</td>' +
+          '<td>Tổng điểm TRỪ tích lũy trong kỳ</td>' +
+          '<td class="center" style="font-weight:bold; color:#dc2626;">-' + totalMinus + '</td>' +
+          '<td style="font-style:italic; color:#475569;">' + minusEvents.length + ' lượt vi phạm</td>' +
         '</tr>' +
         '<tr style="background:#f8fafc;">' +
-          '<td style="font-weight:800; font-size:13pt;">ĐIỂM TRUNG BÌNH THI ĐUA / TUẦN:</td>' +
-          '<td class="center" style="font-weight:900; font-size:16pt; color:' + rankBand.color + ';">' + (td22 ? td22.avgScore : totalScore) + '</td>' +
-          '<td style="font-weight:800; color:' + rankBand.color + ';">Dự kiến xếp loại: ' + rankBand.label + '</td>' +
+          '<td style="font-weight:bold;">ĐIỂM TRUNG BÌNH THI ĐUA / TUẦN:</td>' +
+          '<td class="center" style="font-weight:bold; font-size:12pt; color:#1e3a8a;">' + (td22 ? td22.avgScore : totalScore) + '</td>' +
+          '<td style="font-weight:bold;">Dự kiến xếp loại: ' + rankBand.label + '</td>' +
         '</tr>' +
       '</tbody>' +
     '</table>';
   }
 
-  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:13pt; line-height:1.4; color:#000000; background:#ffffff; padding:0; margin:0;">' +
-    // Header chuẩn hành chính theo Nghị định 30/2020/NĐ-CP
-    '<div class="bb-header-grid">' +
-      '<div class="bb-header-left">' +
-        '<div class="bb-school">' + schoolName + '</div>' +
-        '<div class="bb-class">LỚP: <span>' + className + '</span></div>' +
-        '<div class="bb-line-short"></div>' +
+  // Tiêu đề bảng việc tốt
+  var plusTableHeader = (periodType === 'week' && plusEvents.length <= 8)
+    ? '<thead><tr><th style="width:6%;">TT</th><th style="width:36%;">Nội dung việc tốt</th><th style="width:14%;">Buổi</th><th style="width:32%;">Ghi chú</th><th style="width:12%;" class="center">Điểm cộng</th></tr></thead>'
+    : '<thead><tr><th style="width:6%;">TT</th><th style="width:44%;">Nội dung việc tốt / Biểu dương khen thưởng</th><th style="width:16%;" class="center">Số lượt</th><th style="width:16%;" class="center">Điểm cộng</th><th style="width:18%;">Ghi chú</th></tr></thead>';
+
+  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:12pt; line-height:1.35; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+    // Quốc hiệu, Tiêu ngữ chuẩn Nghị định 30/2020/NĐ-CP
+    '<div class="bb-header-grid" style="display:table; width:100%; margin-bottom:12px;">' +
+      '<div class="bb-header-left" style="display:table-cell; width:40%; text-align:center; vertical-align:top;">' +
+        '<div class="bb-school" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">' + schoolName + '</div>' +
+        '<div class="bb-class" style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">LỚP: <span>' + className + '</span></div>' +
+        '<div class="bb-line-short" style="border-top:1px solid #000; width:75px; margin:3px auto; height:1px;"></div>' +
       '</div>' +
-      '<div class="bb-header-right">' +
-        '<div class="bb-country">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
-        '<div class="bb-motto">Độc lập - Tự do - Hạnh phúc</div>' +
-        '<div class="bb-line-long"></div>' +
+      '<div class="bb-header-right" style="display:table-cell; width:60%; text-align:center; vertical-align:top;">' +
+        '<div class="bb-country" style="font-size:11pt; font-weight:bold; text-transform:uppercase;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>' +
+        '<div class="bb-motto" style="font-size:12pt; font-weight:bold;">Độc lập - Tự do - Hạnh phúc</div>' +
+        '<div class="bb-line-long" style="border-top:1px solid #000; width:140px; margin:3px auto; height:1px;"></div>' +
       '</div>' +
     '</div>' +
 
-    // Tiêu đề biên bản
-    '<div class="bb-title-block">' +
-      '<h1 class="bb-main-title">BIÊN BẢN THI ĐUA CÁ NHÂN HỌC SINH</h1>' +
-      '<div class="bb-sub-title">Kết quả thi đua <b>' + typeUpperLabel + '</b> - ' + periodLabel + '<br><small style="font-weight:normal; font-size:12pt;">(' + dateRangeText + ')</small></div>' +
-      '<div class="bb-year">Năm học ' + (settings.academicYear || '2026 - 2027') + '</div>' +
+    // Tiêu đề biên bản trang trọng
+    '<div class="bb-title-block" style="text-align:center; margin:10px 0 14px 0;">' +
+      '<div class="bb-main-title" style="font-size:14.5pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">' +
+        'PHIẾU THEO DÕI THI ĐUA &amp; RÈN LUYỆN CÁ NHÂN' +
+      '</div>' +
+      '<div class="bb-sub-title" style="font-size:11.5pt; font-weight:bold; color:#1e293b; margin-top:2px;">' +
+        'Kỳ đánh giá: ' + periodLabel + ' • Năm học ' + (settings.academicYear || '2026 - 2027') +
+      '</div>' +
+      '<div style="font-size:10pt; font-style:italic; color:#475569; margin-top:1px;">' +
+        '(' + dateRangeText + ')' +
+      '</div>' +
     '</div>' +
 
-    // Phần I: Thông tin học sinh
-    '<div class="bb-section-title">I. THÔNG TIN HỌC SINH:</div>' +
-    '<table class="bienban-table" style="font-size:12pt;">' +
+    // Phần I: Thông tin học sinh (độ rộng cột cân đối chuẩn để họ tên không bị gãy dòng)
+    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">I. THÔNG TIN HỌC SINH:</div>' +
+    '<table class="bienban-table" style="font-size:10.5pt; margin-bottom:8px;">' +
       '<tbody>' +
         '<tr>' +
-          '<td style="width:32%; font-weight:700;">Họ và tên học sinh:</td>' +
-          '<td style="font-weight:900; font-size:13.5pt; text-transform:uppercase;">' + student.name + '</td>' +
-          '<td style="width:18%; font-weight:700;">Mã số HS:</td>' +
-          '<td style="font-weight:700;">' + (student.code || 'Chưa cấp') + '</td>' +
+          '<td style="width:20%; font-weight:bold;">Họ và tên học sinh:</td>' +
+          '<td style="width:40%; font-weight:bold; font-size:11.5pt; text-transform:uppercase;">' + student.name + '</td>' +
+          '<td style="width:16%; font-weight:bold;">Mã số HS:</td>' +
+          '<td style="width:24%; font-weight:bold;">' + studentCode + '</td>' +
         '</tr>' +
         '<tr>' +
-          '<td style="font-weight:700;">Lớp:</td>' +
+          '<td style="font-weight:bold;">Lớp:</td>' +
           '<td>' + (settings.className || 'Lớp 9A4') + '</td>' +
-          '<td style="font-weight:700;">Tổ sinh hoạt:</td>' +
+          '<td style="font-weight:bold;">Tổ sinh hoạt:</td>' +
           '<td>Tổ ' + student.group + '</td>' +
         '</tr>' +
         '<tr>' +
-          '<td style="font-weight:700;">Chức vụ trong lớp:</td>' +
+          '<td style="font-weight:bold;">Chức vụ trong lớp:</td>' +
           '<td>' + (student.roleName || 'Thành viên') + '</td>' +
-          '<td style="font-weight:700;">GV Chủ nhiệm:</td>' +
+          '<td style="font-weight:bold;">GV chủ nhiệm:</td>' +
           '<td>' + teacherName + '</td>' +
         '</tr>' +
       '</tbody>' +
     '</table>' +
 
     // Phần II: Kết quả điểm thi đua
-    '<div class="bb-section-title" style="margin-top:14px;">II. KẾT QUẢ ĐIỂM THI ĐUA ' + typeUpperLabel + ':</div>' +
+    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:10px; margin-bottom:4px;">II. KẾT QUẢ ĐIỂM THI ĐUA:</div>' +
     scoreTableHtml +
 
     // Bảng tuần (nếu xem Tháng, HK, Cả năm)
     sbBuildWeekTable(student.id, periodType, periodValue) +
 
-    // Phần III: Chi tiết vi phạm
-    '<div class="bb-section-title" style="margin-top:14px;">III. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY:</div>' +
+    // Phần III: Chi tiết vi phạm nội quy
+    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:12px; margin-bottom:4px;">III. CHI TIẾT CÁC LẦN VI PHẠM NỘI QUY:</div>' +
     '<table class="bienban-table" style="font-size:10pt;">' +
       '<thead>' +
         '<tr>' +
-          '<th style="width:5%;">TT</th>' +
-          '<th style="width:20%;">Thời gian ghi nhận</th>' +
+          '<th style="width:6%;">TT</th>' +
+          '<th style="width:20%;">Thời gian</th>' +
           '<th style="width:10%;">Buổi</th>' +
-          '<th style="width:30%;">Nội dung vi phạm</th>' +
-          '<th style="width:25%;">Ghi chú</th>' +
+          '<th style="width:32%;">Nội dung vi phạm</th>' +
+          '<th style="width:22%;">Ghi chú</th>' +
           '<th style="width:10%;" class="center">Điểm trừ</th>' +
         '</tr>' +
       '</thead>' +
-      '<tbody>' + sbBuildDetailRows(minusEvents, false, criteria) + '</tbody>' +
+      '<tbody>' + sbBuildMinusDetailRows(minusEvents, criteria) + '</tbody>' +
     '</table>' +
 
-    // Phần IV: Chi tiết việc tốt
-    '<div class="bb-section-title" style="margin-top:14px;">IV. CHI TIẾT CÁC LẦN THỰC HIỆN TỐT / ĐƯỢC KHEN THƯỞNG:</div>' +
+    // Phần IV: Tổng hợp việc tốt / điểm cộng (súc tích, không làm tràn trang)
+    '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-top:12px; margin-bottom:4px;">IV. TỔNG HỢP CÁC MẶT TÍCH CỰC &amp; VIỆC TỐT ĐẠT ĐIỂM CỘNG:</div>' +
     '<table class="bienban-table" style="font-size:10pt;">' +
-      '<thead>' +
-        '<tr>' +
-          '<th style="width:5%;">TT</th>' +
-          '<th style="width:20%;">Thời gian ghi nhận</th>' +
-          '<th style="width:10%;">Buổi</th>' +
-          '<th style="width:30%;">Nội dung thực hiện tốt</th>' +
-          '<th style="width:25%;">Ghi chú</th>' +
-          '<th style="width:10%;" class="center">Điểm cộng</th>' +
-        '</tr>' +
-      '</thead>' +
-      '<tbody>' + sbBuildDetailRows(plusEvents, true, criteria) + '</tbody>' +
+      plusTableHeader +
+      '<tbody>' + sbBuildPlusSummaryRows(plusEvents, criteria, periodType) + '</tbody>' +
     '</table>' +
 
     // Khối dự kiến xếp loại rèn luyện TT22 (nếu có)
     sbBuildTT22Block(td22, periodLabel) +
 
-    // Phần V: Nhận xét của Giáo viên chủ nhiệm
-    '<div class="bb-keep-together" style="margin-top:16px;">' +
-      '<div class="bb-section-title">V. NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:</div>' +
-      '<div style="border:1px solid #000000; min-height:65px; padding:8px 12px; font-style:italic; line-height:1.6; font-size:12pt; background:#fafafa;">' +
-        '<span contenteditable="true" title="Bấm vào để chỉnh sửa nhận xét">' + teacherComment + '</span>' +
+    // Phần VI: Nhận xét của Giáo viên chủ nhiệm
+    '<div class="bb-keep-together" style="margin-top:12px; page-break-inside:avoid;">' +
+      '<div class="bb-section-title" style="font-size:11pt; font-weight:bold; text-transform:uppercase; margin-bottom:4px;">VI. Ý KIẾN / NHẬN XÉT CỦA GIÁO VIÊN CHỦ NHIỆM:</div>' +
+      '<div style="border:1px solid #000000; min-height:55px; padding:6px 10px; font-style:italic; line-height:1.5; font-size:11pt; background:#ffffff;">' +
+        '<span contenteditable="true" title="Bấm vào để chỉnh sửa lời nhận xét trước khi in hoặc xuất file">' + teacherComment + '</span>' +
       '</div>' +
     '</div>' +
 
-    // Phần VI: Chữ ký 3 bên
-    '<div class="bb-signatures">' +
-      '<div>' +
-        '<div class="bb-sign-role">HỌC SINH</div>' +
-        '<div class="bb-sign-sub">(Ký và ghi rõ họ tên)</div>' +
-        '<div class="bb-sign-space"></div>' +
-        '<div class="bb-sign-name">' + student.name + '</div>' +
+    // Phần VII: Chữ ký 3 bên (Bọc trong avoid page-break)
+    '<div class="bb-signatures bb-keep-together" style="margin-top:16px; width:100%; display:table; page-break-inside:avoid;">' +
+      '<div style="display:table-cell; width:32%; text-align:center; vertical-align:top;">' +
+        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">HỌC SINH</div>' +
+        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+        '<div class="bb-sign-space" style="height:55px;"></div>' +
+        '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + student.name + '</div>' +
       '</div>' +
-      '<div>' +
-        '<div style="text-align:center; font-size:11pt; font-style:italic; margin-bottom:4px;">' + todayDateStr + '</div>' +
-        '<div class="bb-sign-role">GIÁO VIÊN CHỦ NHIỆM</div>' +
-        '<div class="bb-sign-sub">(Ký và ghi rõ họ tên)</div>' +
-        '<div class="bb-sign-space"></div>' +
-        '<div class="bb-sign-name">' + teacherName + '</div>' +
+      '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
+        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH</div>' +
+        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+        '<div class="bb-sign-space" style="height:55px;"></div>' +
+        '<div style="font-style:italic; font-size:10pt; color:#64748b;">(Phụ huynh ký xác nhận)</div>' +
       '</div>' +
-      '<div>' +
-        '<div class="bb-sign-role">PHỤ HUYNH HỌC SINH</div>' +
-        '<div class="bb-sign-sub">(Ký xác nhận)</div>' +
-        '<div class="bb-sign-space"></div>' +
-        '<div class="bb-sign-name" style="font-style:italic; font-size:11pt; color:#64748b;">(Phụ huynh ký tên)</div>' +
+      '<div style="display:table-cell; width:34%; text-align:center; vertical-align:top;">' +
+        '<div style="text-align:center; font-size:10.5pt; font-style:italic; margin-bottom:2px;">Tây Phú, ' + todayDateStr + '</div>' +
+        '<div class="bb-sign-role" style="font-weight:bold; font-size:11pt; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>' +
+        '<div class="bb-sign-sub" style="font-style:italic; font-size:9.5pt; color:#334155;">(Ký và ghi rõ họ tên)</div>' +
+        '<div class="bb-sign-space" style="height:55px;"></div>' +
+        '<div class="bb-sign-name" style="font-weight:bold; font-size:11pt;">' + teacherName + '</div>' +
       '</div>' +
     '</div>' +
 
@@ -671,10 +744,6 @@ var StudentBienBanController = {
   currentPeriodType: 'week',
   currentPeriodValue: 1,
 
-  /**
-   * Kiểm tra quyền Admin (GVCN Võ Văn Hà).
-   * Trả về true nếu là Admin, false nếu không phải.
-   */
   _checkAdmin: function() {
     return Boolean(
       window.authManager &&
@@ -683,10 +752,6 @@ var StudentBienBanController = {
     );
   },
 
-  /**
-   * Mở modal biên bản thi đua cá nhân học sinh
-   * BẢO VỆ CHẶT CHẼ: CHỈ ADMIN MỚI ĐƯỢC PHÉP MỞ
-   */
   open: function(studentId) {
     if (!this._checkAdmin()) {
       if (window.chibiNotifications) {
@@ -720,9 +785,6 @@ var StudentBienBanController = {
     }
   },
 
-  /**
-   * Đóng modal biên bản thi đua cá nhân
-   */
   close: function() {
     var modal = document.getElementById('modal-student-bienban');
     if (modal) {
@@ -829,7 +891,7 @@ var StudentBienBanController = {
           var rv = td22.ranking;
           badge.style.display = 'flex';
           badge.innerHTML = '<span style="background:' + rv.color + '; color:#ffffff; border-radius:6px; padding:4px 12px; font-weight:800; font-size:0.92rem;">' +
-            rv.icon + ' Dự kiến TT22: <b>' + rv.display + '</b>' +
+            'Dự kiến TT22: <b>' + rv.display + '</b>' +
           '</span>' +
           '<span style="font-size:0.8rem; color:#475569; margin-left:8px;">' +
             'ĐTB: <b>' + td22.avgScore + '</b> điểm | ' + td22.totalEvalWeeks + ' tuần' +
@@ -858,26 +920,26 @@ var StudentBienBanController = {
 
     if (window.chibiSound) window.chibiSound.playClick();
 
-    // 1. Đưa nội dung vào print-area chuyên biệt cho biên bản cá nhân
+    // Đưa nội dung vào print-area chuyên biệt cho biên bản cá nhân
     var printArea = document.getElementById('student-bienban-print-area');
     if (printArea) {
       printArea.innerHTML = container.innerHTML;
     }
 
-    // 2. Kích hoạt lớp in ấn trên thẻ body
+    // Kích hoạt lớp in ấn trên thẻ body
     document.body.classList.add('printing-student-bienban');
 
-    // 3. Tự động dọn dẹp sau khi in xong
+    // Tự động dọn dẹp sau khi in xong
     var cleanup = function() {
       document.body.classList.remove('printing-student-bienban');
       window.removeEventListener('afterprint', cleanup);
     };
     window.addEventListener('afterprint', cleanup);
 
-    // Bộ hẹn giờ dự phòng dọn dẹp nếu trình duyệt không bắn sự kiện afterprint
+    // Bộ hẹn giờ dự phòng dọn dẹp nếu trình duyệt không phát sự kiện afterprint
     setTimeout(cleanup, 5000);
 
-    // 4. Kích hoạt lệnh in gốc
+    // Kích hoạt lệnh in gốc
     setTimeout(function() {
       window.print();
     }, 150);
@@ -910,7 +972,16 @@ var StudentBienBanController = {
       window.chibiNotifications.showToast('Đang tạo file PDF...', 'Vui lòng chờ trong giây lát...', 'info');
     }
 
+    // Nhân bản phần tử và xóa các khoảng đệm thừa trên màn hình để PDF dàn trang hoàn hảo
     var clone = container.cloneNode(true);
+    clone.style.padding = '0';
+    clone.style.margin = '0';
+    clone.style.maxWidth = '100%';
+    clone.style.width = '100%';
+    clone.style.boxShadow = 'none';
+    clone.style.border = 'none';
+    clone.style.background = '#ffffff';
+
     clone.querySelectorAll('[contenteditable]').forEach(function(el) {
       el.removeAttribute('contenteditable');
     });
@@ -918,15 +989,20 @@ var StudentBienBanController = {
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
     var cleanPeriod = periodLabel.replace(/\s+/g, '_');
-    var fname = 'BienBan_ThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
+    var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
 
     var opt = {
-      margin: [10, 10, 10, 12],
+      margin: [12, 12, 12, 14],
       filename: fname,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['.bb-keep-together', '.bb-signatures', 'tr'] }
     };
 
     window.html2pdf().set(opt).from(clone).save()
@@ -961,10 +1037,14 @@ var StudentBienBanController = {
     }
 
     var container = document.getElementById('sb-paper-container');
-    var student = window.classData.getStudentById(this.currentStudentId);
+    var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
     if (!container || !student) return;
 
     var clone = container.cloneNode(true);
+    clone.style.padding = '0';
+    clone.style.margin = '0';
+    clone.style.boxShadow = 'none';
+
     clone.querySelectorAll('[contenteditable]').forEach(function(el) {
       el.removeAttribute('contenteditable');
     });
@@ -972,7 +1052,7 @@ var StudentBienBanController = {
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
     var cleanPeriod = periodLabel.replace(/\s+/g, '_');
-    var fname = 'BienBan_ThiDua_' + cleanName + '_' + cleanPeriod + '.doc';
+    var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.doc';
 
     var blob = this._makeWordBlob(clone.innerHTML, fname);
     var link = document.createElement('a');
@@ -1028,7 +1108,7 @@ var StudentBienBanController = {
     }).join('');
 
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
-    var fname = 'BienBan_ThiDua_ToanLop9A4_' + periodLabel.replace(/\s+/g, '_') + '.doc';
+    var fname = 'PhieuThiDua_ToanLop9A4_' + periodLabel.replace(/\s+/g, '_') + '.doc';
 
     var blob = this._makeWordBlob(allHtml, fname);
     var link = document.createElement('a');

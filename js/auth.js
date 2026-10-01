@@ -291,6 +291,26 @@ class AuthManager {
   canPrintBienBan() {
     return this.isHomeroomTeacher();
   }
+
+  /**
+   * Kiểm tra tài khoản có phải Admin (GVCN chủ nhiệm) không.
+   * Alias của isPrimaryAdmin() để code rõ ràng hơn.
+   */
+  isAdmin() {
+    return Boolean(
+      this.currentUser &&
+      this.currentUser.role === 'teacher' &&
+      this.currentUser.isPrimary !== false
+    );
+  }
+
+  /**
+   * Kiểm tra quyền xem/xuất Biên bản Thi đua Cá nhân + Dự kiến TT22.
+   * Chỉ dành cho Admin (GVCN chủ nhiệm).
+   */
+  canViewStudentBienBan() {
+    return this.isAdmin();
+  }
 }
 
 // Global Auth Instance

@@ -369,8 +369,15 @@ class AppController {
       window.authManager.isHomeroomTeacher()
     );
 
+    const canSB = Boolean(
+      window.authManager &&
+      typeof window.authManager.canViewStudentBienBan === 'function' &&
+      window.authManager.canViewStudentBienBan()
+    );
+
     if (document.body) {
       document.body.classList.toggle('is-gvcn', isGVCN);
+      document.body.classList.toggle('is-admin', canSB);
     }
 
     const btnBienBanHeader = document.getElementById('btn-open-bienban');
@@ -383,11 +390,33 @@ class AppController {
       btnBienBanTable.style.display = isGVCN ? 'inline-flex' : 'none';
     }
 
-    // Nếu không phải GVCN mà modal đang mở thì đóng ngay lập tức
+    const btnStudentBienBan = document.getElementById('btn-open-student-bienban');
+    if (btnStudentBienBan) {
+      btnStudentBienBan.style.display = canSB ? 'inline-flex' : 'none';
+    }
+
+    const btnStudentBienBanTable = document.getElementById('btn-open-student-bienban-table');
+    if (btnStudentBienBanTable) {
+      btnStudentBienBanTable.style.display = canSB ? 'inline-flex' : 'none';
+    }
+
+    // Nếu không phải GVCN mà modal biên bản tuần đang mở thì đóng ngay lập tức
     if (!isGVCN) {
       const modal = document.getElementById('modal-bienban-sinhoat');
       if (modal && modal.classList.contains('active')) {
         this.closeBienBanModal();
+      }
+    }
+
+    // Nếu không phải Admin mà modal biên bản học sinh TT22 đang mở thì đóng ngay lập tức
+    if (!canSB) {
+      const modalSB = document.getElementById('modal-student-bienban');
+      if (modalSB && modalSB.style.display !== 'none') {
+        if (window.studentBienBanCtrl) {
+          window.studentBienBanCtrl.close();
+        } else {
+          modalSB.style.display = 'none';
+        }
       }
     }
   }
@@ -728,6 +757,10 @@ class AppController {
         html += `<button class="btn-icon-sm" style="background:#3b82f6;" title="Chấm điểm nhanh" onclick="window.appController.openScoreModal('${student.id}', 'T2')">➕</button>`;
       }
       html += `<button class="btn-icon-sm" style="background:#ec4899;" title="Gửi tin nhắn" onclick="window.appController.openSendMessageModal('${student.id}')">💬</button>`;
+      const canAdminBienBan = Boolean(window.authManager && typeof window.authManager.canViewStudentBienBan === 'function' && window.authManager.canViewStudentBienBan());
+      if (canAdminBienBan) {
+        html += `<button class="btn-icon-sm" style="background:#7c3aed;" title="Xuất Biên Bản Thi Đua Cá Nhân + Dự Kiến Xếp Loại TT22 (Chỉ Admin)" onclick="window.studentBienBanCtrl && window.studentBienBanCtrl.open('${student.id}')">📋</button>`;
+      }
       html += `</td>`;
 
       tr.innerHTML = html;

@@ -2854,4 +2854,44 @@ body.is-gvcn #btn-open-bienban-table {
   display: none;
 }
 
+/* ==========================================================================
+   BIÊN BẢN THI ĐUA CÁ NHÂN HỌC SINH (CHUẨN ĐỊNH DẠNG VĂN BẢN HÀNH CHÍNH)
+   ========================================================================== */
+.student-conduct-paper {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "Times New Roman", Times, Georgia, serif;
+  color: #000000;
+  background: #ffffff;
+}
+
+.student-conduct-paper .bienban-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 8px 0;
+  font-size: 9.5pt;
+  line-height: 1.25;
+}
+
+.student-conduct-paper .bienban-table th,
+.student-conduct-paper .bienban-table td {
+  border: 1px solid #000000;
+  padding: 3.5px 5px;
+  vertical-align: middle;
+}
+
+.student-conduct-paper .bienban-table th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+  text-align: center;
+}
+
+.student-conduct-paper .html2pdf__page-break {
+  page-break-before: always;
+  clear: both;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
 

@@ -258,22 +258,23 @@ function sbBuildPlusSummaryRows(events, criteria, periodType) {
   // Nếu là Tháng, Học kỳ, Cả năm: TỰ ĐỘNG TỔNG HỢP THEO TIÊU CHÍ (GROUP BY CRITERIA)
   var map = {};
   events.forEach(function(ev) {
-    var cid = ev.criteriaId || 'other';
-    if (!map[cid]) {
-      var crit = (criteria || []).find(function(c) { return c.id === cid; }) || { name: 'Việc tốt, hoạt động phong trào' };
-      map[cid] = {
-        name: sbCleanText(crit.name),
+    var crit = (criteria || []).find(function(c) { return c.id === ev.criteriaId; }) || { name: 'Việc tốt, hoạt động phong trào' };
+    var cleanName = sbCleanText(crit.name);
+    var key = cleanName.toLowerCase() || 'other';
+    if (!map[key]) {
+      map[key] = {
+        name: cleanName,
         count: 0,
         totalPoints: 0,
         notes: []
       };
     }
-    map[cid].count++;
-    map[cid].totalPoints += (ev.points || 0);
-    if (ev.note && ev.note.trim() && map[cid].notes.length < 2) {
+    map[key].count++;
+    map[key].totalPoints += (ev.points || 0);
+    if (ev.note && ev.note.trim() && map[key].notes.length < 2) {
       var n = sbCleanText(ev.note.trim());
-      if (n && !map[cid].notes.includes(n)) {
-        map[cid].notes.push(n);
+      if (n && !map[key].notes.includes(n)) {
+        map[key].notes.push(n);
       }
     }
   });
@@ -715,7 +716,7 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
 
   // ================= TRƯỜNG HỢP 1: BÁO CÁO TUẦN (GỌN GÀNG TRỌN VẸN TRONG 1 TRANG A4) =================
   if (periodType === 'week') {
-    return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+    return '<div class="student-conduct-paper" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0; width:100%; box-sizing:border-box;">' +
       docHeaderHtml +
       titleBlockHtml +
       studentInfoHtml +
@@ -755,7 +756,7 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
   }
 
   // ================= TRƯỜNG HỢP 2: THÁNG, HỌC KỲ, CẢ NĂM (PHÂN TRANG 2 TRANG A4 CHUẨN XÁC) =================
-  return '<div class="bienban-page" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0;">' +
+  return '<div class="student-conduct-paper" style="font-family:\'Times New Roman\',Times,serif; font-size:11.5pt; line-height:1.25; color:#000000; background:#ffffff; padding:0; margin:0; width:100%; box-sizing:border-box;">' +
 
     // -------- TRANG 1 --------
     '<div class="bb-page bb-page-1">' +
@@ -784,12 +785,12 @@ function generateStudentBienBanHtml(student, periodType, periodValue, settings) 
     '</div>' +
 
     // -------- ĐƯỜNG PHÂN CÁCH TRỰC QUAN MÀN HÌNH PREVIEW --------
-    '<div class="sb-screen-only-divider" style="border-top:2px dashed #94a3b8; margin:22px -30px 18px; text-align:center;">' +
+    '<div class="sb-screen-only-divider" style="border-top:2px dashed #94a3b8; margin:20px 0 16px; text-align:center;">' +
       '<span style="background:#f1f5f9; color:#475569; font-size:8.5pt; font-weight:bold; padding:2px 14px; border-radius:999px; position:relative; top:-9px; border:1px solid #cbd5e1; font-family:sans-serif; letter-spacing:0.5px;">--- HẾT TRANG 1 • BẮT ĐẦU TRANG 2 ---</span>' +
     '</div>' +
 
     // -------- NGẮT TRANG PDF / IN ẤN THỰC TẾ --------
-    '<div class="html2pdf__page-break"></div>' +
+    '<div class="html2pdf__page-break" style="page-break-before:always; clear:both; height:0; margin:0; padding:0;"></div>' +
 
     // -------- TRANG 2 --------
     '<div class="bb-page bb-page-2">' +
@@ -1078,33 +1079,35 @@ var StudentBienBanController = {
       window.chibiNotifications.showToast('Đang tạo file PDF...', 'Vui lòng chờ trong giây lát...', 'info');
     }
 
-    // Tạo overlay căn giữa màn hình (0,0) - TUYỆT ĐỐI KHÔNG DÙNG left:-9999px gây lệch toạ độ
-    var overlay = document.createElement('div');
-    overlay.id = 'pdf-render-overlay';
-    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; overflow-y:auto; padding:20px; box-sizing:border-box;';
+    // 1. Tạo bản sao (clone) nội dung biên bản
+    var clone = container.cloneNode(true);
 
-    var msg = document.createElement('div');
-    msg.style.cssText = 'color:#fde047; font-weight:800; font-size:13pt; margin-bottom:12px; font-family:sans-serif; text-align:center;';
-    msg.innerHTML = '📄 Đang tạo file PDF chuẩn A4 cho em ' + student.name + '...';
-    overlay.appendChild(msg);
-
-    var paper = document.createElement('div');
-    paper.id = 'pdf-paper-render';
-    paper.style.cssText = 'width:760px; min-width:760px; max-width:760px; background:#ffffff; padding:0; margin:0; box-sizing:border-box; color:#000000; box-shadow:0 10px 30px rgba(0,0,0,0.5);';
-    paper.innerHTML = container.innerHTML;
-
-    // Xóa triệt để đường phân cách màn hình preview khỏi bản in PDF
-    paper.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
+    // 2. Xóa triệt để đường phân cách màn hình preview khỏi bản in PDF
+    clone.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
       if (el.parentNode) el.parentNode.removeChild(el);
     });
 
-    // Bỏ contenteditable
-    paper.querySelectorAll('[contenteditable]').forEach(function(el) {
+    // 3. Bỏ thuộc tính chỉnh sửa nội dung
+    clone.querySelectorAll('[contenteditable]').forEach(function(el) {
       el.removeAttribute('contenteditable');
     });
 
-    overlay.appendChild(paper);
-    document.body.appendChild(overlay);
+    // 4. Tạo wrapper kết xuất cố định tại góc (0,0) với độ rộng chuẩn 750px (tương đương 190mm in ấn)
+    // TUYỆT ĐỐI KHÔNG dùng overlay căn giữa flexbox hoặc left: -9999px để html2canvas không bị lệch toạ độ
+    var wrapper = document.createElement('div');
+    wrapper.id = 'pdf-student-render-wrapper';
+    wrapper.style.cssText = 'position:fixed; top:0; left:0; width:750px; background:#ffffff; color:#000000; font-family:"Times New Roman",Times,serif; z-index:9999999; margin:0; padding:0; box-sizing:border-box;';
+
+    // Đảm bảo phần tử con không bị ảnh hưởng bởi shadow hoặc padding ngoài của màn hình
+    var paper = clone.querySelector('.student-conduct-paper') || clone;
+    paper.style.boxShadow = 'none';
+    paper.style.borderRadius = '0';
+    paper.style.padding = '0';
+    paper.style.margin = '0';
+    paper.style.width = '100%';
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
     var periodLabel = sbGetPeriodLabel(this.currentPeriodType, this.currentPeriodValue);
     var cleanName = student.name.replace(/\s+/g, '_');
@@ -1112,18 +1115,16 @@ var StudentBienBanController = {
     var fname = 'PhieuThiDua_' + cleanName + '_' + cleanPeriod + '.pdf';
 
     var opt = {
-      margin: [8, 8, 8, 8],
+      margin: [10, 10, 10, 10], // Lề chuẩn 10mm đều 4 cạnh giúp tài liệu nằm cân đối, chính giữa trang A4
       filename: fname,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
-        logging: false,
         letterRendering: true,
-        width: 760,
-        windowWidth: 760,
+        scrollY: 0,
         scrollX: 0,
-        scrollY: 0
+        logging: false
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
@@ -1131,8 +1132,8 @@ var StudentBienBanController = {
 
     window.html2pdf().set(opt).from(paper).save()
       .then(function() {
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
+        if (wrapper && wrapper.parentNode) {
+          wrapper.parentNode.removeChild(wrapper);
         }
         if (window.chibiSound) window.chibiSound.playPlus();
         if (window.chibiNotifications) {
@@ -1141,8 +1142,8 @@ var StudentBienBanController = {
       })
       .catch(function(err) {
         console.warn('PDF export error:', err);
-        if (overlay && overlay.parentNode) {
-          overlay.parentNode.removeChild(overlay);
+        if (wrapper && wrapper.parentNode) {
+          wrapper.parentNode.removeChild(wrapper);
         }
         self.print();
       });

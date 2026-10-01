@@ -267,7 +267,8 @@
   }
 
   body.printing-bienban .bb-page-break,
-  body.printing-student-bienban .bb-page-break {
+  body.printing-student-bienban .bb-page-break,
+  body.printing-student-bienban .html2pdf__page-break {
     page-break-before: always !important;
     break-before: page !important;
     clear: both !important;
@@ -278,7 +279,8 @@
   }
 
   body.printing-bienban .bb-page-break::after,
-  body.printing-student-bienban .bb-page-break::after {
+  body.printing-student-bienban .bb-page-break::after,
+  body.printing-student-bienban .sb-screen-only-divider {
     display: none !important;
   }
 

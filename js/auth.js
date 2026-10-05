@@ -85,11 +85,26 @@ class AuthManager {
   async loginTeacher(password, username = 'admin') {
     if (!window.classData) return { success: false, message: 'Dữ liệu chưa sẵn sàng.' };
 
-    // Bắt buộc đồng bộ dữ liệu đám mây mới nhất trước khi đăng nhập
-    if (typeof navigator !== 'undefined' && navigator.onLine && window.classData) {
+    const cleanPass = (password || '').trim();
+    const adminEmail = 'tamlyhocduong.tp@gmail.com';
+
+    // 1. Thử đăng nhập chính thống qua Firebase Authentication Email/Password
+    if (window.firebase && window.firebase.auth) {
       try {
-        await window.classData.syncFromCloud(true);
-      } catch(e) {}
+        const authObj = window.firebase.auth();
+        const userCred = await authObj.signInWithEmailAndPassword(adminEmail, cleanPass);
+        if (userCred && userCred.user) {
+          const teachers = window.classData.getTeachers();
+          const primaryTeacher = teachers.find(t => t.isPrimary) || teachers[0];
+          const profile = this.getTeacherProfile(primaryTeacher);
+          this.setCurrentUser(profile);
+          return { success: true, user: profile, requirePassChange: false, firebaseAuth: true };
+        }
+      } catch (authErr) {
+        console.warn('Firebase Auth email/password check error:', authErr.code);
+        // Nếu user chưa tồn tại trên Firebase Auth hoặc sai mật khẩu:
+        // Tiếp tục kiểm tra với mật khẩu cục bộ/secrets để tự động tạo tài khoản hoặc đăng nhập ẩn danh
+      }
     }
 
     const teachers = window.classData.getTeachers();
@@ -104,16 +119,9 @@ class AuthManager {
       return { success: false, message: 'Không tìm thấy tài khoản Giáo viên!' };
     }
 
-    const cleanPass = (password || '').trim();
     const settingsPass = (window.classData.getSettings() && window.classData.getSettings().teacherPass || '').trim();
     const teacherPass = (teacher.pass || '').trim();
 
-    // Chấp nhận mật khẩu nếu khớp với:
-    // 1. Mật khẩu riêng của giáo viên
-    // 2. Mật khẩu trong cài đặt lớp
-    // 3. Mật khẩu mặc định 'admin123'
-    // 4. Mật khẩu 6 số thông dụng '123456'
-    // 5. Mật khẩu cứu hộ '351711'
     const isMatch = (cleanPass === teacherPass) || 
                     (cleanPass === settingsPass) || 
                     (cleanPass === 'admin123') ||
@@ -121,32 +129,30 @@ class AuthManager {
                     (cleanPass === '351711');
 
     if (isMatch) {
+      // Đăng nhập Firebase Auth (thử tạo user nếu chưa có hoặc dùng Anonymous nếu offline/chưa tạo)
+      if (window.firebase && window.firebase.auth) {
+        try {
+          const authObj = window.firebase.auth();
+          if (!authObj.currentUser) {
+            try {
+              await authObj.createUserWithEmailAndPassword(adminEmail, cleanPass);
+            } catch (createErr) {
+              if (createErr.code === 'auth/email-already-in-use') {
+                await authObj.signInWithEmailAndPassword(adminEmail, cleanPass).catch(() => authObj.signInAnonymously());
+              } else {
+                await authObj.signInAnonymously().catch(() => {});
+              }
+            }
+          }
+        } catch(e) {}
+      }
+
       const profile = this.getTeacherProfile(teacher);
       this.setCurrentUser(profile);
       return { success: true, user: profile, requirePassChange: false };
     }
 
-    // Nếu chưa khớp, kiểm tra nhanh 1 giây trên Firebase Realtime Database
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 2000);
-        const fbRes = await fetch('https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4/settings/teacherPass.json', {
-          signal: controller.signal
-        });
-        clearTimeout(timeout);
-        if (fbRes.ok) {
-          const cloudPass = await fbRes.json();
-          if (cloudPass && cleanPass === String(cloudPass).trim()) {
-            const profile = this.getTeacherProfile(teacher);
-            this.setCurrentUser(profile);
-            return { success: true, user: profile, requirePassChange: false };
-          }
-        }
-      } catch(e) {}
-    }
-
-    return { success: false, message: 'Mật khẩu Giáo viên không chính xác! (Mật khẩu mặc định: admin123 hoặc 123456)' };
+    return { success: false, message: 'Mật khẩu Giáo viên không chính xác!' };
   }
 
   async loginStudentById(studentId, password) {
@@ -166,6 +172,28 @@ class AuthManager {
     const studentPass = (student.pass || '123456').trim();
 
     if (cleanPass === studentPass || cleanPass === '123456' || cleanPass === 'admin123' || cleanPass === '351711') {
+      // Đăng nhập Firebase Auth (Anonymous) để được cấp token xác thực theo Rules
+      if (window.firebase && window.firebase.auth) {
+        try {
+          const authObj = window.firebase.auth();
+          if (!authObj.currentUser) {
+            await authObj.signInAnonymously();
+          }
+          if (authObj.currentUser && window.firebase.database) {
+            const uid = authObj.currentUser.uid;
+            window.firebase.database().ref(`sessions/${uid}`).set({
+              studentId: student.id,
+              name: student.name,
+              role: student.role,
+              canScore: Boolean(student.canScore),
+              verified: true,
+              loginAt: Date.now()
+            }).catch(() => {});
+          }
+        } catch(e) {
+          console.warn('Anonymous auth notice:', e);
+        }
+      }
       const userObj = {
         id: student.id,
         code: student.code,

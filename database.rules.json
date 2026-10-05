@@ -1,0 +1,98 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.email === 'tamlyhocduong.tp@gmail.com')",
+        ".write": "auth != null && auth.token.email === 'tamlyhocduong.tp@gmail.com'"
+      }
+    },
+
+    "secrets": {
+      "lop9a4": {
+        ".read": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+        "studentPass": {
+          "$studentId": {
+            ".read": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true || (root.child('sessions').child(auth.uid).child('studentId').val() === $studentId && root.child('sessions').child(auth.uid).child('verified').val() === true))",
+            ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true || (root.child('sessions').child(auth.uid).child('studentId').val() === $studentId && root.child('sessions').child(auth.uid).child('verified').val() === true))"
+          }
+        }
+      }
+    },
+
+    "sessions": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "classes": {
+      "lop9a4": {
+        ".read": "auth != null",
+
+        "settings": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "students": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "teachers": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "criteria": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "scorers": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "deletedEventIds": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "feedback": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+        },
+        "lastSenderClientId": {
+          ".write": "auth != null"
+        },
+        "lastPushedAt": {
+          ".write": "auth != null"
+        },
+
+        "events": {
+          "$eventId": {
+            ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true || (!data.exists() && newData.exists() && root.child('classes/lop9a4/scorers').child(root.child('sessions').child(auth.uid).child('studentId').val()).child('canScore').val() === true && root.child('sessions').child(auth.uid).child('verified').val() === true))",
+            ".validate": "newData.hasChildren(['id', 'studentId', 'points', 'type', 'criteriaId', 'week']) && newData.child('id').isString() && newData.child('studentId').isString() && newData.child('points').isNumber() && newData.child('points').val() >= -50 && newData.child('points').val() <= 50"
+          }
+        },
+
+        "notifications": {
+          ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+          "$notifId": {
+            ".write": "auth != null && (!data.exists() || auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+            "readBy": {
+              ".write": "auth != null"
+            }
+          }
+        }
+      }
+    },
+
+    "thiet_bi_2026": {
+      ".read": true,
+      ".write": true
+    },
+
+    "thidua9a4_data": {
+      ".read": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+      ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+    },
+    "thidua9a4_master": {
+      ".read": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)",
+      ".write": "auth != null && (auth.token.email === 'tamlyhocduong.tp@gmail.com' || root.child('admins').child(auth.uid).val() === true)"
+    }
+  }
+}

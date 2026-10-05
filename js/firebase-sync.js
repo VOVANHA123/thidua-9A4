@@ -12,13 +12,13 @@
 
   // Cấu hình Firebase mặc định của Thầy Hà
   const DEFAULT_FIREBASE_CONFIG = {
-    apiKey: "",
+    apiKey: "AIzaSyDRB7dtXtACb-Fj4WSjUyhfkuoU5RJxDlI",
     authDomain: "thidua-lop-9a4-79dca.firebaseapp.com",
     databaseURL: "https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "thidua-lop-9a4-79dca",
-    storageBucket: "thidua-lop-9a4-79dca.appspot.com",
-    messagingSenderId: "100000000000",
-    appId: "1:100000000000:web:thidua9a4"
+    storageBucket: "thidua-lop-9a4-79dca.firebasestorage.app",
+    messagingSenderId: "23913470129",
+    appId: "1:23913470129:web:8183b8ddc217a8e568ea90"
   };
 
   class FirebaseSyncEngine {
@@ -101,6 +101,14 @@
 
         this.database = window.firebase.database();
         this.dbRef = this.database.ref('classes/lop9a4');
+
+        // Tự động kết nối Firebase Auth (Anonymous) để đảm bảo có token hợp lệ theo Security Rules
+        if (window.firebase.auth) {
+          const authObj = window.firebase.auth();
+          if (!authObj.currentUser) {
+            authObj.signInAnonymously().catch(e => console.warn('Auto anonymous auth notice:', e));
+          }
+        }
 
         // Lắng nghe trạng thái kết nối mạng của Firebase (.info/connected)
         const connectedRef = this.database.ref('.info/connected');
@@ -365,7 +373,22 @@
         } catch(e) {}
       }
 
-      // Cách 1: Thử đẩy toàn bộ qua Firebase SDK WebSocket
+      // Cách 1: Nếu là hành động thêm điểm (SCORE_ADD), ghi trực tiếp vào events/{id}
+      if (this.dbRef && extraMeta && extraMeta.recentAction === 'SCORE_ADD' && extraMeta.recentData && extraMeta.recentData.id) {
+        try {
+          await this.dbRef.child('events').child(extraMeta.recentData.id).set(extraMeta.recentData);
+          await this.dbRef.child('lastSenderClientId').set(payload.lastSenderClientId || 'unknown');
+          await this.dbRef.child('lastPushedAt').set(Date.now());
+          this.lastSyncTimestamp = Date.now();
+          this.updateStatusBadge('connected', 'Đã Lưu Điểm ⚡');
+          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+          return { success: true, method: 'sdk_event_add' };
+        } catch (e) {
+          console.warn('Per-event SDK write failed, falling back to full set:', e);
+        }
+      }
+
+      // Cách 2: Thử đẩy toàn bộ qua Firebase SDK WebSocket (Giáo viên / Admin)
       if (this.dbRef) {
         try {
           await this.dbRef.set(payload);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chibi-thidua-9a4-v61';
+const CACHE_NAME = 'chibi-thidua-9a4-v62';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
   './js/html2pdf.bundle.min.js',
   './js/bienban-hocsinh.js',
   './js/app.js',
+  './assets/images/logo.webp',
   './assets/images/logo.png',
   './assets/images/icon-512.png',
   './assets/images/icon.svg',

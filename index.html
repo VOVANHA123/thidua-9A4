@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Thi Đua 9A4">
   <link rel="manifest" href="manifest.json?v=20260930_v53">
+  <link rel="preload" as="image" href="assets/images/logo.webp" type="image/webp">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <link rel="apple-touch-icon" href="assets/images/logo.png">
 
@@ -41,7 +42,10 @@
   <div id="view-login" style="display: flex;">
     <div class="login-portal-card">
       <div class="login-portal-header">
-        <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="login-portal-logo" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+        <picture>
+          <source srcset="assets/images/logo.webp" type="image/webp">
+          <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="login-portal-logo" width="96" height="96" loading="eager" fetchpriority="high" decoding="async" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+        </picture>
         <div class="login-portal-school">TRƯỜNG THCS TÂY PHÚ</div>
         <h1 class="login-portal-title">BẢNG THEO DÕI THI ĐUA LỚP 9A4</h1>
         <p class="login-portal-subtitle">🌸 Chào mừng Quý Thầy Cô & các em học sinh niên khóa 2026 - 2027</p>
@@ -148,7 +152,10 @@
     <header class="header-hero">
       <div class="header-container">
         <div class="header-brand">
-          <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="chibi-avatar-hero" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+          <picture>
+            <source srcset="assets/images/logo.webp" type="image/webp">
+            <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="chibi-avatar-hero" width="72" height="72" loading="eager" fetchpriority="high" decoding="async" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+          </picture>
           <div class="header-titles">
             <span class="school-tagline" id="header-school-name">TRƯỜNG THCS TÂY PHÚ</span>
             <h1 class="main-title">

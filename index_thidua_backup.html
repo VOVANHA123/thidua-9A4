@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="screen-orientation" content="any">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Bảng Thi Đua Lớp 9A4 - Trường THCS Tây Phú</title>
+  
+  <!-- SEO & PWA Meta Tags -->
+  <meta name="description" content="Hệ thống Quản lý và Theo dõi Thi Đua Lớp 9A4 - Trường THCS Tây Phú do Thầy Võ Văn Hà chủ nhiệm.">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Thi Đua 9A4">
+  <link rel="manifest" href="manifest.json?v=20260909_v40">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+
+  <!-- Stylesheets with Cache-busting -->
+  <link rel="stylesheet" href="css/style.css?v=20260909_v40">
+  <link rel="stylesheet" href="css/print.css?v=20260909_v40" media="print">
+</head>
+<body>
+
+  <!-- ================= BOOT CLOUD HYDRATION OVERLAY ================= -->
+  <div id="cloud-boot-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 24px;">
+    <div style="font-size: 3.5rem; margin-bottom: 16px; animation: bounce 1.5s infinite;">🌸</div>
+    <h2 style="margin: 0 0 10px 0; font-weight: 800; color: #fde047; font-size: 1.35rem; letter-spacing: 0.5px;">ĐANG TẢI DỮ LIỆU LỚP 9A4 MỚI NHẤT...</h2>
+    <p id="boot-status-text" style="margin: 0 0 16px 0; color: #cbd5e1; font-size: 0.95rem; max-width: 380px; line-height: 1.5;">Đang kết nối máy chủ đám mây để nạp bảng điểm và danh sách thi đua</p>
+    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); padding: 6px 16px; border-radius: 999px; font-size: 0.8rem; color: #86efac; border: 1px solid rgba(134, 239, 172, 0.3);">
+      <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+      <span>Đồng bộ máy chủ: Google Firebase & Google Sheets</span>
+    </div>
+  </div>
+
+  <!-- ================= FULL-SCREEN LOGIN PORTAL ================= -->
+  <div id="view-login" style="display: flex;">
+    <div class="login-portal-card">
+      <div class="login-portal-header">
+        <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="login-portal-logo" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+        <div class="login-portal-school">TRƯỜNG THCS TÂY PHÚ</div>
+        <h1 class="login-portal-title">BẢNG THEO DÕI THI ĐUA LỚP 9A4</h1>
+        <p class="login-portal-subtitle">🌸 Chào mừng Quý Thầy Cô & các em học sinh niên khóa 2026 - 2027</p>
+      </div>
+
+      <!-- Login Tabs Nav -->
+      <div class="login-tabs-nav">
+        <button type="button" class="login-tab-btn active" id="btn-tab-student" onclick="window.appController.switchLoginTab('student')">
+          🧑‍🎓 Học Sinh (29 Bạn)
+        </button>
+        <button type="button" class="login-tab-btn" id="btn-tab-teacher" onclick="window.appController.switchLoginTab('teacher')">
+          👨‍🏫 Giáo Viên
+        </button>
+      </div>
+
+      <!-- Tab 1: Student Login Form -->
+      <form id="form-portal-student-login" class="login-tab-pane active">
+        <div class="form-group">
+          <label class="form-label">Chọn tên của em trong danh sách lớp 9A4:</label>
+          <select id="portal-student-select" class="form-control" style="font-weight: 700; color: #1e3a8a;" required>
+            <option value="">-- Bấm vào đây để chọn tên của em --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mật khẩu:</label>
+          <input type="password" id="portal-student-pass" class="form-control" placeholder="Nhập mật khẩu (Mặc định: 123456)" required />
+          <small style="color: #64748b; font-size: 0.75rem; margin-top: 4px; display: block;">Mật khẩu ban đầu của học sinh là: <b>123456</b></small>
+        </div>
+
+        <button type="submit" class="btn-hero btn-gold btn-block">
+          ĐĂNG NHẬP HỌC SINH ✨
+        </button>
+      </form>
+
+      <!-- Tab 2: Teacher Login Form -->
+      <form id="form-portal-teacher-login" class="login-tab-pane">
+        <div class="form-group">
+          <label class="form-label">Chọn tài khoản Giáo viên:</label>
+          <select id="portal-teacher-select" class="form-control" style="font-weight: 700; color: #1e3a8a;">
+            <option value="admin">👨‍🏫 Thầy Võ Văn Hà (GVCN & Admin)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mật khẩu Giáo viên:</label>
+          <input type="password" id="portal-teacher-pass" class="form-control" placeholder="Nhập mật khẩu Giáo viên..." required />
+          <small id="hint-teacher-pass" style="color: #64748b; font-size: 0.75rem; margin-top: 4px; display: block;">Mật khẩu quản trị của Giáo viên chủ nhiệm</small>
+        </div>
+
+        <button type="submit" class="btn-hero btn-gold btn-block">
+          ĐĂNG NHẬP GIÁO VIÊN 🚀
+        </button>
+      </form>
+
+      <!-- Quick refresh / update button on Login screen -->
+      <div style="margin-top: 18px; border-top: 1px dashed #e2e8f0; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <span class="role-pill" id="cloud-sync-status-badge" onclick="window.classData.syncFromCloud(true)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid #86efac; color: #15803d; cursor: pointer; font-size: 0.72rem; padding: 4px 10px; font-weight: 700;" title="Bấm để đồng bộ dữ liệu đám mây ngay lập tức">
+          🟢 Máy Chủ: Đã Kết Nối ⚡
+        </span>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button type="button" class="btn-hero btn-white" style="padding: 4px 11px; font-size: 0.76rem; font-weight: 700; color: #0284c7; border-color: #7dd3fc;" onclick="window.classData.syncFromCloud(true)" title="Tải dữ liệu mới nhất từ máy chủ">
+            🔄 Đồng bộ máy chủ
+          </button>
+          <button type="button" class="btn-hero btn-white" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; color: #475569;" onclick="window.appController.forceAppUpdate()" title="Tải lại phiên bản mới nhất">
+            ⚡ Làm mới App
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP VIEW (DASHBOARD) ================= -->
+  <div id="view-app" style="display: none;">
+
+    <!-- ================= TOP STATUS BAR & CONTROLS ================= -->
+    <div class="top-bar no-print">
+      <div class="top-bar-left" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span class="badge-tag">Chibi PWA</span>
+        <span>TRƯỜNG THCS TÂY PHÚ • LỚP 9A4</span>
+        <span class="role-pill" id="cloud-sync-status-badge-top" onclick="window.classData.syncFromCloud(true)" style="background: rgba(34, 197, 94, 0.25); border: 1px solid #86efac; color: #86efac; cursor: pointer; font-size: 0.72rem; padding: 2px 8px;" title="Bấm để tải dữ liệu mới nhất từ đám mây">
+          ☁️ Đám Mây: Trực Tuyến
+        </span>
+      </div>
+
+      <div class="top-bar-actions" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <button class="role-pill" onclick="window.classData.pushToCloud(); window.chibiNotifications.showToast('Đã Lưu Đám Mây! ☁️', 'Dữ liệu máy này đã được tải lên máy chủ cho tất cả điện thoại!', 'success');" style="background: rgba(16, 185, 129, 0.45); border-color: #6ee7b7; color: #fff;" title="Đẩy toàn bộ dữ liệu máy tính lên máy chủ">
+          ☁️ Lưu Lên Đám Mây
+        </button>
+        <button class="role-pill" onclick="window.classData.syncFromCloud(true); window.chibiNotifications.showToast('Đã Đồng Bộ! 📥', 'Đã tải dữ liệu mới nhất từ máy chủ!', 'info');" style="background: rgba(59, 130, 246, 0.45); border-color: #93c5fd;" title="Tải dữ liệu mới nhất từ máy chủ">
+          📥 Nhận Từ Đám Mây
+        </button>
+        <button class="role-pill" onclick="window.appController.openChangePasswordModal()" style="background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3);" title="Đổi mật khẩu tài khoản của bạn">
+          🔑 Đổi Mật Khẩu
+        </button>
+        <button class="role-pill" onclick="window.authManager.logout()" style="background: rgba(239, 68, 68, 0.4); border-color: #f87171;" title="Đăng xuất khỏi tài khoản">
+          🚪 Đăng Xuất
+        </button>
+        <button class="btn-icon-sm" id="btn-sound-toggle" title="Bật/Tắt âm thanh">🔊</button>
+      </div>
+    </div>
+
+    <!-- ================= HERO HEADER (CHIBI ANIME) ================= -->
+    <header class="header-hero">
+      <div class="header-container">
+        <div class="header-brand">
+          <img src="assets/images/logo.png" alt="Logo Trường THCS Tây Phú" class="chibi-avatar-hero" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 60})">
+          <div class="header-titles">
+            <span class="school-tagline" id="header-school-name">TRƯỜNG THCS TÂY PHÚ</span>
+            <h1 class="main-title">
+              <span>BẢNG THEO DÕI THI ĐUA TỔ EM</span>
+              <span style="color:#fde047; font-size: 1.4rem;" id="header-class-name">LỚP 9A4</span>
+            </h1>
+            <span class="teacher-info">
+              <span>🌸 Giáo viên chủ nhiệm:</span>
+              <b id="header-teacher-name" style="color: #fff;">Thầy Võ Văn Hà</b>
+              <span style="font-size: 0.8rem; opacity: 0.9;">(Niên khóa: 2026 - 2027)</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="header-actions no-print">
+          <!-- User Account Badge -->
+          <div class="user-account-badge" id="header-user-badge" title="Bấm để đổi tài khoản hoặc đăng nhập">
+            <div class="user-avatar-tiny" id="header-user-avatar">👨‍🏫</div>
+            <div class="user-account-details">
+              <span class="user-account-name" id="header-user-name">Thầy Võ Văn Hà</span>
+              <span class="user-account-role" id="header-user-role">Giáo viên chủ nhiệm</span>
+            </div>
+          </div>
+
+          <button class="btn-hero btn-gold" id="btn-open-settings" onclick="window.appController.openSettingsModal()">
+            ⚙️ Cài Đặt Lớp
+          </button>
+          <button class="btn-hero btn-white" id="btn-export-excel">
+            📊 Xuất Excel
+          </button>
+          <button class="btn-hero btn-glass" id="btn-print-table" title="In bảng điểm thi đua A4 ngang">
+            🖨️ In Bảng Điểm
+          </button>
+          <button class="btn-hero btn-emerald" id="btn-open-bienban" onclick="window.appController.openBienBanModal()" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border: 1px solid rgba(255,255,255,0.3); font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); display: none;" title="In biên bản sinh hoạt chủ nhiệm tuần">
+            📑 In Biên Bản Tuần
+          </button>
+          <button class="btn-hero btn-glass" id="btn-header-logout" onclick="window.authManager.logout()" style="border-color: #fca5a5; color: #fee2e2;" title="Đăng xuất khỏi hệ thống">
+            🚪 Đăng Xuất
+          </button>
+        </div>
+      </div>
+    </header>
+
+  <!-- ================= NAVIGATION & TIME CONTROLS ================= -->
+  <div class="controls-container no-print">
+    <div class="nav-glass-bar">
+      <div class="nav-tabs-group">
+        <button class="nav-tab active" data-tab="table">📊 Bảng Điểm Thi Đua</button>
+        <button class="nav-tab" data-tab="leaderboard">🏆 Bảng Vàng Vinh Danh</button>
+        <button class="nav-tab" data-tab="stats">📈 Thống Kê & Biểu Đồ</button>
+        <button class="nav-tab" data-tab="mailbox">
+          📬 Hộp Thư & Tin Nhắn
+          <span id="notif-badge-count" style="background: #ef4444; color: white; border-radius: 9999px; padding: 1px 6px; font-size: 0.72rem; font-weight: 900; display: none;">0</span>
+        </button>
+        <button class="nav-tab" data-tab="duty">📋 Nhiệm Vụ Ban Cán Sự</button>
+      </div>
+
+      <div class="time-selector-group">
+        <label for="select-week" style="font-weight: 800; font-size: 0.88rem; color: #334155;">🗓️ Thời gian:</label>
+        <select id="select-week" class="select-custom">
+          <optgroup label="🌸 HỌC KỲ I (Tuần 1 -> Tuần 18)">
+            <option value="1" selected>Tuần 1 (Hiện tại)</option>
+            <option value="2">Tuần 2</option>
+            <option value="3">Tuần 3</option>
+            <option value="4">Tuần 4</option>
+            <option value="5">Tuần 5</option>
+            <option value="6">Tuần 6</option>
+            <option value="7">Tuần 7</option>
+            <option value="8">Tuần 8</option>
+            <option value="9">Tuần 9</option>
+            <option value="10">Tuần 10</option>
+            <option value="11">Tuần 11</option>
+            <option value="12">Tuần 12</option>
+            <option value="13">Tuần 13</option>
+            <option value="14">Tuần 14</option>
+            <option value="15">Tuần 15</option>
+            <option value="16">Tuần 16</option>
+            <option value="17">Tuần 17</option>
+            <option value="18">Tuần 18</option>
+            <option value="hk1">🏆 Tổng Kết Học Kỳ I (Tuần 1 – 18)</option>
+          </optgroup>
+          <optgroup label="🌻 HỌC KỲ II (Tuần 19 -> Tuần 35)">
+            <option value="19">Tuần 19</option>
+            <option value="20">Tuần 20</option>
+            <option value="21">Tuần 21</option>
+            <option value="22">Tuần 22</option>
+            <option value="23">Tuần 23</option>
+            <option value="24">Tuần 24</option>
+            <option value="25">Tuần 25</option>
+            <option value="26">Tuần 26</option>
+            <option value="27">Tuần 27</option>
+            <option value="28">Tuần 28</option>
+            <option value="29">Tuần 29</option>
+            <option value="30">Tuần 30</option>
+            <option value="31">Tuần 31</option>
+            <option value="32">Tuần 32</option>
+            <option value="33">Tuần 33</option>
+            <option value="34">Tuần 34</option>
+            <option value="35">Tuần 35</option>
+            <option value="hk2">🏆 Tổng Kết Học Kỳ II (Tuần 19 – 35)</option>
+          </optgroup>
+          <optgroup label="🌟 TOÀN NĂM HỌC">
+            <option value="all-year">👑 Tổng Kết Cả Năm Học (Tuần 1 – 35)</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN WRAPPER ================= -->
+  <main class="main-wrapper">
+
+    <!-- Mobile Push Notification Banner Prompt -->
+    <div class="push-banner no-print" id="push-permission-banner">
+      <div class="push-banner-content">
+        <span style="font-size: 1.5rem;">📱</span>
+        <span>Nhận thông báo điểm thưởng & tin nhắn trực tiếp từ Thầy Võ Văn Hà trên điện thoại di động!</span>
+      </div>
+      <button class="push-banner-btn" id="btn-request-push">Kích Hoạt Ngay ✨</button>
+    </div>
+
+    <!-- ================= TAB 1: THI ĐUA TABLE ================= -->
+    <section id="tab-table" class="tab-pane active">
+      <div class="table-card">
+        <div class="table-card-header no-print">
+          <div class="group-filter-pills">
+            <button class="group-pill active" data-group="all">🌟 Toàn Bộ 29 Học Sinh</button>
+            <button class="group-pill" data-group="1">Tổ 1 (7 HS)</button>
+            <button class="group-pill" data-group="2">Tổ 2 (7 HS)</button>
+            <button class="group-pill" data-group="3">Tổ 3 (7 HS)</button>
+            <button class="group-pill" data-group="4">Tổ 4 (8 HS)</button>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-hero btn-emerald btn-sm" id="btn-open-bienban-table" onclick="window.appController.openBienBanModal()" style="background: #059669; color: white; padding: 6px 14px; font-size: 0.82rem; border-radius: 9999px; border: none; cursor: pointer; font-weight: 800; display: none; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(5,150,105,0.3);" title="Xem trước và in biên bản sinh hoạt tuần chuẩn">
+              <span>📑</span> In Biên Bản Sinh Hoạt Tuần
+            </button>
+            <span style="font-size: 0.85rem; color: #64748b; font-weight: 700;">
+              💡 Bấm vào từng ô ngày (T2 - T7) để chấm điểm nhanh
+            </span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="thidua-table" id="thidua-table">
+            <thead>
+              <tr>
+                <th rowspan="2" class="col-stt">STT</th>
+                <th rowspan="2" class="col-name">CÁC THÀNH VIÊN</th>
+                <th rowspan="2" class="col-role">CHỨC VỤ</th>
+                <th rowspan="2" class="col-group">TỔ</th>
+                <th colspan="6">ĐIỂM CÁC NGÀY TRONG TUẦN</th>
+                <th rowspan="2" class="col-total">TỔNG ĐIỂM</th>
+                <th rowspan="2" class="col-rank">XẾP LOẠI</th>
+                <th rowspan="2" class="col-actions no-print">THAO TÁC</th>
+              </tr>
+              <tr>
+                <th class="col-day">Thứ 2 (T2)</th>
+                <th class="col-day">Thứ 3 (T3)</th>
+                <th class="col-day">Thứ 4 (T4)</th>
+                <th class="col-day">Thứ 5 (T5)</th>
+                <th class="col-day">Thứ 6 (T6)</th>
+                <th class="col-day">Thứ 7 (T7)</th>
+              </tr>
+            </thead>
+            <tbody id="thidua-table-body">
+              <!-- Dynamically populated via js/app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3 Summary Boxes (Matching Image 3 Template) -->
+      <div class="summary-boxes-grid">
+        <!-- Box 1: Tổng kết tuần -->
+        <div class="summary-box">
+          <div class="summary-box-header box-header-green">
+            <span>🏆</span> TỔNG KẾT TUẦN
+          </div>
+          <div class="summary-box-body">
+            <div style="line-height: 1.8;">
+              <div>1. Điểm đầu tuần: <b>100 điểm</b></div>
+              <div>2. Tổng điểm cộng trong tuần: <b style="color:#16a34a;" id="sum-box-plus">+0</b></div>
+              <div>3. Tổng điểm trừ trong tuần: <b style="color:#dc2626;" id="sum-box-minus">-0</b></div>
+            </div>
+            <div class="formula-display">
+              <span>ĐIỂM CUỐI TUẦN:</span>
+              <span class="formula-box">100</span>
+              <span>+</span>
+              <span class="formula-box plus">Cộng</span>
+              <span>-</span>
+              <span class="formula-box minus">Trừ</span>
+              <span>=</span>
+              <span class="formula-box total" id="sum-box-final">100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Box 2: Quy định tiêu chí chấm điểm -->
+        <div class="summary-box">
+          <div class="summary-box-header box-header-blue" id="box-criteria-title">
+            <span>📋</span> QUY ĐỊNH CHẤM ĐIỂM TIÊU CHÍ
+          </div>
+          <div class="summary-box-body">
+            <div class="criteria-columns" id="summary-criteria-columns">
+              <!-- Dynamically populated by renderSummaryBoxes() -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Box 3: Thang Xếp Loại Thi Đua -->
+        <div class="summary-box">
+          <div class="summary-box-header box-header-purple">
+            <span>⭐</span> XẾP LOẠI THI ĐUA
+          </div>
+          <div class="summary-box-body">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.84rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid #e2e8f0;">
+                  <th style="padding: 4px;">ĐIỂM CUỐI TUẦN</th>
+                  <th style="padding: 4px;">XẾP LOẠI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 6px 4px; font-weight: bold;">≥ 150 điểm</td>
+                  <td style="padding: 6px 4px;"><span class="rank-badge rank-5star">⭐⭐⭐⭐⭐ XUẤT SẮC</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 6px 4px; font-weight: bold;">130 – 149 điểm</td>
+                  <td style="padding: 6px 4px;"><span class="rank-badge rank-4star">⭐⭐⭐⭐ TỐT</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 6px 4px; font-weight: bold;">110 – 129 điểm</td>
+                  <td style="padding: 6px 4px;"><span class="rank-badge rank-3star">⭐⭐⭐ CỐ GẮNG</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 4px; font-weight: bold;">Dưới 110 điểm</td>
+                  <td style="padding: 6px 4px;"><span class="rank-badge rank-2star">⭐⭐ CẦN CỐ GẮNG</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Feedback Card -->
+      <div class="footer-feedback-card">
+        <h3 style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <span>💬</span> NHẬN XÉT – ĐÁNH GIÁ CỦA GIÁO VIÊN CHỦ NHIỆM
+        </h3>
+        <div class="feedback-grid" style="grid-template-columns: 1fr 200px;">
+          <div class="feedback-item">
+            <label for="input-feedback-teacher">🌸 Lời nhận xét, đánh giá của Thầy Võ Văn Hà (GVCN):</label>
+            <textarea id="input-feedback-teacher" class="feedback-input" placeholder="Thầy Võ Văn Hà nhận xét tổng kết và động viên các tổ trong tuần..."></textarea>
+          </div>
+
+          <div style="text-align: center;">
+            <img src="assets/images/icon.svg" alt="Chibi Study" class="chibi-study-img" />
+          </div>
+        </div>
+
+        <!-- Slogan Ribbon -->
+        <div class="slogan-ribbon" id="footer-slogan-text">
+          💖 ⭐ ĐOÀN KẾT – TRUNG THỰC – KỶ LUẬT – TÍCH CỰC – TIẾN BỘ MỖI NGÀY! ⭐ 💖
+        </div>
+
+        <!-- Print Signatures (Shown only when printing A4) -->
+        <div class="print-signatures" style="display: none;">
+          <div class="signature-col">
+            <b>LỚP TRƯỞNG</b>
+            <div class="signature-space"></div>
+            <div>Nguyễn Văn Bảo</div>
+          </div>
+          <div class="signature-col">
+            <b>GIÁO VIÊN CHỦ NHIỆM</b>
+            <div class="signature-space"></div>
+            <div>Thầy Võ Văn Hà</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: LEADERBOARD (BẢNG VÀNG) ================= -->
+    <section id="tab-leaderboard" class="tab-pane">
+      <div class="leaderboard-container">
+        <!-- Top 3 Podium -->
+        <div class="podium-section">
+          <h2 style="font-family: 'Quicksand'; font-weight: 900; font-size: 1.4rem; color: #d97706; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>👑</span> TOP 3 NGÔI SAO XUẤT SẮC NHẤT TUẦN
+          </h2>
+          <p style="font-size: 0.85rem; color: #64748b;">Vinh danh những gương mặt tiêu biểu dẫn đầu phong trào thi đua</p>
+
+          <div class="podium-display">
+            <!-- Rank 2 -->
+            <div class="podium-item podium-rank-2" id="podium-top2"></div>
+            <!-- Rank 1 -->
+            <div class="podium-item podium-rank-1" id="podium-top1"></div>
+            <!-- Rank 3 -->
+            <div class="podium-item podium-rank-3" id="podium-top3"></div>
+          </div>
+
+          <button class="btn-hero btn-gold" onclick="window.chibiConfetti && window.chibiConfetti.fire({count: 140}); window.chibiSound && window.chibiSound.playFanfare();" style="margin-top: 10px;">
+            🎉 Bắn Pháo Hoa Chúc Mừng!
+          </button>
+        </div>
+
+        <!-- Top 10 Student List & Group Podium -->
+        <div style="background: white; border-radius: var(--radius-lg); border: 2px solid #e2e8f0; padding: 20px; box-shadow: var(--shadow-md);">
+          <h3 style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.15rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+            <span>🎖️</span> BẢNG XẾP HẠNG 4 TỔ THI ĐUA
+          </h3>
+          <div class="group-rank-cards" id="group-ranking-cards"></div>
+
+          <h3 style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.1rem; margin: 20px 0 10px; display: flex; align-items: center; gap: 8px;">
+            <span>🌟</span> TOP 10 HỌC SINH ĐIỂM CAO NHẤT
+          </h3>
+          <div id="top10-student-list" style="max-height: 250px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: STATS & CHARTS ================= -->
+    <section id="tab-stats" class="tab-pane">
+      <div style="background: white; border-radius: var(--radius-lg); border: 2px solid #e2e8f0; padding: 24px; box-shadow: var(--shadow-md);">
+        <h2 style="font-family: 'Quicksand'; font-weight: 900; font-size: 1.3rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span>📈</span> THỐNG KÊ & SO SÁNH ĐIỂM THI ĐUA 4 TỔ
+        </h2>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 24px;">Biểu đồ điểm trung bình và tỷ lệ đạt danh hiệu Xuất Sắc (5 sao)</p>
+        
+        <div id="stats-bars-container"></div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: MAILBOX & NOTIFICATIONS ================= -->
+    <section id="tab-mailbox" class="tab-pane">
+      <div class="messages-container">
+        <div class="messages-sidebar">
+          <div class="messages-sidebar-header">
+            <h3 style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.05rem;">📬 Hộp Thư Lớp</h3>
+            <button class="btn-hero btn-gold" style="padding: 4px 12px; font-size: 0.8rem;" onclick="window.appController.openSendMessageModal()">
+              ✍️ Soạn Tin
+            </button>
+          </div>
+          <ul class="messages-list" id="mailbox-list"></ul>
+        </div>
+
+        <div class="message-detail-pane" id="mailbox-detail">
+          <div style="text-align: center; color: #94a3b8; margin-top: 100px;">Chọn một tin nhắn để đọc nội dung.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: DUTY / BAN CÁN SỰ INFOGRAPHIC ================= -->
+    <section id="tab-duty" class="tab-pane">
+      <div style="background: white; border-radius: var(--radius-lg); border: 2px solid #e2e8f0; padding: 24px; box-shadow: var(--shadow-md);">
+        <h2 style="font-family: 'Quicksand'; font-weight: 900; font-size: 1.4rem; color: #1e40af; text-align: center; margin-bottom: 6px;" id="duty-heading-title">
+          ⭐ NHIỆM VỤ BAN CÁN SỰ LỚP 9A4 ⭐
+        </h2>
+        <p style="text-align: center; font-weight: 700; color: #db2777; margin-bottom: 20px;">
+          GƯƠNG MẪU – TRÁCH NHIỆM – CÔNG BẰNG – ĐOÀN KẾT – TIẾN BỘ
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;" id="duty-cards-container">
+          <!-- Dynamically populated by renderDutyTab() -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL: CHẤM ĐIỂM (QUICK SCORING) ================= -->
+  <div class="modal-backdrop" id="modal-score">
+    <div class="modal-content">
+      <div class="modal-header header-primary">
+        <div class="modal-title">
+          <span>✍️</span> Chấm Điểm Thi Đua: <span id="score-modal-student-name">Học sinh</span>
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <form id="form-add-score">
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Chọn tuần:</label>
+              <select id="score-modal-week" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chọn ngày:</label>
+              <select id="score-modal-day" class="form-control">
+                <option value="T2">Thứ 2 (T2)</option>
+                <option value="T3">Thứ 3 (T3)</option>
+                <option value="T4">Thứ 4 (T4)</option>
+                <option value="T5">Thứ 5 (T5)</option>
+                <option value="T6">Thứ 6 (T6)</option>
+                <option value="T7">Thứ 7 (T7)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Loại điểm:</label>
+              <select id="score-modal-type" class="form-control">
+                <option value="plus">➕ Điểm Cộng (Thưởng)</option>
+                <option value="minus">➖ Điểm Trừ (Nhắc nhở)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tiêu chí chấm điểm (12 Tiêu chí):</label>
+            <select id="score-modal-criteria" class="form-control"></select>
+          </div>
+
+          <!-- Quick Scoring Shortcuts -->
+          <label class="form-label">⚡ Nút chấm nhanh:</label>
+          <div class="quick-score-pills">
+            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c1', 'Đi học đúng giờ')">+1 Đúng giờ</button>
+            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c2', 'Chuẩn bị bài đầy đủ')">+1 Đủ bài</button>
+            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c3', 'Phát biểu xây dựng bài')">+1 Phát biểu</button>
+            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 2, 'c8', 'Được cô giáo khen')">+2 Khen ngợi</button>
+            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 2, 'c9', 'Đi học muộn')">-2 Đi muộn</button>
+            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 1, 'c12', 'Nói chuyện riêng')">-1 Nói chuyện</button>
+            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 2, 'c10', 'Không làm bài')">-2 Quên bài</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số điểm:</label>
+            <input type="number" id="score-modal-points" class="form-control" value="1" min="1" max="10" step="1" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ghi chú lý do:</label>
+            <input type="text" id="score-modal-note" class="form-control" placeholder="VD: Phát biểu tốt môn Toán, giúp bạn lau bảng..." />
+          </div>
+
+          <hr style="margin: 16px 0; border: none; border-top: 1px solid #e2e8f0;" />
+          <h4 style="font-size: 0.88rem; font-weight: 800; margin-bottom: 8px;">Lịch sử điểm tuần này của học sinh:</h4>
+          <div id="score-modal-history" style="max-height: 120px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-hero btn-white btn-close-modal">Hủy</button>
+          <button type="submit" class="btn-hero btn-gold">Lưu Điểm Ngay ✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CÀI ĐẶT LỚP & QUẢN LÝ TÀI KHOẢN ================= -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-content" style="max-width: 820px;">
+      <div class="modal-header header-gold">
+        <div class="modal-title">
+          <span>⚙️</span> Cài Đặt Lớp Học & Quản Lý Tài Khoản
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+
+      <!-- Settings Sub-tabs -->
+      <div style="display: flex; gap: 8px; padding: 12px 20px 0; background: #f8fafc; border-bottom: 2px solid #e2e8f0; overflow-x: auto;">
+        <button type="button" class="btn-hero btn-white setting-sub-tab active" id="tab-btn-set-class" onclick="window.appController.switchSettingsSubTab('class')" style="font-size: 0.85rem; padding: 6px 14px; white-space: nowrap;">
+          🏫 Thông Tin Lớp
+        </button>
+        <button type="button" class="btn-hero btn-white setting-sub-tab" id="tab-btn-set-students" onclick="window.appController.switchSettingsSubTab('students')" style="font-size: 0.85rem; padding: 6px 14px; white-space: nowrap;">
+          👥 Học Sinh & Phân Quyền
+        </button>
+        <button type="button" class="btn-hero btn-white setting-sub-tab" id="tab-btn-set-teachers" onclick="window.appController.switchSettingsSubTab('teachers')" style="font-size: 0.85rem; padding: 6px 14px; white-space: nowrap;">
+          👨‍🏫 Tài Khoản Giáo Viên
+        </button>
+        <button type="button" class="btn-hero btn-white setting-sub-tab" id="tab-btn-set-criteria" onclick="window.appController.switchSettingsSubTab('criteria')" style="font-size: 0.85rem; padding: 6px 14px; white-space: nowrap;">
+          🎯 Tiêu Chí Chấm Điểm
+        </button>
+        <button type="button" class="btn-hero btn-white setting-sub-tab" id="tab-btn-set-cloud" onclick="window.appController.switchSettingsSubTab('cloud')" style="font-size: 0.85rem; padding: 6px 14px; white-space: nowrap; color: #0284c7; border-color: #7dd3fc;">
+          ☁️ Máy Chủ Đám Mây
+        </button>
+      </div>
+
+      <form id="form-class-settings">
+        <!-- Sub-tab 1: Class Information -->
+        <div class="modal-body setting-tab-pane active" id="pane-set-class">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Tên Trường:</label>
+              <input type="text" id="setting-school-name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tên Lớp:</label>
+              <input type="text" id="setting-class-name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tên Giáo Viên Chủ Nhiệm:</label>
+              <input type="text" id="setting-teacher-name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mật khẩu GVCN Chính (Admin):</label>
+              <input type="text" id="setting-teacher-pass" class="form-control" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Khẩu hiệu / Slogan Lớp:</label>
+            <input type="text" id="setting-slogan" class="form-control" required />
+          </div>
+
+          <!-- Backup / Restore Configuration between PC and Mobile Phones -->
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 14px 16px; margin-top: 14px;">
+            <div style="font-weight: 800; font-size: 0.92rem; color: #166534; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <span>📲</span> ĐỒNG BỘ CẤU HÌNH TỪ MÁY TÍNH SANG ĐIỆN THOẠI
+            </div>
+            <p style="font-size: 0.78rem; color: #15803d; margin-bottom: 12px; line-height: 1.4;">
+              <b>Cách 1 (Tiện nhất):</b> Bấm <b>"📱 Hiện Mã QR Đồng Bộ"</b> $\rightarrow$ Dùng Camera/Zalo trên điện thoại quét là xong ngay!<br>
+              <b>Cách 2:</b> Bấm <b>"📋 Sao Chép Mã"</b> $\rightarrow$ Gửi Zalo $\rightarrow$ Mở trên điện thoại bấm <b>"📥 Dán Mã"</b>.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn-hero btn-gold" style="padding: 7px 16px; font-size: 0.85rem; font-weight: 800;" onclick="window.appController.openQrSyncModal()">
+                📱 Hiện Mã QR Đồng Bộ (Quét bằng ĐT)
+              </button>
+              <button type="button" class="btn-hero btn-white" style="color: #0369a1; padding: 6px 12px; font-size: 0.8rem;" onclick="window.appController.copyConfigCode()">
+                📋 Sao Chép Mã (Gửi Zalo)
+              </button>
+              <button type="button" class="btn-hero btn-white" style="color: #15803d; border-color: #86efac; padding: 6px 12px; font-size: 0.8rem;" onclick="window.appController.pasteConfigCode()">
+                📥 Dán Mã Cấu Hình
+              </button>
+              <button type="button" class="btn-hero btn-white" style="color: #64748b; padding: 6px 10px; font-size: 0.78rem;" onclick="window.classData.exportConfig()">
+                📤 Xuất File JSON
+              </button>
+              <button type="button" class="btn-hero btn-white" style="color: #64748b; padding: 6px 10px; font-size: 0.78rem;" onclick="document.getElementById('input-import-config').click()">
+                📥 Nạp File JSON
+              </button>
+            </div>
+            <input type="file" id="input-import-config" accept=".json" style="display: none;" onchange="window.appController.handleImportConfigFile(event)" />
+          </div>
+        </div>
+
+        <!-- Sub-tab 2: Students & Scoring Permissions -->
+        <div class="modal-body setting-tab-pane" id="pane-set-students" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <h4 style="font-family: 'Quicksand'; font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">Danh Sách Học Sinh & Cấp Quyền Chấm Điểm</h4>
+              <p style="font-size: 0.78rem; color: #64748b;">Thầy có thể cấp quyền cho từng học sinh được phép chấm điểm (Tổ mình hoặc Toàn lớp).</p>
+            </div>
+            <button type="button" class="btn-hero btn-gold" style="padding: 5px 12px; font-size: 0.8rem;" onclick="window.appController.addNewStudent()">
+              ➕ Thêm Học Sinh
+            </button>
+          </div>
+          
+          <div id="settings-students-list" style="max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px;"></div>
+        </div>
+
+        <!-- Sub-tab 3: Teachers Management -->
+        <div class="modal-body setting-tab-pane" id="pane-set-teachers" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <h4 style="font-family: 'Quicksand'; font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">Danh Sách Tài Khoản Giáo Viên</h4>
+              <p style="font-size: 0.78rem; color: #64748b;">Cấp thêm tài khoản cho Giáo viên bộ môn / Giáo viên hỗ trợ cùng theo dõi và chấm điểm.</p>
+            </div>
+            <button type="button" class="btn-hero btn-gold" style="padding: 5px 12px; font-size: 0.8rem;" onclick="window.appController.openAddTeacherModal()">
+              ➕ Cấp Tài Khoản GV Mới
+            </button>
+          </div>
+
+          <div id="settings-teachers-list" style="max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px;"></div>
+        </div>
+
+        <!-- Sub-tab 4: Criteria Management (Add/Edit/Delete Plus/Minus Criteria) -->
+        <div class="modal-body setting-tab-pane" id="pane-set-criteria" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <h4 style="font-family: 'Quicksand'; font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">Tiêu Chí Chấm Điểm Thi Đua (Cộng & Trừ)</h4>
+              <p style="font-size: 0.78rem; color: #64748b;">Điều chỉnh tên tiêu chí, số điểm cộng (+), điểm trừ (-) hoặc thêm/xóa tiêu chí theo quy định của lớp.</p>
+            </div>
+            <button type="button" class="btn-hero btn-gold" style="padding: 5px 12px; font-size: 0.8rem;" onclick="window.appController.openAddCriteriaModal()">
+              ➕ Thêm Tiêu Chí Mới
+            </button>
+          </div>
+
+          <div id="settings-criteria-list" style="max-height: 340px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px;"></div>
+        </div>
+
+        <!-- Sub-tab 5: Cloud Server & Sync Management (Google Firebase Realtime Engine) -->
+        <div class="modal-body setting-tab-pane" id="pane-set-cloud" style="display: none;">
+          <!-- Card 1: Trạng thái kết nối Firebase -->
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <div style="font-weight: 800; font-size: 1rem; color: #166534; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.3rem;">🔥</span> GOOGLE FIREBASE REALTIME DATABASE
+              </div>
+              <span id="cloud-sync-details-badge" style="background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+                🟢 Đang kết nối trực tuyến
+              </span>
+            </div>
+            <p style="font-size: 0.82rem; color: #166534; line-height: 1.5; margin-bottom: 14px;">
+              Hệ thống kết nối trực tiếp với <b>Google Firebase Realtime Database</b> qua kênh WebSocket bảo mật. Khi Thầy hoặc Tổ trưởng chấm/trừ điểm trên điện thoại hoặc máy tính, tất cả thiết bị khác trong lớp sẽ <b>lập tức cập nhật điểm số và phát chuông báo chỉ sau 0.2 giây</b> mà không cần bấm tải lại trang! Dữ liệu được lưu trữ vĩnh viễn trên đám mây của Google.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn-hero btn-gold" onclick="window.appController.forcePushFirebase()" style="padding: 8px 18px; font-size: 0.84rem; font-weight: 800;">
+                ☁️ Lưu Toàn Bộ Dữ Liệu Lên Firebase Ngay
+              </button>
+              <button type="button" class="btn-hero btn-white" onclick="window.appController.forcePullFirebase()" style="color: #0284c7; border-color: #93c5fd; padding: 8px 18px; font-size: 0.84rem; font-weight: 800;">
+                📥 Tải Dữ Liệu Mới Nhất Về Máy Này
+              </button>
+              <button type="button" class="btn-hero btn-white" onclick="window.appController.testFirebaseConnection()" style="color: #059669; border-color: #a7f3d0; padding: 8px 14px; font-size: 0.82rem;">
+                🧪 Kiểm Tra Kết Nối
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Cấu hình thông số Firebase -->
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.92rem; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 6px;">
+                <span>⚙️</span> Thông Số Dự Án Firebase (Google Cloud):
+              </label>
+              <span style="font-size: 0.75rem; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">Gói Spark Miễn Phí 100%</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 12px; line-height: 1.45;">
+              Thầy có thể sử dụng cơ sở dữ liệu Firebase sẵn có của lớp, hoặc dán thông số Firebase riêng của Thầy vào đây (lấy từ Firebase Console):
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px;">
+              <div>
+                <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">
+                  1. Database URL (Bắt buộc để đồng bộ thời gian thực):
+                </label>
+                <input type="url" id="setting-firebase-url" class="form-control" placeholder="vd: https://thidua-lop-9a4-rtdb.firebaseio.com" style="font-size: 0.82rem; font-family: monospace;" />
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">
+                    2. Project ID:
+                  </label>
+                  <input type="text" id="setting-firebase-projectid" class="form-control" placeholder="vd: thidua-lop-9a4" style="font-size: 0.82rem; font-family: monospace;" />
+                </div>
+                <div>
+                  <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">
+                    3. API Key (Web API Key):
+                  </label>
+                  <input type="text" id="setting-firebase-apikey" class="form-control" placeholder="AIzaSy..." style="font-size: 0.82rem; font-family: monospace;" />
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button type="button" class="btn-hero btn-gold" onclick="window.appController.saveFirebaseConfig()" style="font-size: 0.82rem; padding: 7px 18px; font-weight: 800;">
+                💾 Lưu Cấu Hình & Kết Nối Lại
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Hướng dẫn nhanh 1 phút -->
+          <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px 16px;">
+            <div style="font-weight: 800; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+              📖 Cách tạo Firebase Realtime Database riêng cho Thầy (Nếu cần tạo mới):
+            </div>
+            <ol style="margin: 0; padding-left: 18px; font-size: 0.76rem; color: #64748b; line-height: 1.55;">
+              <li>Mở trang <b>console.firebase.google.com</b> bằng tài khoản Google của Thầy $\rightarrow$ Bấm <b>"Add project"</b> đặt tên là <code>thidua-lop-9a4</code>.</li>
+              <li>Tại cột bên trái, bấm <b>Build $\rightarrow$ Realtime Database $\rightarrow$ Create Database</b> (chọn khu vực Singapore hoặc US).</li>
+              <li>Tại tab <b>Rules</b>, đặt <code>".read": true, ".write": true</code> để học sinh và giáo viên được phép đồng bộ.</li>
+              <li>Sao chép đường dẫn <b>Database URL</b> (dạng <code>https://...firebaseio.com</code>) và dán vào ô bên trên rồi bấm <b>Lưu</b>!</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn-hero btn-white" style="color: #0284c7; font-size: 0.8rem;" onclick="window.appController.forceAppUpdate()">
+              🔄 Xóa Cache & Cập Nhật App
+            </button>
+            <button type="button" class="btn-hero btn-white" style="color: #ef4444; font-size: 0.8rem;" onclick="window.appController.resetAllData()">
+              ⚠️ Khôi phục dữ liệu gốc
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-hero btn-white btn-close-modal">Đóng</button>
+            <button type="submit" class="btn-hero btn-gold">Lưu Cài Đặt ✨</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: THÊM TIÊU CHÍ THI ĐUA MỚI ================= -->
+  <div class="modal-backdrop" id="modal-add-criteria">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header header-gold">
+        <div class="modal-title">
+          <span>🎯</span> Thêm Tiêu Chí Chấm Điểm Mới
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="form-add-criteria">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Tên tiêu chí:</label>
+            <input type="text" id="add-criteria-name" class="form-control" placeholder="VD: Làm bài tập đầy đủ, Vi phạm đồng phục..." required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Loại điểm:</label>
+              <select id="add-criteria-type" class="form-control" required>
+                <option value="plus">🌸 Điểm Cộng (+)</option>
+                <option value="minus">⚠️ Điểm Trừ (-)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Số điểm (Điểm số):</label>
+              <input type="number" id="add-criteria-points" class="form-control" value="1" min="0.5" max="20" step="0.5" required />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Biểu tượng (Icon / Emoji):</label>
+              <input type="text" id="add-criteria-icon" class="form-control" value="🌸" placeholder="VD: 🌸, 🏆, 📚, ⚠️, ❌" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Lĩnh vực / Phân loại:</label>
+              <select id="add-criteria-category" class="form-control">
+                <option value="Học tập">Học tập</option>
+                <option value="Kỷ luật">Kỷ luật</option>
+                <option value="Chuyên cần">Chuyên cần</option>
+                <option value="Đạo đức">Đạo đức</option>
+                <option value="Lao động">Lao động</option>
+                <option value="Kỹ năng">Kỹ năng</option>
+                <option value="Phong trào">Phong trào</option>
+                <option value="Khen thưởng">Khen thưởng</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-hero btn-white btn-close-modal">Hủy</button>
+          <button type="submit" class="btn-hero btn-gold">Tạo Tiêu Chí Mới ✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: THÊM GIÁO VIÊN MỚI ================= -->
+  <div class="modal-backdrop" id="modal-add-teacher">
+    <div class="modal-content" style="max-width: 460px;">
+      <div class="modal-header header-primary">
+        <div class="modal-title">
+          <span>👨‍🏫</span> Cấp Tài Khoản Giáo Viên Mới
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="form-add-teacher">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Họ và Tên Giáo viên:</label>
+            <input type="text" id="add-teacher-name" class="form-control" placeholder="VD: Cô Nguyễn Thị Lan" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Môn giảng dạy / Chức vụ:</label>
+            <input type="text" id="add-teacher-subject" class="form-control" placeholder="VD: Giáo viên môn Toán, Anh văn..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tên đăng nhập (Username):</label>
+            <input type="text" id="add-teacher-username" class="form-control" placeholder="VD: colan, gvtoan..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu ban đầu:</label>
+            <input type="password" id="add-teacher-pass" class="form-control" value="123456" placeholder="Mật khẩu (mặc định: 123456)" required />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-hero btn-white btn-close-modal">Hủy</button>
+          <button type="submit" class="btn-hero btn-gold">Tạo Tài Khoản GV 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ĐỔI MẬT KHẨU (CHANGE PASSWORD) ================= -->
+  <div class="modal-backdrop" id="modal-change-password">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header header-primary">
+        <div class="modal-title">
+          <span>🔑</span> Đổi Mật Khẩu Tài Khoản
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="form-change-password">
+        <div class="modal-body">
+          <div style="background: #eff6ff; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.85rem; color: #1e40af;">
+            Đang đổi mật khẩu cho: <b id="change-pass-user-label">...</b>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu hiện tại:</label>
+            <input type="password" id="change-pass-old" class="form-control" placeholder="Nhập mật khẩu hiện tại..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu mới:</label>
+            <input type="password" id="change-pass-new" class="form-control" placeholder="Tối thiểu 4 ký tự..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nhập lại mật khẩu mới:</label>
+            <input type="password" id="change-pass-confirm" class="form-control" placeholder="Xác nhận mật khẩu mới..." required />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-hero btn-white btn-close-modal">Hủy</button>
+          <button type="submit" class="btn-hero btn-gold">Lưu Mật Khẩu Mới ✨</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: GỬI TIN NHẮN (SEND NOTIFICATION) ================= -->
+  <div class="modal-backdrop" id="modal-send-message">
+    <div class="modal-content">
+      <div class="modal-header header-primary">
+        <div class="modal-title">
+          <span>✍️</span> Soạn & Gửi Tin Nhắn / Thông Báo
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+
+      <form id="form-send-message">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Người nhận:</label>
+            <select id="msg-target" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phân loại thông báo:</label>
+            <select id="msg-type" class="form-control">
+              <option value="broadcast">📢 Thông báo chung cả lớp</option>
+              <option value="praise">🌟 Tuyên dương & Khen ngợi</option>
+              <option value="reminder">⏰ Nhắc nhở nề nếp / Bài tập</option>
+              <option value="direct">💬 Tin nhắn trao đổi riêng</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tiêu đề tin nhắn:</label>
+            <input type="text" id="msg-title" class="form-control" placeholder="VD: Tuyên dương bạn Bùi Thị Ngọc Giang..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nội dung chi tiết:</label>
+            <textarea id="msg-content" class="form-control" rows="4" placeholder="Nhập nội dung thông báo gửi đến học sinh..." required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-hero btn-white btn-close-modal">Hủy</button>
+          <button type="submit" class="btn-hero btn-gold">Phát Thông Báo Ngay 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: QUÉT MÃ QR ĐỒNG BỘ ================= -->
+  <div class="modal-backdrop" id="modal-qr-sync">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header header-primary">
+        <div class="modal-title">
+          <span>📱</span> Đồng Bộ Sang Điện Thoại Bằng Mã QR
+        </div>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="qr-sync-container">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-hero btn-white btn-close-modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: IN BIÊN BẢN SINH HOẠT CHỦ NHIỆM TUẦN ================= -->
+  <div class="modal-backdrop" id="modal-bienban-sinhoat">
+    <div class="modal-content modal-bienban-content">
+      <div class="modal-header header-primary" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 10px; color: #fde047; font-size: 1.15rem;">
+          <span>📑</span>
+          <span>BIÊN BẢN SINH HOẠT CHỦ NHIỆM TUẦN - LỚP 9A4</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="window.appController.closeAllModals()">&times;</button>
+      </div>
+
+      <!-- Control Toolbar Inside Modal -->
+      <div class="bienban-modal-toolbar no-print">
+        <div class="bienban-toolbar-left">
+          <div class="bienban-toolbar-item">
+            <label for="bienban-select-week">🗓️ <b>Chọn tuần:</b></label>
+            <select id="bienban-select-week" class="select-custom" onchange="window.appController.onBienBanWeekChange(this.value)">
+              <!-- Populated dynamically via app.js -->
+            </select>
+          </div>
+
+          <!-- Mode Toggle: Auto Data vs Blank Template -->
+          <div class="bienban-mode-toggle">
+            <button type="button" class="bienban-mode-btn active" id="btn-mode-auto" onclick="window.appController.switchBienBanMode('auto')">
+              ⚡ Điền tự động dữ liệu của tổ
+            </button>
+            <button type="button" class="bienban-mode-btn" id="btn-mode-blank" onclick="window.appController.switchBienBanMode('blank')">
+              📝 Phôi mẫu trống dòng chấm (viết tay)
+            </button>
+          </div>
+        </div>
+
+        <div class="bienban-toolbar-right" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <button type="button" class="btn-hero btn-red" id="btn-export-pdf" onclick="window.appController.exportBienBanPdf()" style="background: #dc2626; color: white; border: none; font-weight: 700; box-shadow: 0 4px 12px rgba(220,38,38,0.35);" title="Xuất file PDF trực tiếp về máy tính">
+            <span>📕</span> Xuất File PDF
+          </button>
+          <button type="button" class="btn-hero btn-blue" onclick="window.appController.exportBienBanWord()" style="background: #2563eb; color: white; border: none;" title="Xuất file Word (.doc) để mở bằng Microsoft Word">
+            <span>📄</span> Xuất File Word (.doc)
+          </button>
+          <button type="button" class="btn-hero btn-emerald" onclick="window.appController.printBienBan()" style="background: #059669; color: white; border: none; font-weight: 800; box-shadow: 0 4px 12px rgba(5,150,105,0.35);" title="Mở hộp thoại in ấn giấy A4 dọc">
+            <span>🖨️</span> In Biên Bản Ngay (A4 Dọc)
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Area for the A4 Pages -->
+      <div class="modal-body bienban-modal-body">
+        <div class="bienban-quick-notice no-print">
+          <span>💡 <b>Mẹo chỉnh sửa:</b> Thầy/Cô có thể nhấp chuột trực tiếp vào bất kỳ ô chữ nào trên biên bản dưới đây để chỉnh sửa trước khi In hoặc Xuất file Word.</span>
+        </div>
+
+        <div id="bienban-paper-container" class="bienban-paper-container">
+          <!-- Dynamically rendered A4 Document Content -->
+        </div>
+      </div>
+
+      <div class="modal-footer no-print" style="justify-content: space-between;">
+        <span style="font-size: 0.82rem; color: #64748b;">
+          Đúng thể thức mẫu văn bản sinh hoạt lớp - Khổ giấy chuẩn in ấn A4 portrait
+        </span>
+        <button type="button" class="btn-hero btn-white btn-close-modal" onclick="window.appController.closeAllModals()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- /#view-app -->
+
+  <!-- ================= BIEN BAN PRINT AREA (A4 PORTRAIT ONLY) ================= -->
+  <div id="bienban-print-area" class="bienban-print-area"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Google Firebase SDK (App & Realtime Database compat CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Scripts with Cache-busting -->
+  <script src="js/firebase-sync.js?v=20260909_v40"></script>
+  <script src="js/data.js?v=20260909_v40"></script>
+  <script src="js/sound.js?v=20260909_v40"></script>
+  <script src="js/confetti.js?v=20260909_v40"></script>
+  <script src="js/notifications.js?v=20260909_v40"></script>
+  <script src="js/auth.js?v=20260909_v40"></script>
+  <script src="js/html2pdf.bundle.min.js?v=20260909_v40"></script>
+  <script src="js/app.js?v=20260909_v40"></script>
+</body>
+</html>

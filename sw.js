@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chibi-thidua-9a4-v62';
+const CACHE_NAME = 'chibi-thidua-9a4-v63';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

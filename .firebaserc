@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "thidua-lop-9a4-79dca"
-  }
+  },
+  "targets": {
+    "thidua-lop-9a4-79dca": {
+      "database": {
+        "main": [
+          "thidua-lop-9a4-79dca-default-rtdb"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -1,0 +1,956 @@
+{
+  "clientId": "cli_recovery_admin",
+  "criteria": [
+    {
+      "category": "Chuyên cần",
+      "icon": "⏰",
+      "id": "c1",
+      "name": "Đi học đúng giờ",
+      "points": 1,
+      "type": "plus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "📚",
+      "id": "c2",
+      "name": "Chuẩn bị bài đầy đủ",
+      "points": 1,
+      "type": "plus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "🙋‍♂️",
+      "id": "c3",
+      "maxDaily": 3,
+      "name": "Phát biểu xây dựng bài",
+      "points": 1,
+      "type": "plus"
+    },
+    {
+      "category": "Đạo đức",
+      "icon": "🤝",
+      "id": "c4",
+      "name": "Giúp đỡ bạn tiến bộ",
+      "points": 2,
+      "type": "plus"
+    },
+    {
+      "category": "Kỹ năng",
+      "icon": "🧩",
+      "id": "c5",
+      "name": "Làm việc nhóm tích cực",
+      "points": 1,
+      "type": "plus"
+    },
+    {
+      "category": "Lao động",
+      "icon": "🧹",
+      "id": "c6",
+      "name": "Giữ gìn vệ sinh tốt",
+      "points": 1,
+      "type": "plus"
+    },
+    {
+      "category": "Đạo đức",
+      "icon": "🌟",
+      "id": "c7",
+      "name": "Việc tốt, hành động đẹp",
+      "points": 2,
+      "type": "plus"
+    },
+    {
+      "category": "Khen thưởng",
+      "icon": "🏆",
+      "id": "c8",
+      "name": "Được giáo viên tuyên dương",
+      "points": 2,
+      "type": "plus"
+    },
+    {
+      "category": "Chuyên cần",
+      "icon": "⏱️",
+      "id": "c9",
+      "name": "Đi học muộn",
+      "points": 2,
+      "type": "minus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "❌",
+      "id": "c10",
+      "name": "Không chuẩn bị bài / Không thuộc bài",
+      "points": 2,
+      "type": "minus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "🎒",
+      "id": "c11",
+      "name": "Quên sách vở, đồ dùng học tập",
+      "points": 1,
+      "type": "minus"
+    },
+    {
+      "category": "Kỷ luật",
+      "icon": "💬",
+      "id": "c12",
+      "name": "Nói chuyện riêng trong giờ",
+      "points": 1,
+      "type": "minus"
+    },
+    {
+      "category": "Kỷ luật",
+      "icon": "📢",
+      "id": "c13",
+      "name": "Làm mất trật tự lớp",
+      "points": 2,
+      "type": "minus"
+    },
+    {
+      "category": "Đạo đức",
+      "icon": "🚫",
+      "id": "c14",
+      "name": "Nói tục, thiếu lễ phép",
+      "points": 3,
+      "type": "minus"
+    },
+    {
+      "category": "Kỹ năng",
+      "icon": "🙅‍♂️",
+      "id": "c15",
+      "name": "Không hợp tác / lười hoạt động nhóm",
+      "points": 2,
+      "type": "minus"
+    },
+    {
+      "category": "Kỷ luật",
+      "icon": "⚠️",
+      "id": "c16",
+      "name": "Vi phạm nội quy nghiêm trọng",
+      "points": 5,
+      "type": "minus"
+    }
+  ],
+  "events": [
+    {
+      "by": "teacher",
+      "byName": "Thầy Võ Văn Hà",
+      "byRole": "Giáo viên chủ nhiệm (Admin)",
+      "criteriaId": "c9",
+      "day": "T4",
+      "id": "ev-1788417231713-9gvu2",
+      "note": "Đi học muộn",
+      "points": 2,
+      "recordedAt": "13:33 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:33:51.713Z",
+      "type": "minus",
+      "week": 1
+    },
+    {
+      "by": "monitor",
+      "byName": "Lê Minh Trí",
+      "byRole": "Lớp trưởng",
+      "criteriaId": "c10",
+      "day": "T2",
+      "id": "ev-1788418413485-it2lp",
+      "note": "Không làm bài",
+      "points": 2,
+      "recordedAt": "13:53 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:53:33.485Z",
+      "type": "minus",
+      "week": 1
+    },
+    {
+      "by": "monitor",
+      "byName": "Lê Minh Trí",
+      "byRole": "Lớp trưởng",
+      "criteriaId": "c8",
+      "day": "T2",
+      "id": "ev-1788418429347-k43hn",
+      "note": "Được cô giáo khen",
+      "points": 2,
+      "recordedAt": "13:53 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:53:49.347Z",
+      "type": "plus",
+      "week": 1
+    },
+    {
+      "by": "monitor",
+      "byName": "Lê Minh Trí",
+      "byRole": "Lớp trưởng",
+      "criteriaId": "c1",
+      "day": "T2",
+      "id": "ev-1788418451713-qzxqd",
+      "note": "",
+      "points": 2,
+      "recordedAt": "13:54 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:54:11.713Z",
+      "type": "plus",
+      "week": 1
+    },
+    {
+      "by": "monitor",
+      "byName": "Lê Minh Trí",
+      "byRole": "Lớp trưởng",
+      "criteriaId": "c10",
+      "day": "T3",
+      "id": "ev-1788418539468-ecsls",
+      "note": "Không làm bài",
+      "points": 2,
+      "recordedAt": "13:55 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:55:39.468Z",
+      "type": "minus",
+      "week": 1
+    },
+    {
+      "by": "monitor",
+      "byName": "Lê Minh Trí",
+      "byRole": "Lớp trưởng",
+      "criteriaId": "c10",
+      "day": "T4",
+      "id": "ev-1788418558802-vklvi",
+      "note": "Không làm bài",
+      "points": 2,
+      "recordedAt": "13:55 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T06:55:58.802Z",
+      "type": "minus",
+      "week": 1
+    },
+    {
+      "by": "teacher",
+      "byName": "Thầy Võ Văn Hà",
+      "byRole": "Giáo viên chủ nhiệm (Admin)",
+      "criteriaId": "c1",
+      "day": "T4",
+      "id": "ev-1788419455122-4t1ky",
+      "note": "",
+      "points": 1,
+      "recordedAt": "14:10 03/09/2026",
+      "studentId": "hs01",
+      "timestamp": "2026-09-03T07:10:55.122Z",
+      "type": "plus",
+      "week": 1
+    }
+  ],
+  "feedback": {},
+  "lastUpdatedBy": "hs03",
+  "notifications": [
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận +1 điểm vào T4 (Tuần 1).\n• Tiêu chí: ⏰ Đi học đúng giờ\n• Ghi chú: Không có ghi chú\n• Thời gian chấm: 14:10 03/09/2026",
+      "id": "notif-1788419455143",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 07:10",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "11010101010",
+      "id": "notif-1788419206425",
+      "readBy": [
+        "gv01",
+        "hs03"
+      ],
+      "sender": "Thầy Võ Văn Hà",
+      "senderRole": "teacher",
+      "target": "hs03",
+      "time": "2026-09-03 07:06",
+      "title": "101010101010101010101001101010101000101010100110010100010101010101001101001011001",
+      "type": "praise"
+    },
+    {
+      "content": "ighhrrytruugihhghyrt8yt8yreyeiytr",
+      "id": "notif-1788418616011",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí",
+      "senderRole": "monitor",
+      "target": "teacher",
+      "time": "2026-09-03 06:56",
+      "title": "dgfgf",
+      "type": "praise"
+    },
+    {
+      "content": "Thầy Hà kính mến!\nLê Minh Trí (Lớp trưởng) vừa chấm -2 điểm cho bạn Nguyễn Ngọc Bảo Anh (Tổ 1) vào T4 - Tuần 1.\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian: 13:55 03/09/2026",
+      "id": "notif-1788418558814",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "all",
+      "time": "2026-09-03 06:55",
+      "title": "📢 BCS vừa chấm điểm: [-2đ] Nguyễn Ngọc Bảo Anh",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Lê Minh Trí (Lớp trưởng) ghi nhận -2 điểm vào T4 (Tuần 1).\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian chấm: 13:55 03/09/2026",
+      "id": "notif-1788418558809",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "hs01",
+      "time": "2026-09-03 06:55",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Thầy Hà kính mến!\nLê Minh Trí (Lớp trưởng) vừa chấm -2 điểm cho bạn Nguyễn Ngọc Bảo Anh (Tổ 1) vào T3 - Tuần 1.\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian: 13:55 03/09/2026",
+      "id": "notif-1788418539478",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "all",
+      "time": "2026-09-03 06:55",
+      "title": "📢 BCS vừa chấm điểm: [-2đ] Nguyễn Ngọc Bảo Anh",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Lê Minh Trí (Lớp trưởng) ghi nhận -2 điểm vào T3 (Tuần 1).\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian chấm: 13:55 03/09/2026",
+      "id": "notif-1788418539474",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "hs01",
+      "time": "2026-09-03 06:55",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Thầy Hà kính mến!\nLê Minh Trí (Lớp trưởng) vừa chấm +2 điểm cho bạn Nguyễn Ngọc Bảo Anh (Tổ 1) vào T2 - Tuần 1.\n• Tiêu chí: ⏰ Đi học đúng giờ\n• Ghi chú: Không có ghi chú\n• Thời gian: 13:54 03/09/2026",
+      "id": "notif-1788418451725",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "all",
+      "time": "2026-09-03 06:54",
+      "title": "📢 BCS vừa chấm điểm: [+2đ] Nguyễn Ngọc Bảo Anh",
+      "type": "praise"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Lê Minh Trí (Lớp trưởng) ghi nhận +2 điểm vào T2 (Tuần 1).\n• Tiêu chí: ⏰ Đi học đúng giờ\n• Ghi chú: Không có ghi chú\n• Thời gian chấm: 13:54 03/09/2026",
+      "id": "notif-1788418451720",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "hs01",
+      "time": "2026-09-03 06:54",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "Thầy Hà kính mến!\nLê Minh Trí (Lớp trưởng) vừa chấm +2 điểm cho bạn Nguyễn Ngọc Bảo Anh (Tổ 1) vào T2 - Tuần 1.\n• Tiêu chí: 🏆 Được giáo viên tuyên dương\n• Ghi chú: Được cô giáo khen\n• Thời gian: 13:53 03/09/2026",
+      "id": "notif-1788418429352",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "all",
+      "time": "2026-09-03 06:53",
+      "title": "📢 BCS vừa chấm điểm: [+2đ] Nguyễn Ngọc Bảo Anh",
+      "type": "praise"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Lê Minh Trí (Lớp trưởng) ghi nhận +2 điểm vào T2 (Tuần 1).\n• Tiêu chí: 🏆 Được giáo viên tuyên dương\n• Ghi chú: Được cô giáo khen\n• Thời gian chấm: 13:53 03/09/2026",
+      "id": "notif-1788418429351",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "hs01",
+      "time": "2026-09-03 06:53",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "Thầy Hà kính mến!\nLê Minh Trí (Lớp trưởng) vừa chấm -2 điểm cho bạn Nguyễn Ngọc Bảo Anh (Tổ 1) vào T2 - Tuần 1.\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian: 13:53 03/09/2026",
+      "id": "notif-1788418413504",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "all",
+      "time": "2026-09-03 06:53",
+      "title": "📢 BCS vừa chấm điểm: [-2đ] Nguyễn Ngọc Bảo Anh",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Lê Minh Trí (Lớp trưởng) ghi nhận -2 điểm vào T2 (Tuần 1).\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian chấm: 13:53 03/09/2026",
+      "id": "notif-1788418413500",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Lê Minh Trí (Lớp trưởng)",
+      "senderRole": "monitor",
+      "target": "hs01",
+      "time": "2026-09-03 06:53",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận -2 điểm vào T4 (Tuần 1).\n• Tiêu chí: ⏱️ Đi học muộn\n• Ghi chú: Đi học muộn\n• Thời gian chấm: 13:33 03/09/2026",
+      "id": "notif-1788417231724",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:33",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận -2 điểm vào T4 (Tuần 1).\n• Tiêu chí: ❌ Không chuẩn bị bài / Không thuộc bài\n• Ghi chú: Không làm bài\n• Thời gian chấm: 13:33 03/09/2026",
+      "id": "notif-1788417220107",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:33",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận -1 điểm vào T4 (Tuần 1).\n• Tiêu chí: 💬 Nói chuyện riêng trong giờ\n• Ghi chú: Nói chuyện riêng\n• Thời gian chấm: 13:33 03/09/2026",
+      "id": "notif-1788417202684",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:33",
+      "title": "⚠️ Em bị trừ điểm thi đua",
+      "type": "reminder"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận +2 điểm vào T4 (Tuần 1).\n• Tiêu chí: 🏆 Được giáo viên tuyên dương\n• Ghi chú: Được cô giáo khen\n• Thời gian chấm: 13:33 03/09/2026",
+      "id": "notif-1788417180487",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:33",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận +1 điểm vào T4 (Tuần 1).\n• Tiêu chí: 🙋‍♂️ Phát biểu xây dựng bài\n• Ghi chú: Phát biểu xây dựng bài\n• Thời gian chấm: 13:32 03/09/2026",
+      "id": "notif-1788417168224",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:32",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "Chào em Nguyễn Ngọc Bảo Anh!\nEm vừa được Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin)) ghi nhận +1 điểm vào T2 (Tuần 1).\n• Tiêu chí: ⏰ Đi học đúng giờ\n• Ghi chú: Đi học đúng giờ\n• Thời gian chấm: 13:30 03/09/2026",
+      "id": "notif-1788417031502",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (Giáo viên chủ nhiệm (Admin))",
+      "senderRole": "teacher",
+      "target": "hs01",
+      "time": "2026-09-03 06:30",
+      "title": "🌸 Em được cộng điểm thi đua!",
+      "type": "praise"
+    },
+    {
+      "content": "Chào các em 9A4 thân yêu! Năm học mới 35 tuần đã bắt đầu, thầy chúc cả lớp luôn đoàn kết, chăm chỉ và gặt hái thật nhiều hoa điểm 10. Chúc 4 tổ thi đua sôi nổi và tiến bộ mỗi ngày! 🌟",
+      "id": "notif-1",
+      "readBy": [
+        "gv01"
+      ],
+      "sender": "Thầy Võ Văn Hà (GVCN)",
+      "senderRole": "teacher",
+      "target": "all",
+      "time": "2026-09-01 07:30",
+      "title": "Chào mừng năm học mới & Khởi động phong trào thi đua!",
+      "type": "broadcast"
+    }
+  ],
+  "recentAction": "FULL_DATA_SYNC",
+  "recentData": {
+    "by": "teacher",
+    "byName": "Thầy Võ Văn Hà",
+    "byRole": "GVCN (Admin)",
+    "criteriaId": "c1",
+    "day": "T3",
+    "id": "ev-test-1788443817847",
+    "note": "Test sync",
+    "points": 2,
+    "recordedAt": "20:56 03/09/2026",
+    "studentId": "hs02",
+    "timestamp": "2026-09-03T13:56:57.849Z",
+    "type": "plus",
+    "week": 1
+  },
+  "settings": {
+    "academicYear": "2026 - 2027",
+    "className": "Lớp 9A4",
+    "currentMonth": 9,
+    "currentWeek": 1,
+    "lockedWeeks": [],
+    "schoolName": "TRƯỜNG THCS TÂY PHÚ",
+    "slogan": "ĐOÀN KẾT – TRUNG THỰC – KỶ LUẬT – TÍCH CỰC – TIẾN BỘ MỖI NGÀY!",
+    "teacherName": "Thầy Võ Văn Hà",
+    "teacherPass": "admin123",
+    "updatedAt": 1788444102221
+  },
+  "students": [
+    {
+      "avatar": "👧",
+      "canScore": true,
+      "code": "9A401",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs01",
+      "name": "Nguyễn Ngọc Bảo Anh",
+      "pass": "123456",
+      "role": "leader",
+      "roleName": "Tổ trưởng Tổ 1",
+      "scoreScope": "group",
+      "username": "baoanh.nnb"
+    },
+    {
+      "avatar": "🌸",
+      "canScore": true,
+      "code": "9A402",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs02",
+      "name": "Nguyễn Văn Bảo",
+      "pass": "123456",
+      "role": "monitor",
+      "roleName": "Lớp trưởng",
+      "scoreScope": "class",
+      "username": "bao.nv"
+    },
+    {
+      "avatar": "🎀",
+      "canScore": false,
+      "code": "9A403",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs03",
+      "name": "Nguyễn Kim Đào",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "dao.nk"
+    },
+    {
+      "avatar": "👦",
+      "canScore": false,
+      "code": "9A404",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs04",
+      "name": "Huỳnh Thanh Đủ",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "du.ht"
+    },
+    {
+      "avatar": "🌷",
+      "canScore": false,
+      "code": "9A405",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs05",
+      "name": "Lê Thu Hà",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "ha.lt"
+    },
+    {
+      "avatar": "🌼",
+      "canScore": false,
+      "code": "9A406",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs06",
+      "name": "Nguyễn Thị Ngọc Hân",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "han.ntn"
+    },
+    {
+      "avatar": "✨",
+      "canScore": false,
+      "code": "9A407",
+      "group": 1,
+      "hasChangedPass": false,
+      "id": "hs07",
+      "name": "Lê Thị Trúc Huỳnh",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "huynh.ltt"
+    },
+    {
+      "avatar": "👦",
+      "canScore": true,
+      "code": "9A408",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs08",
+      "name": "Nguyễn Văn Khang",
+      "pass": "123456",
+      "role": "leader",
+      "roleName": "Tổ trưởng Tổ 2",
+      "scoreScope": "group",
+      "username": "khang.nv"
+    },
+    {
+      "avatar": "📚",
+      "canScore": true,
+      "code": "9A409",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs09",
+      "name": "Võ Trọng Khang",
+      "pass": "123456",
+      "role": "vice",
+      "roleName": "Lớp phó Học tập",
+      "scoreScope": "class",
+      "username": "khang.vt"
+    },
+    {
+      "avatar": "🎯",
+      "canScore": false,
+      "code": "9A410",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs10",
+      "name": "Phạm Đoàn Huy Khánh",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "khanh.pdh"
+    },
+    {
+      "avatar": "🚀",
+      "canScore": false,
+      "code": "9A411",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs11",
+      "name": "Huỳnh Khôi",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "khoi.h"
+    },
+    {
+      "avatar": "⚽",
+      "canScore": false,
+      "code": "9A412",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs12",
+      "name": "Nguyễn Gia Lâm",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "lam.ng"
+    },
+    {
+      "avatar": "👓",
+      "canScore": false,
+      "code": "9A413",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs13",
+      "name": "Phan Văn Long",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "long.pv"
+    },
+    {
+      "avatar": "🌻",
+      "canScore": false,
+      "code": "9A414",
+      "group": 2,
+      "hasChangedPass": false,
+      "id": "hs14",
+      "name": "Bùi Lê Trà My",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "my.blt"
+    },
+    {
+      "avatar": "👦",
+      "canScore": true,
+      "code": "9A415",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs15",
+      "name": "Lê Trần Quang Nghĩa",
+      "pass": "123456",
+      "role": "leader",
+      "roleName": "Tổ trưởng Tổ 3",
+      "scoreScope": "group",
+      "username": "nghia.ltq"
+    },
+    {
+      "avatar": "🧹",
+      "canScore": true,
+      "code": "9A416",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs16",
+      "name": "Võ Quốc Nhựt",
+      "pass": "123456",
+      "role": "vice",
+      "roleName": "Lớp phó Lao động",
+      "scoreScope": "class",
+      "username": "nhut.vq"
+    },
+    {
+      "avatar": "⚡",
+      "canScore": false,
+      "code": "9A417",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs17",
+      "name": "Lê Thành Phát",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "phat.lt"
+    },
+    {
+      "avatar": "🎨",
+      "canScore": false,
+      "code": "9A418",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs18",
+      "name": "Lê Hoài Phong",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "phong.lh"
+    },
+    {
+      "avatar": "🌿",
+      "canScore": false,
+      "code": "9A419",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs19",
+      "name": "Nguyễn Vũ Phương",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "phuong.nv"
+    },
+    {
+      "avatar": "💖",
+      "canScore": false,
+      "code": "9A420",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs20",
+      "name": "Lê Thị Mỹ Quyên",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "quyen.ltm"
+    },
+    {
+      "avatar": "🌺",
+      "canScore": false,
+      "code": "9A421",
+      "group": 3,
+      "hasChangedPass": false,
+      "id": "hs21",
+      "name": "Lê Thị Ngọc Quỳnh",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "quynh.ltn"
+    },
+    {
+      "avatar": "👦",
+      "canScore": true,
+      "code": "9A422",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs22",
+      "name": "Huỳnh Nhật Tân",
+      "pass": "123456",
+      "role": "leader",
+      "roleName": "Tổ trưởng Tổ 4",
+      "scoreScope": "group",
+      "username": "tan.hn"
+    },
+    {
+      "avatar": "🍀",
+      "canScore": false,
+      "code": "9A423",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs23",
+      "name": "Hà Phương Thảo",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "thao.hp"
+    },
+    {
+      "avatar": "🎸",
+      "canScore": false,
+      "code": "9A424",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs24",
+      "name": "Lê Văn Tiềm",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "tiem.lv"
+    },
+    {
+      "avatar": "🦄",
+      "canScore": false,
+      "code": "9A425",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs25",
+      "name": "Nguyễn Thị Huyền Trang",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "trang.nth"
+    },
+    {
+      "avatar": "🏆",
+      "canScore": false,
+      "code": "9A426",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs26",
+      "name": "Lê Minh Trí",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "tri.lm"
+    },
+    {
+      "avatar": "💎",
+      "canScore": false,
+      "code": "9A427",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs27",
+      "name": "Bùi Thị Như Tuyết",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "tuyet.btn"
+    },
+    {
+      "avatar": "🍓",
+      "canScore": false,
+      "code": "9A428",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs28",
+      "name": "Nguyễn Thị Cẩm Vân",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "van.ntc"
+    },
+    {
+      "avatar": "🌈",
+      "canScore": false,
+      "code": "9A429",
+      "group": 4,
+      "hasChangedPass": false,
+      "id": "hs29",
+      "name": "Bùi Huỳnh Bảo Xuyên",
+      "pass": "123456",
+      "role": "member",
+      "roleName": "Thành viên",
+      "scoreScope": "none",
+      "username": "xuyen.bhb"
+    }
+  ],
+  "teachers": [
+    {
+      "avatar": "👨‍🏫",
+      "hasChangedPass": false,
+      "id": "gv01",
+      "isPrimary": true,
+      "name": "Thầy Võ Văn Hà",
+      "pass": "admin123",
+      "role": "teacher",
+      "roleName": "Giáo viên chủ nhiệm (Admin)",
+      "subject": "Chủ nhiệm & Vật lý",
+      "username": "admin"
+    }
+  ]
+}

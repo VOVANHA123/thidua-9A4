@@ -759,6 +759,30 @@ class ClassDataManager {
             this.syncInProgress = false;
             return { success: true, updated: true, data: this.data, source: 'firebase_realtime' };
           } else {
+            // TỰ ĐỘNG BÙ ĐẮP DỮ LIỆU NGOẠI TUYẾN / CHƯA ĐỒNG BỘ:
+            // Nếu máy này có nhiều sự kiện hơn máy chủ (học sinh/BCS đã nhập điểm nhưng trước đó bị lỗi kết nối hoặc phân quyền),
+            // tự động gom sự kiện máy chủ + sự kiện máy này và đẩy bù lên Firebase ngay lập tức!
+            if (localEventsLen > serverEventsLen && !this.isFreshDevice && this.hasSuccessfullySyncedWithCloud) {
+              console.log(`[SYNC TỰ ĐỘNG BÙ] Thiết bị có ${localEventsLen} sự kiện (Server có ${serverEventsLen}). Đang tự động bù đắp dữ liệu lên Firebase...`);
+              if (Array.isArray(fbData.events)) {
+                const eventMap = new Map();
+                const deletedSet = new Set([
+                  ...(this.data.deletedEventIds || []),
+                  ...(fbData.deletedEventIds || [])
+                ]);
+                this.data.deletedEventIds = Array.from(deletedSet);
+                fbData.events.forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                (this.data.events || []).forEach(e => {
+                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+                });
+                this.data.events = Array.from(eventMap.values());
+              }
+              this.saveToStorageLocal();
+              this.pushToCloud(true, { recentAction: 'OFFLINE_EVENTS_RECOVERY' });
+            }
+
             this.lastSyncTime = Date.now();
             this.updateCloudStatusUI(true, 'Đã Đồng Bộ ⚡');
             return { success: true, updated: false, data: this.data, source: 'firebase_realtime' };

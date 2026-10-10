@@ -1415,14 +1415,58 @@ var StudentBienBanController = {
     if (tt22El) tt22El.textContent = tt22 ? tt22.ranking.display : 'ĐẠT';
 
     var phoneEl = document.getElementById('zalo-modal-phone');
-    if (phoneEl) phoneEl.value = student.phone || '';
+    if (phoneEl) {
+      phoneEl.value = student.phone || '';
+      this.onPhoneInput(student.phone || '');
+    }
 
     var msgEl = document.getElementById('zalo-modal-msg');
     if (msgEl) msgEl.value = this._buildZaloMessage(student);
 
+    var mobileBox = document.getElementById('zalo-mobile-share-box');
+    if (mobileBox) {
+      var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      mobileBox.style.display = (isMobile && navigator.share) ? 'block' : 'none';
+    }
+
     var modal = document.getElementById('modal-student-zalo-share');
     if (modal) {
       modal.classList.add('show');
+    }
+  },
+
+  /**
+   * Cập nhật liên kết Zalo trực tiếp ngay khi gõ số điện thoại
+   */
+  onPhoneInput: function(val) {
+    var phone = (val || '').trim().replace(/\s+/g, '');
+    var linkChat = document.getElementById('zalo-direct-link');
+    var linkText = document.getElementById('zalo-direct-link-text');
+    var linkApp = document.getElementById('zalo-app-link');
+
+    if (phone && phone.length >= 9) {
+      var cleanPhone = phone.replace(/^0/, '84');
+      if (linkChat) {
+        linkChat.href = 'https://zalo.me/' + cleanPhone;
+      }
+      if (linkText) {
+        linkText.textContent = 'Mở Chat Zalo (' + phone + ')';
+      }
+      if (linkApp) {
+        linkApp.href = 'zalo://chat?phone=' + cleanPhone;
+        linkApp.style.display = 'inline-flex';
+      }
+    } else {
+      if (linkChat) {
+        linkChat.href = 'https://chat.zalo.me';
+      }
+      if (linkText) {
+        linkText.textContent = 'Mở Chat Zalo Web';
+      }
+      if (linkApp) {
+        linkApp.href = 'zalo://';
+        linkApp.style.display = 'inline-flex';
+      }
     }
   },
 
@@ -1452,6 +1496,7 @@ var StudentBienBanController = {
     }
     if (window.classData) {
       window.classData.updateStudent(this.currentStudentId, { phone: phone });
+      this.onPhoneInput(phone);
       if (window.chibiSound) window.chibiSound.playPlus();
       if (window.chibiNotifications) {
         window.chibiNotifications.showToast('Đã lưu SĐT Zalo! 💾', 'Đã lưu số điện thoại: ' + phone + ' cho học sinh.', 'success');
@@ -1485,112 +1530,136 @@ var StudentBienBanController = {
   },
 
   /**
-   * Gửi trực tiếp tệp PDF vào ứng dụng Zalo (Tối ưu cho Điện thoại / Máy tính bảng qua Web Share API)
+   * Sao chép toàn bộ hình ảnh Phiếu thi đua A4 vào Clipboard để dán (Ctrl+V) vào Zalo
    */
-  sharePdfDirect: function() {
-    if (!this._checkAdmin()) {
-      if (window.chibiNotifications) {
-        window.chibiNotifications.showToast('Không có quyền', 'Chỉ tài khoản Admin mới được thực hiện tính năng này.', 'warning');
-      }
-      return;
-    }
+  copyStudentConductImage: function() {
+    if (!this._checkAdmin()) return;
     var self = this;
+    var container = document.getElementById('sb-paper-container');
     var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
-    if (!student) return;
-
-    var msgEl = document.getElementById('zalo-modal-msg');
-    var msg = msgEl ? msgEl.value : this._buildZaloMessage(student);
+    if (!container || !student) return;
 
     if (window.chibiNotifications) {
-      window.chibiNotifications.showToast('Đang kết xuất PDF...', 'Đang tạo tệp PDF A4 và kích hoạt gửi Zalo...', 'info');
+      window.chibiNotifications.showToast('Đang chụp ảnh phiếu...', 'Đang xử lý hình ảnh phiếu thi đua để copy vào Clipboard...', 'info');
     }
 
-    this._generatePdfBlob(function(err, blob, fname) {
-      if (err || !blob) {
-        console.warn('PDF blob generation notice:', err);
-        self.sendZaloWebWithPdf();
-        return;
-      }
-
-      var file = new File([blob], fname, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: 'Phiếu thi đua - ' + student.name,
-          text: msg
-        }).then(function() {
-          if (window.chibiSound) window.chibiSound.playPlus();
-          if (window.chibiNotifications) {
-            window.chibiNotifications.showToast('Đã kích hoạt Zalo! 🚀', 'Tệp PDF đã sẵn sàng gửi tới học sinh/phụ huynh.', 'success');
-          }
-        }).catch(function(shareErr) {
-          if (shareErr && shareErr.name !== 'AbortError') {
-            console.warn('Share error:', shareErr);
-            self.sendZaloWebWithPdf(blob, fname);
-          }
-        });
-      } else {
-        // Thiết bị không hỗ trợ chia sẻ tệp qua Web Share (như máy tính bàn): Chuyển sang quy trình Desktop
-        self.sendZaloWebWithPdf(blob, fname);
-      }
+    var clone = container.cloneNode(true);
+    clone.querySelectorAll('.sb-screen-only-divider').forEach(function(el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
     });
+    clone.querySelectorAll('[contenteditable]').forEach(function(el) {
+      el.removeAttribute('contenteditable');
+    });
+
+    var wrapper = document.createElement('div');
+    wrapper.id = 'img-student-render-wrapper';
+    wrapper.style.cssText = 'position:fixed; top:0; left:0; width:750px; background:#ffffff; color:#000000; font-family:"Times New Roman",Times,serif; z-index:9999999; margin:0; padding:12px; box-sizing:border-box;';
+
+    var paper = clone.querySelector('.student-conduct-paper') || clone;
+    paper.style.boxShadow = 'none';
+    paper.style.borderRadius = '0';
+    paper.style.padding = '0';
+    paper.style.margin = '0';
+    paper.style.width = '100%';
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    var opt = {
+      margin: 0,
+      image: { type: 'png', quality: 1.0 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        scrollY: 0,
+        scrollX: 0,
+        logging: false
+      }
+    };
+
+    window.html2pdf().set(opt).from(paper).toCanvas()
+      .then(function() {
+        var canvas = this.prop.canvas;
+        if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+
+        if (!canvas) {
+          if (window.chibiNotifications) {
+            window.chibiNotifications.showToast('Lỗi tạo ảnh', 'Không thể tạo hình ảnh canvas.', 'error');
+          }
+          return;
+        }
+
+        canvas.toBlob(function(blob) {
+          if (!blob) return;
+
+          // Thử sao chép ảnh vào Clipboard (Hỗ trợ Chrome, Edge, Safari hiện đại)
+          if (navigator.clipboard && window.ClipboardItem) {
+            navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]).then(function() {
+              if (window.chibiSound) window.chibiSound.playPlus();
+              if (window.chibiNotifications) {
+                window.chibiNotifications.showToast(
+                  'Đã copy Ảnh Phiếu! 📸',
+                  'Vào Zalo bấm Ctrl + V để dán và gửi ảnh ngay nhé Thầy!',
+                  'success'
+                );
+              }
+            }).catch(function(err) {
+              console.warn('Clipboard write image notice:', err);
+              self._downloadImageBlob(blob, 'PhieuThiDua_' + student.name.replace(/\s+/g, '_') + '.png');
+            });
+          } else {
+            self._downloadImageBlob(blob, 'PhieuThiDua_' + student.name.replace(/\s+/g, '_') + '.png');
+          }
+        }, 'image/png');
+      })
+      .catch(function(err) {
+        console.warn('Canvas render error:', err);
+        if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Lỗi kết xuất ảnh', 'Không thể tạo ảnh phiếu thi đua.', 'error');
+        }
+      });
+  },
+
+  _downloadImageBlob: function(blob, fname) {
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fname;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function() {
+      if (link.parentNode) link.parentNode.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }, 150);
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Đã tải Ảnh Phiếu! 🖼️', 'Đã tải ảnh về máy. Thầy hãy kéo thả ảnh vào Zalo để gửi nhé!', 'success');
+    }
   },
 
   /**
-   * Gửi qua Zalo Web / Zalo PC (Tối ưu cho Máy tính PC/Laptop):
-   * Tự động tải file PDF + Copy tin nhắn + Mở khung chat Zalo của học sinh/phụ huynh
+   * Chia sẻ nhanh qua thiết bị di động (Web Share API)
    */
-  sendZaloWebWithPdf: function(existingBlob, existingFname) {
-    if (!this._checkAdmin()) {
-      if (window.chibiNotifications) {
-        window.chibiNotifications.showToast('Không có quyền', 'Chỉ tài khoản Admin mới được thực hiện tính năng này.', 'warning');
-      }
-      return;
-    }
-    var self = this;
+  shareViaMobileDevice: function() {
     var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
     if (!student) return;
-
-    var phoneInput = document.getElementById('zalo-modal-phone');
-    var phone = phoneInput ? phoneInput.value.trim().replace(/\s+/g, '') : (student.phone || '');
     var msgEl = document.getElementById('zalo-modal-msg');
     var msg = msgEl ? msgEl.value : this._buildZaloMessage(student);
 
-    // 1. Sao chép tin nhắn vào clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(msg).catch(function() {});
-    }
-
-    // 2. Tải tệp PDF về máy
-    if (existingBlob && existingFname) {
-      var link = document.createElement('a');
-      link.href = URL.createObjectURL(existingBlob);
-      link.download = existingFname;
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(function() {
-        if (link.parentNode) link.parentNode.removeChild(link);
-        URL.revokeObjectURL(link.href);
-      }, 150);
-    } else {
-      this.exportPdf();
-    }
-
-    // 3. Mở khung chat Zalo
-    var cleanPhone = phone.replace(/^0/, '84');
-    var targetUrl = (phone && phone.length >= 9) 
-      ? ('https://zalo.me/' + cleanPhone) 
-      : 'https://chat.zalo.me';
-
-    window.open(targetUrl, '_blank');
-
-    if (window.chibiSound) window.chibiSound.playClick();
-    if (window.chibiNotifications) {
-      window.chibiNotifications.showToast(
-        'Đã mở Zalo & Tải PDF! 💬',
-        'Đã tải file PDF và sao chép lời nhắn. Thầy chỉ cần bấm Ctrl+V và kéo thả file PDF vào Zalo nhé!',
-        'success'
-      );
+    if (navigator.share) {
+      navigator.share({
+        title: 'Phiếu thi đua - ' + student.name,
+        text: msg,
+        url: window.location.href
+      }).then(function() {
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đã mở chia sẻ! 🚀', 'Đã chuyển nội dung sang ứng dụng Zalo.', 'success');
+        }
+      }).catch(function(err) {
+        if (err && err.name !== 'AbortError') console.warn('Mobile share error:', err);
+      });
     }
   }
 };

@@ -400,6 +400,17 @@ class AppController {
       btnStudentBienBanTable.style.display = canSB ? 'inline-flex' : 'none';
     }
 
+    const btnSbZalo = document.getElementById('btn-sb-zalo');
+    if (btnSbZalo) {
+      btnSbZalo.style.display = canSB ? 'inline-flex' : 'none';
+    }
+
+    // Nếu không phải Admin mà modal gửi Zalo đang mở thì đóng ngay lập tức
+    if (!canSB) {
+      const zModal = document.getElementById('modal-student-zalo-share');
+      if (zModal) zModal.classList.remove('show');
+    }
+
     // Nếu không phải GVCN mà modal biên bản tuần đang mở thì đóng ngay lập tức
     if (!isGVCN) {
       const modal = document.getElementById('modal-bienban-sinhoat');
@@ -769,6 +780,7 @@ class AppController {
       const canAdminBienBan = Boolean(window.authManager && typeof window.authManager.canViewStudentBienBan === 'function' && window.authManager.canViewStudentBienBan());
       if (canAdminBienBan) {
         html += `<button class="btn-icon-sm" style="background:#7c3aed;" title="Xuất Biên Bản Thi Đua Cá Nhân + Dự Kiến Xếp Loại TT22 (Chỉ Admin)" onclick="window.studentBienBanCtrl && window.studentBienBanCtrl.open('${student.id}')">📋</button>`;
+        html += `<button class="btn-icon-sm" style="background:#0068ff;" title="Gửi Phiếu thi đua cá nhân (Kèm PDF) vào Zalo (Chỉ Admin)" onclick="if(window.studentBienBanCtrl){ window.studentBienBanCtrl.openZaloShareModal('${student.id}'); }"><span style="font-weight:900; font-size:10px; color:white;">Z</span></button>`;
       }
       html += `</td>`;
 

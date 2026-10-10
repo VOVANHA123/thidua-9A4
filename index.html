@@ -1316,6 +1316,10 @@
           <button type="button" onclick="window.studentBienBanCtrl.exportAllStudents()" style="background:#7c3aed; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem;" title="Xuất biên bản tất cả 29 học sinh">
             📦 Xuất Tất Cả (29 HS)
           </button>
+          <button type="button" id="btn-sb-zalo" onclick="window.studentBienBanCtrl.openZaloShareModal()" style="background: linear-gradient(135deg, #0068ff 0%, #0052cc 100%); color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 3px 10px rgba(0,104,255,0.4);" title="Gửi Phiếu thi đua cá nhân (Kèm PDF) trực tiếp đến Zalo (Chỉ Admin)">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:white; color:#0068ff; border-radius:50%; font-size:11px; font-weight:900;">Z</span>
+            <span>Gửi Zalo (PDF)</span>
+          </button>
         </div>
       </div>
 
@@ -1340,6 +1344,112 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: GỬI PHIẾU THI ĐUA VÀO ZALO (CHỈ ADMIN) ================= -->
+  <div class="modal-backdrop" id="modal-student-zalo-share">
+    <div class="modal-content" style="max-width:580px; width:95%; border-radius:18px; overflow:hidden; box-shadow:0 20px 50px rgba(0,104,255,0.25); border: 2px solid #93c5fd;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header" style="background: linear-gradient(135deg, #0068ff 0%, #0284c7 100%); color:white; padding:14px 20px;">
+        <div class="modal-title" style="display:flex; align-items:center; gap:8px; font-size:1.05rem; font-weight:800;">
+          <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; background:white; color:#0068ff; border-radius:50%; font-size:15px; font-weight:900;">Z</span>
+          <span>Gửi Phiếu Thi Đua Vào Zalo (Admin)</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="window.studentBienBanCtrl.closeZaloShareModal()" style="color:white; font-size:1.5rem; background:none; border:none; cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding:18px 22px; max-height:80vh; overflow-y:auto; background:#f8fafc;">
+        
+        <!-- Info Card -->
+        <div style="background:white; border:1px solid #bfdbfe; border-radius:12px; padding:12px 16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="font-size:0.95rem; font-weight:800; color:#1e3a8a;">
+              👤 <span id="zalo-modal-student-name">Nguyễn Ngọc Bảo Anh</span> <span id="zalo-modal-student-code" style="color:#64748b; font-size:0.85rem; font-weight:600;">(9A401)</span>
+            </div>
+            <span id="zalo-modal-period" style="background:#e0f2fe; color:#0369a1; padding:3px 10px; border-radius:20px; font-size:0.8rem; font-weight:700;">Tuần 1</span>
+          </div>
+          <div style="display:flex; gap:16px; font-size:0.85rem; color:#475569; border-top:1px dashed #e2e8f0; padding-top:6px; margin-top:6px;">
+            <div>⭐ Điểm: <b id="zalo-modal-score" style="color:#059669;">140 điểm</b></div>
+            <div>🏆 Xếp loại TT22: <b id="zalo-modal-tt22" style="color:#7c3aed;">TỐT</b></div>
+          </div>
+        </div>
+
+        <!-- Phone Input Section -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:0.85rem; font-weight:700; color:#334155; margin-bottom:6px;">
+            📱 Số điện thoại Zalo của Học sinh / Phụ huynh:
+          </label>
+          <div style="display:flex; gap:8px;">
+            <input type="tel" id="zalo-modal-phone" placeholder="VD: 0912345678" style="flex:1; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.92rem; outline:none;" />
+            <button type="button" onclick="window.studentBienBanCtrl.saveStudentPhone()" style="background:#3b82f6; color:white; border:none; border-radius:8px; padding:8px 14px; font-weight:700; font-size:0.84rem; cursor:pointer;" title="Lưu số điện thoại cho học sinh này để dùng cho các lần sau">
+              💾 Lưu SĐT
+            </button>
+          </div>
+          <small style="color:#64748b; font-size:0.75rem; margin-top:4px; display:block;">
+            💡 <i>Hệ thống tự động ghi nhớ SĐT này vào hồ sơ của em để lần sau gửi 1-chạm không cần gõ lại.</i>
+          </small>
+        </div>
+
+        <!-- Message Preview Section -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:0.85rem; font-weight:700; color:#334155;">
+              💬 Nội dung tin nhắn gửi kèm:
+            </label>
+            <button type="button" onclick="window.studentBienBanCtrl.copyZaloMessage()" style="background:#f1f5f9; color:#0284c7; border:1px solid #cbd5e1; border-radius:6px; padding:3px 10px; font-size:0.78rem; font-weight:700; cursor:pointer;">
+              📋 Sao chép tin nhắn
+            </button>
+          </div>
+          <textarea id="zalo-modal-msg" rows="7" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; line-height:1.45; font-family:monospace; background:white; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
+        </div>
+
+        <!-- Action Buttons (Options) -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          
+          <!-- Direct Mobile/Share Action -->
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:12px 14px;">
+            <div style="font-size:0.85rem; font-weight:800; color:#1d4ed8; margin-bottom:4px;">
+              📱 Trên Điện thoại / Máy tính bảng (Gửi trực tiếp tệp PDF)
+            </div>
+            <div style="font-size:0.78rem; color:#475569; margin-bottom:8px;">
+              Hệ thống tự động tạo tệp PDF A4 và mở bảng chia sẻ để chuyển thẳng file vào Zalo học sinh/phụ huynh.
+            </div>
+            <button type="button" onclick="window.studentBienBanCtrl.sharePdfDirect()" style="width:100%; background:linear-gradient(135deg, #0068ff 0%, #2563eb 100%); color:white; border:none; border-radius:8px; padding:10px 16px; font-weight:800; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 8px rgba(0,104,255,0.35);">
+              <span>🚀 Gửi Thẳng File PDF vào Zalo (1-Chạm)</span>
+            </button>
+          </div>
+
+          <!-- Desktop Action -->
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px 14px;">
+            <div style="font-size:0.85rem; font-weight:800; color:#15803d; margin-bottom:4px;">
+              💻 Trên Máy tính PC / Laptop (Zalo Web hoặc Zalo PC)
+            </div>
+            <div style="font-size:0.78rem; color:#475569; margin-bottom:8px;">
+              Tự động tải file PDF về máy + Tự copy tin nhắn + Mở sẵn khung chat Zalo của học sinh/phụ huynh. Thầy chỉ cần bấm <b>Ctrl + V</b> và kéo thả file PDF vào!
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" onclick="window.studentBienBanCtrl.sendZaloWebWithPdf()" style="flex:1; background:#16a34a; color:white; border:none; border-radius:8px; padding:9px 12px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                <span>💬 Mở Chat Zalo (zalo.me) & Tải PDF</span>
+              </button>
+              <button type="button" onclick="window.open('https://chat.zalo.me', '_blank')" style="background:#0284c7; color:white; border:none; border-radius:8px; padding:9px 12px; font-weight:700; font-size:0.82rem; cursor:pointer;" title="Mở Zalo Web chung để gửi vào Nhóm Lớp 9A4">
+                👥 Nhóm Lớp
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" style="padding:10px 20px; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.78rem; color:#64748b;">🔐 Phân quyền: Chỉ Giáo viên chủ nhiệm (Admin) mới có quyền gửi</span>
+        <button type="button" class="btn-hero btn-white" onclick="window.studentBienBanCtrl.closeZaloShareModal()" style="padding:6px 16px; font-size:0.85rem;">Đóng</button>
+      </div>
+
+    </div>
+  </div>
+
   </div> <!-- /#view-app -->
 
   <!-- ================= CRITERIA STATS PRINT AREA ================= -->
@@ -1358,14 +1468,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <!-- Scripts with Cache-busting -->
-  <script src="js/firebase-sync.js?v=20261001_v61"></script>
-  <script src="js/data.js?v=20261001_v61"></script>
-  <script src="js/sound.js?v=20261001_v61"></script>
-  <script src="js/confetti.js?v=20261001_v61"></script>
-  <script src="js/notifications.js?v=20261001_v61"></script>
-  <script src="js/auth.js?v=20261001_v61"></script>
-  <script src="js/html2pdf.bundle.min.js?v=20261001_v61"></script>
-  <script src="js/bienban-hocsinh.js?v=20261001_v61"></script>
-  <script src="js/app.js?v=20261001_v61"></script>
+  <script src="js/firebase-sync.js?v=20261010_v62"></script>
+  <script src="js/data.js?v=20261010_v62"></script>
+  <script src="js/sound.js?v=20261010_v62"></script>
+  <script src="js/confetti.js?v=20261010_v62"></script>
+  <script src="js/notifications.js?v=20261010_v62"></script>
+  <script src="js/auth.js?v=20261010_v62"></script>
+  <script src="js/html2pdf.bundle.min.js?v=20261010_v62"></script>
+  <script src="js/bienban-hocsinh.js?v=20261010_v62"></script>
+  <script src="js/app.js?v=20261010_v62"></script>
 </body>
 </html>

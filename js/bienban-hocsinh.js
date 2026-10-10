@@ -1273,6 +1273,21 @@ var StudentBienBanController = {
   },
 
   /**
+   * Tạo đường dẫn tra cứu cá nhân riêng biệt cho từng học sinh
+   * Đảm bảo phụ huynh chỉ thấy duy nhất phiếu của con mình
+   */
+  _getPrivateLink: function(student) {
+    if (!student) return '';
+    var code = student.code || student.id;
+    var origin = window.location.origin;
+    var path = window.location.pathname.replace(/\/[^\/]*$/, '/');
+    if (!origin || origin.includes('localhost') || origin.startsWith('file:') || origin === 'null') {
+      return 'https://thidua-lop-9a4-79dca.web.app/tra-cuu.html?ma=' + encodeURIComponent(code);
+    }
+    return origin + path + 'tra-cuu.html?ma=' + encodeURIComponent(code);
+  },
+
+  /**
    * Tạo văn bản thông báo kết quả thi đua & rèn luyện cá nhân gửi Zalo
    */
   _buildZaloMessage: function(student) {
@@ -1282,6 +1297,7 @@ var StudentBienBanController = {
     var score = window.classData ? window.classData.calculateStudentScore(student.id, curW) : { total: 0, plus: 0, minus: 0, rank: 'Tốt' };
     var tt22 = calcTT22Ranking(student.id, this.currentPeriodType, this.currentPeriodValue);
     var tt22Rank = tt22 ? tt22.ranking.display : 'ĐẠT';
+    var privateLink = this._getPrivateLink(student);
 
     var msg = "🌸 THÔNG BÁO KẾT QUẢ THI ĐUA & RÈN LUYỆN - LỚP 9A4\n" +
       "🏫 Trường THCS Tây Phú | Năm học 2026 - 2027\n" +
@@ -1291,13 +1307,13 @@ var StudentBienBanController = {
       "📌 Mã học sinh: " + (student.code || '') + " | Tổ: " + student.group + " (" + (student.roleName || 'Thành viên') + ")\n" +
       "📅 Kỳ đánh giá: " + periodLabel + "\n\n" +
       "⭐ Điểm tổng kết thi đua: " + score.total + " điểm (Xếp loại: " + score.rank + ")\n" +
-      "➕ Điểm cộng khen thưởng: +" + score.plus + " điểm\n" +
-      "➖ Điểm trừ vi phạm: -" + score.minus + " điểm\n" +
       "🏆 Dự kiến xếp loại rèn luyện (TT22): " + tt22Rank + "\n\n" +
-      "✨ Lời nhắn từ Thầy Võ Văn Hà (GVCN):\n" +
-      "\"Thầy gửi kèm Phiếu thi đua & rèn luyện cá nhân chi tiết (định dạng PDF chuẩn A4) để gia đình và em cùng theo dõi, phát huy ưu điểm và khắc phục thiếu sót nhé!\"\n" +
+      "🔗 Link xem phiếu cá nhân của con (Bảo mật riêng tư):\n" +
+      privateLink + "\n" +
+      "(Phụ huynh bấm vào link trên để xem chi tiết kết quả rèn luyện và bấm nút 'Tải PDF' để lưu về máy)\n" +
       "-------------------------------------------\n" +
-      "🌐 Tra cứu nề nếp trực tuyến Lớp 9A4: https://vovanha123.github.io/thidua-9A4/";
+      "✨ Lời nhắn từ Thầy Võ Văn Hà (GVCN):\n" +
+      "\"Kính mong gia đình cùng theo dõi và phối hợp động viên con phát huy ưu điểm, khắc phục các thiếu sót nhé!\"";
 
     return msg;
   },
@@ -1420,6 +1436,12 @@ var StudentBienBanController = {
       this.onPhoneInput(student.phone || '');
     }
 
+    var linkVal = this._getPrivateLink(student);
+    var linkInput = document.getElementById('zalo-modal-private-link');
+    if (linkInput) linkInput.value = linkVal;
+    var linkOpen = document.getElementById('zalo-modal-private-link-open');
+    if (linkOpen) linkOpen.href = linkVal;
+
     var msgEl = document.getElementById('zalo-modal-msg');
     if (msgEl) msgEl.value = this._buildZaloMessage(student);
 
@@ -1432,6 +1454,89 @@ var StudentBienBanController = {
     var modal = document.getElementById('modal-student-zalo-share');
     if (modal) {
       modal.classList.add('show');
+    }
+  },
+
+  /**
+   * Sao chép đường link tra cứu riêng biệt của học sinh vào Clipboard
+   */
+  copyPrivateLink: function() {
+    var linkInput = document.getElementById('zalo-modal-private-link');
+    if (!linkInput) return;
+    var text = linkInput.value;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        if (window.chibiSound) window.chibiSound.playClick();
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đã copy Link riêng! 📋', 'Đã copy link tra cứu riêng của học sinh.', 'info');
+        }
+      });
+    } else {
+      linkInput.select();
+      document.execCommand('copy');
+      if (window.chibiSound) window.chibiSound.playClick();
+      if (window.chibiNotifications) {
+        window.chibiNotifications.showToast('Đã copy Link riêng! 📋', 'Đã copy link tra cứu riêng của học sinh.', 'info');
+      }
+    }
+  },
+
+  /**
+   * Xuất danh sách 29 đường link tra cứu riêng biệt của cả lớp ra file Word
+   * Để Thầy gửi cho từng phụ huynh một lần duy nhất vào đầu năm học
+   */
+  exportAllPrivateLinks: function() {
+    if (!this._checkAdmin()) return;
+    var self = this;
+    var students = (window.classData && window.classData.data.students) || [];
+    if (students.length === 0) return;
+
+    var rows = students.slice().sort(function(a, b) {
+      return (a.code || '').localeCompare(b.code || '');
+    }).map(function(s, idx) {
+      var link = self._getPrivateLink(s);
+      return '<tr>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">' + (idx + 1) + '</td>' +
+        '<td style="border:1px solid #000; padding:6px; font-weight:bold;">' + s.name + '</td>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">' + (s.code || s.id) + '</td>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">Tổ ' + s.group + '</td>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">' + (s.phone || '---') + '</td>' +
+        '<td style="border:1px solid #000; padding:6px; font-size:10pt; word-break:break-all;"><a href="' + link + '">' + link + '</a></td>' +
+      '</tr>';
+    }).join('');
+
+    var tableHtml = '<div style="font-family:\'Times New Roman\',Times,serif; padding:20px;">' +
+      '<h2 style="text-align:center; text-transform:uppercase;">DANH SÁCH ĐƯỜNG LINK TRA CỨU THI ĐUA CÁ NHÂN RIÊNG BIỆT</h2>' +
+      '<p style="text-align:center; font-style:italic;">Lớp 9A4 • Trường THCS Tây Phú • Năm học 2026 - 2027 • GVCN: Thầy Võ Văn Hà</p>' +
+      '<p style="font-size:11pt; color:#475569;"><i>(Lưu ý: Mỗi học sinh có một đường link riêng biệt. Phụ huynh nhấp vào link chỉ thấy duy nhất kết quả rèn luyện của con mình, hoàn toàn không thấy học sinh khác.)</i></p>' +
+      '<table style="width:100%; border-collapse:collapse; border:1px solid #000; font-size:11pt;">' +
+        '<tr style="background:#f1f5f9; font-weight:bold; text-align:center;">' +
+          '<th style="border:1px solid #000; padding:6px; width:40px;">STT</th>' +
+          '<th style="border:1px solid #000; padding:6px;">Họ và tên học sinh</th>' +
+          '<th style="border:1px solid #000; padding:6px; width:70px;">Mã HS</th>' +
+          '<th style="border:1px solid #000; padding:6px; width:60px;">Tổ</th>' +
+          '<th style="border:1px solid #000; padding:6px; width:100px;">SĐT Zalo</th>' +
+          '<th style="border:1px solid #000; padding:6px;">Link tra cứu Zalo riêng tư (1-chạm tải PDF)</th>' +
+        '</tr>' +
+        rows +
+      '</table>' +
+    '</div>';
+
+    var fname = 'DanhSach_29_Link_TraCuu_Zalo_Lop9A4.doc';
+    var blob = this._makeWordBlob(tableHtml, 'Danh Sách Link Tra Cứu Zalo Lớp 9A4');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      if (a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 150);
+
+    if (window.chibiSound) window.chibiSound.playPlus();
+    if (window.chibiNotifications) {
+      window.chibiNotifications.showToast('Xuất thành công! 📦', 'Đã tải file danh sách 29 link tra cứu riêng biệt toàn lớp.', 'success');
     }
   },
 

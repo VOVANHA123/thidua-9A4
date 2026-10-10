@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Phiếu Theo Dõi Thi Đua & Rèn Luyện Cá Nhân - Lớp 9A4</title>
+  
+  <meta name="description" content="Cổng tra cứu kết quả thi đua và dự kiến xếp loại rèn luyện cá nhân học sinh Lớp 9A4 - Trường THCS Tây Phú - GVCN Thầy Võ Văn Hà.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+
+  <!-- Style Fonts & Base -->
+  <link rel="stylesheet" href="css/style.css?v=20261010_v63">
+  <link rel="stylesheet" href="css/print.css?v=20261010_v63" media="print">
+
+  <style>
+    body {
+      background: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+    }
+    .parent-portal-header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+    }
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .portal-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .portal-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: white;
+      padding: 2px;
+    }
+    .portal-title-box h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .portal-title-box p {
+      margin: 2px 0 0;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    .portal-container {
+      max-width: 900px;
+      margin: 16px auto 40px;
+      padding: 0 16px;
+    }
+    .control-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .period-selector-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .select-styled {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: #f8fafc;
+      color: #334155;
+      outline: none;
+      cursor: pointer;
+    }
+    .action-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-pdf {
+      background: #dc2626;
+      color: white;
+      box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+    }
+    .btn-print {
+      background: #059669;
+      color: white;
+      box-shadow: 0 2px 6px rgba(5,150,105,0.3);
+    }
+    .btn-refresh {
+      background: #475569;
+      color: white;
+    }
+    .student-badge-strip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .student-info-main {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .student-meta-tags {
+      display: flex;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .tag-blue { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 6px; }
+    .tag-green { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 6px; }
+    .tag-purple { background: #f3e8ff; color: #6b21a8; padding: 2px 8px; border-radius: 6px; }
+
+    /* Paper Container */
+    #paper-wrapper {
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    /* Error / Form state */
+    .lookup-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      max-width: 480px;
+      margin: 40px auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .input-code {
+      width: 80%;
+      padding: 12px 16px;
+      font-size: 1.1rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .btn-submit-code {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Print styling */
+    @media print {
+      .parent-portal-header, .control-card, .student-badge-strip, .no-print {
+        display: none !important;
+      }
+      body { background: white; margin: 0; padding: 0; }
+      .portal-container { max-width: 100%; margin: 0; padding: 0; }
+      #paper-wrapper { box-shadow: none; border-radius: 0; padding: 0; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="parent-portal-header no-print">
+    <div class="header-content">
+      <div class="portal-brand">
+        <img src="assets/images/logo.png" alt="Logo" class="portal-logo">
+        <div class="portal-title-box">
+          <h1>TRƯỜNG THCS TÂY PHÚ • LỚP 9A4</h1>
+          <p>Cổng Tra Cứu Kết Quả Thi Đua & Rèn Luyện Cá Nhân Học Sinh</p>
+        </div>
+      </div>
+      <div style="font-size: 0.8rem; opacity: 0.9; text-align: right;">
+        👨‍🏫 GVCN: <b>Thầy Võ Văn Hà</b><br>
+        🔒 Bảo mật thông tin học sinh
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="portal-container">
+
+    <!-- Loading State -->
+    <div id="loading-state" style="text-align:center; padding:50px 20px;">
+      <div style="font-size:2.5rem; animation: bounce 1.5s infinite;">🌸</div>
+      <p style="font-weight:700; color:#475569; margin-top:12px;">Đang nạp dữ liệu phiếu thi đua cá nhân...</p>
+    </div>
+
+    <!-- Lookup Form (Shown only if no valid student is specified) -->
+    <div id="lookup-state" class="lookup-card" style="display:none;">
+      <div style="font-size:3rem; margin-bottom:12px;">👤</div>
+      <h2 style="margin:0 0 8px; color:#1e3a8a; font-size:1.3rem;">TRA CỨU PHIẾU CỦA CON</h2>
+      <p style="font-size:0.85rem; color:#64748b; margin:0 0 20px;">
+        Vui lòng nhập Mã học sinh (ví dụ: <b>9A401</b>, <b>9A415</b>...) do Thầy Võ Văn Hà cung cấp để xem phiếu thi đua của con.
+      </p>
+      <input type="text" id="manual-student-code" class="input-code" placeholder="MÃ HỌC SINH" maxlength="10">
+      <div>
+        <button type="button" onclick="submitManualCode()" class="btn-submit-code">Xem Phiếu Của Con 🔍</button>
+      </div>
+      <p style="font-size:0.75rem; color:#94a3b8; margin-top:20px;">
+        🔐 <i>Để đảm bảo quyền riêng tư, hệ thống chỉ hiển thị duy nhất kết quả của học sinh được tra cứu.</i>
+      </p>
+    </div>
+
+    <!-- Active Student Report View -->
+    <div id="report-view" style="display:none;">
+      
+      <!-- Student Badge Strip -->
+      <div class="student-badge-strip no-print">
+        <div class="student-info-main">
+          <span>👤 Học sinh:</span>
+          <span id="txt-student-name" style="color:#1d4ed8; font-size:1.05rem;">---</span>
+        </div>
+        <div class="student-meta-tags">
+          <span class="tag-blue" id="txt-student-code">Mã: ---</span>
+          <span class="tag-green" id="txt-student-group">Tổ: -</span>
+          <span class="tag-purple" id="txt-student-role">Thành viên</span>
+        </div>
+      </div>
+
+      <!-- Controls Card (Week / Month / Term selector + Export buttons) -->
+      <div class="control-card no-print">
+        <div class="period-selector-box">
+          <label style="font-size:0.84rem; font-weight:700; color:#475569;">📅 Chọn kỳ:</label>
+          <select id="sel-period-type" class="select-styled" onchange="onPeriodTypeChange(this.value)">
+            <option value="week">Theo Tuần</option>
+            <option value="month">Theo Tháng</option>
+            <option value="semester">Theo Học Kỳ</option>
+            <option value="year">Cả Năm Học</option>
+          </select>
+          <select id="sel-period-value" class="select-styled" onchange="onPeriodValueChange(this.value)"></select>
+        </div>
+
+        <div class="action-btn-group">
+          <button type="button" onclick="exportPdf()" class="btn-action btn-pdf" title="Tải file PDF về máy">
+            📕 Tải PDF
+          </button>
+          <button type="button" onclick="window.print()" class="btn-action btn-print" title="In trực tiếp">
+            🖨️ In Phiếu
+          </button>
+          <button type="button" onclick="loadDataFromCloud(true)" class="btn-action btn-refresh" title="Làm mới dữ liệu từ máy chủ">
+            🔄 Cập nhật
+          </button>
+        </div>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="no-print" style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:8px 14px; font-size:0.78rem; color:#92400e; margin-bottom:14px; display:flex; align-items:center; gap:6px;">
+        <span>🔒</span>
+        <span><b>Bảo mật cá nhân:</b> Trang này chỉ hiển thị duy nhất phiếu theo dõi của em <b><span id="txt-security-name"></span></b> để gia đình theo dõi.</span>
+      </div>
+
+      <!-- Conduct Report Paper (Exact A4 Portrait Format) -->
+      <div id="paper-wrapper">
+        <div id="student-report-content"></div>
+      </div>
+
+      <!-- Footer Note -->
+      <div class="no-print" style="text-align:center; color:#64748b; font-size:0.78rem; margin-top:24px; padding:12px;">
+        Trường THCS Tây Phú • Lớp 9A4 • Năm học 2026 - 2027 • GVCN: Thầy Võ Văn Hà<br>
+        <i>Phụ huynh có thể bấm nút "Tải PDF" ở trên để lưu trữ kết quả rèn luyện của con.</i>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- html2pdf Library for 1-click PDF download -->
+  <script src="js/html2pdf.bundle.min.js?v=20261010_v63"></script>
+
+  <!-- Application Logic -->
+  <script>
+    (function() {
+      'use strict';
+
+      var FIREBASE_URL = 'https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app/classes/lop9a4.json';
+      var currentStudent = null;
+      var classData = null;
+      var currentPeriodType = 'week';
+      var currentPeriodValue = 1;
+
+      // Khởi tạo trang
+      window.addEventListener('DOMContentLoaded', function() {
+        initPage();
+      });
+
+      function initPage() {
+        var params = new URLSearchParams(window.location.search);
+        var hsCodeOrId = params.get('ma') || params.get('hs') || params.get('code') || params.get('id');
+
+        loadDataFromCloud(false, function(err, data) {
+          document.getElementById('loading-state').style.display = 'none';
+
+          if (err || !data) {
+            alert('Không thể kết nối máy chủ để tải dữ liệu. Vui lòng thử lại sau.');
+            return;
+          }
+
+          classData = data;
+          currentPeriodValue = (data.settings && data.settings.currentWeek) || 1;
+
+          if (hsCodeOrId) {
+            var found = findStudent(hsCodeOrId);
+            if (found) {
+              selectStudent(found);
+            } else {
+              showLookupForm();
+            }
+          } else {
+            showLookupForm();
+          }
+        });
+      }
+
+      function findStudent(query) {
+        if (!classData || !classData.students) return null;
+        var q = query.trim().toUpperCase();
+        return classData.students.find(function(s) {
+          return (s.id && s.id.toUpperCase() === q) ||
+                 (s.code && s.code.toUpperCase() === q) ||
+                 (s.username && s.username.toUpperCase() === q);
+        });
+      }
+
+      function showLookupForm() {
+        document.getElementById('lookup-state').style.display = 'block';
+        document.getElementById('report-view').style.display = 'none';
+      }
+
+      window.submitManualCode = function() {
+        var code = document.getElementById('manual-student-code').value.trim();
+        if (!code) {
+          alert('Vui lòng nhập Mã học sinh (ví dụ: 9A401)');
+          return;
+        }
+        var found = findStudent(code);
+        if (found) {
+          selectStudent(found);
+        } else {
+          alert('Không tìm thấy học sinh với mã: ' + code + '. Vui lòng kiểm tra lại!');
+        }
+      };
+
+      function selectStudent(student) {
+        currentStudent = student;
+        document.getElementById('lookup-state').style.display = 'none';
+        document.getElementById('report-view').style.display = 'block';
+
+        // Điền thông tin tiêu đề
+        document.getElementById('txt-student-name').textContent = student.name;
+        document.getElementById('txt-security-name').textContent = student.name;
+        document.getElementById('txt-student-code').textContent = 'Mã: ' + (student.code || student.id);
+        document.getElementById('txt-student-group').textContent = 'Tổ ' + student.group;
+        document.getElementById('txt-student-role').textContent = student.roleName || 'Thành viên';
+
+        // Điền danh sách chọn kỳ
+        populatePeriodOptions();
+
+        // Hiển thị báo cáo
+        renderReport();
+      }
+
+      function populatePeriodOptions() {
+        var selVal = document.getElementById('sel-period-value');
+        var curWeek = (classData.settings && classData.settings.currentWeek) || 1;
+        var html = '';
+
+        if (currentPeriodType === 'week') {
+          var hk1 = '';
+          var hk2 = '';
+          for (var w = 1; w <= 18; w++) {
+            hk1 += '<option value="' + w + '"' + (w === currentPeriodValue ? ' selected' : '') + '>Tuần ' + w + '</option>';
+          }
+          for (var w = 19; w <= 35; w++) {
+            hk2 += '<option value="' + w + '"' + (w === currentPeriodValue ? ' selected' : '') + '>Tuần ' + w + '</option>';
+          }
+          html = '<optgroup label="Học Kỳ I">' + hk1 + '</optgroup><optgroup label="Học Kỳ II">' + hk2 + '</optgroup>';
+        } else if (currentPeriodType === 'month') {
+          html = '<option value="9">Tháng 9 (Tuần 1-4)</option>' +
+                 '<option value="10">Tháng 10 (Tuần 5-8)</option>' +
+                 '<option value="11">Tháng 11 (Tuần 9-13)</option>' +
+                 '<option value="12">Tháng 12 (Tuần 14-17)</option>' +
+                 '<option value="1">Tháng 1 (Tuần 18-21)</option>' +
+                 '<option value="2">Tháng 2 (Tuần 22-23)</option>' +
+                 '<option value="3">Tháng 3 (Tuần 24-27)</option>' +
+                 '<option value="4">Tháng 4 (Tuần 28-32)</option>' +
+                 '<option value="5">Tháng 5 (Tuần 33-35)</option>';
+        } else if (currentPeriodType === 'semester') {
+          html = '<option value="hk1">Học Kỳ I (Tuần 1 - 18)</option><option value="hk2">Học Kỳ II (Tuần 19 - 35)</option>';
+        } else {
+          html = '<option value="all-year">Cả Năm Học (Tuần 1 - 35)</option>';
+        }
+        selVal.innerHTML = html;
+      }
+
+      window.onPeriodTypeChange = function(type) {
+        currentPeriodType = type;
+        if (type === 'week') {
+          currentPeriodValue = (classData.settings && classData.settings.currentWeek) || 1;
+        } else if (type === 'month') {
+          currentPeriodValue = 9;
+        } else if (type === 'semester') {
+          currentPeriodValue = 'hk1';
+        } else {
+          currentPeriodValue = 'all-year';
+        }
+        populatePeriodOptions();
+        renderReport();
+      };
+
+      window.onPeriodValueChange = function(val) {
+        currentPeriodValue = (currentPeriodType === 'week' || currentPeriodType === 'month') ? parseInt(val, 10) : val;
+        renderReport();
+      };
+
+      // Tải dữ liệu từ Firebase
+      window.loadDataFromCloud = function(isRefresh, callback) {
+        if (isRefresh) {
+          var btn = document.querySelector('.btn-refresh');
+          if (btn) btn.textContent = 'Đang tải...';
+        }
+
+        fetch(FIREBASE_URL)
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (isRefresh) {
+              var btn = document.querySelector('.btn-refresh');
+              if (btn) btn.textContent = '🔄 Cập nhật';
+              classData = data;
+              if (currentStudent) {
+                var found = findStudent(currentStudent.id || currentStudent.code);
+                if (found) currentStudent = found;
+                renderReport();
+              }
+              alert('Đã cập nhật dữ liệu mới nhất từ máy chủ thành công!');
+            }
+            if (callback) callback(null, data);
+          })
+          .catch(function(err) {
+            console.error('Lỗi nạp dữ liệu:', err);
+            if (isRefresh) {
+              var btn = document.querySelector('.btn-refresh');
+              if (btn) btn.textContent = '🔄 Cập nhật';
+              alert('Lỗi kết nối máy chủ. Vui lòng kiểm tra lại mạng internet.');
+            }
+            if (callback) callback(err);
+          });
+      };
+
+      // Tính điểm của học sinh
+      function calculateScore(studentId, weekNum) {
+        var baseScore = 100;
+        var plus = 0;
+        var minus = 0;
+        var events = (classData.events || []).filter(function(e) {
+          return e.studentId === studentId && e.week === weekNum;
+        });
+
+        events.forEach(function(e) {
+          var crit = (classData.criteria || []).find(function(c) { return c.id === e.criteriaId; });
+          var pts = parseInt(e.points, 10) || (crit ? crit.points : 0);
+          var type = e.type || (crit ? crit.type : 'plus');
+          if (type === 'plus') plus += pts;
+          else if (type === 'minus') minus += pts;
+        });
+
+        var total = baseScore + plus - minus;
+        var rank = 'Xuất sắc';
+        if (total >= 140) rank = 'Xuất sắc';
+        else if (total >= 120) rank = 'Tốt';
+        else if (total >= 100) rank = 'Đạt';
+        else rank = 'Cần cố gắng';
+
+        return { total: total, plus: plus, minus: minus, rank: rank, events: events };
+      }
+
+      // Xếp loại rèn luyện TT22
+      function calcTT22(studentId, periodType, periodValue) {
+        var weeksToCheck = [];
+        if (periodType === 'semester') {
+          var isHk1 = (periodValue === 'hk1' || periodValue === '1' || periodValue === 1);
+          for (var i = isHk1 ? 1 : 19; i <= (isHk1 ? 18 : 35); i++) weeksToCheck.push(i);
+        } else if (periodType === 'year' || periodType === 'all-year') {
+          for (var i = 1; i <= 35; i++) weeksToCheck.push(i);
+        } else if (periodType === 'month') {
+          var m = parseInt(periodValue, 10);
+          var monthWeeks = {
+            9: [1,2,3,4], 10: [5,6,7,8], 11: [9,10,11,12,13], 12: [14,15,16,17],
+            1: [18,19,20,21], 2: [22,23], 3: [24,25,26,27], 4: [28,29,30,31,32], 5: [33,34,35]
+          };
+          weeksToCheck = monthWeeks[m] || [1];
+        } else {
+          weeksToCheck = [parseInt(periodValue, 10) || 1];
+        }
+
+        var totalScore = 0;
+        var countTot = 0;
+        weeksToCheck.forEach(function(w) {
+          var sc = calculateScore(studentId, w);
+          totalScore += sc.total;
+          if (sc.total >= 120) countTot++;
+        });
+
+        var avg = Math.round((totalScore / weeksToCheck.length) * 10) / 10;
+        var rank = 'ĐẠT';
+        var color = '#b45309';
+        var bg = '#fffbeb';
+
+        if (avg >= 140 && (countTot / weeksToCheck.length >= 0.7)) {
+          rank = 'TỐT'; color = '#15803d'; bg = '#f0fdf4';
+        } else if (avg >= 120 && (countTot / weeksToCheck.length >= 0.5)) {
+          rank = 'KHÁ'; color = '#0369a1'; bg = '#f0f9ff';
+        } else if (avg >= 100) {
+          rank = 'ĐẠT'; color = '#b45309'; bg = '#fffbeb';
+        } else {
+          rank = 'CHƯA ĐẠT'; color = '#b91c1c'; bg = '#fef2f2';
+        }
+
+        return { display: rank, avg: avg, color: color, bg: bg };
+      }
+
+      function getPeriodLabel(type, val) {
+        if (type === 'week') return 'Tuần ' + val;
+        if (type === 'month') return 'Tháng ' + val;
+        if (type === 'semester') return (val === 'hk1' ? 'Học kỳ I' : 'Học kỳ II');
+        return 'Cả năm học';
+      }
+
+      function renderReport() {
+        if (!currentStudent || !classData) return;
+
+        var periodLabel = getPeriodLabel(currentPeriodType, currentPeriodValue);
+        var curW = (currentPeriodType === 'week') ? parseInt(currentPeriodValue, 10) : ((classData.settings && classData.settings.currentWeek) || 1);
+        var score = calculateScore(currentStudent.id, curW);
+        var tt22 = calcTT22(currentStudent.id, currentPeriodType, currentPeriodValue);
+
+        // Lấy sự kiện của học sinh trong kỳ
+        var allEvents = (classData.events || []).filter(function(e) {
+          if (e.studentId !== currentStudent.id) return false;
+          if (currentPeriodType === 'week') return e.week === parseInt(currentPeriodValue, 10);
+          return true; // Có thể mở rộng lọc theo tháng/học kỳ
+        });
+
+        var plusEvents = allEvents.filter(function(e) {
+          var crit = (classData.criteria || []).find(function(c) { return c.id === e.criteriaId; });
+          return (e.type === 'plus') || (crit && crit.type === 'plus');
+        });
+
+        var minusEvents = allEvents.filter(function(e) {
+          var crit = (classData.criteria || []).find(function(c) { return c.id === e.criteriaId; });
+          return (e.type === 'minus') || (crit && crit.type === 'minus');
+        });
+
+        var html = `
+          <div class="student-conduct-paper" style="font-family:'Times New Roman',Times,serif; color:#000; line-height:1.45; font-size:14pt;">
+            
+            <!-- Quốc hiệu & Tiêu ngữ -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
+              <tr>
+                <td style="width:45%; text-align:center; vertical-align:top;">
+                  <div style="font-size:11pt; text-transform:uppercase;">ỦY BAN NHÂN DÂN HUYỆN THOẠI SƠN</div>
+                  <div style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">TRƯỜNG THCS TÂY PHÚ</div>
+                  <div style="font-size:11pt; font-style:italic;">Lớp 9A4 • Năm học 2026 - 2027</div>
+                  <div style="width:120px; border-bottom:1px solid #000; margin:4px auto 0;"></div>
+                </td>
+                <td style="width:55%; text-align:center; vertical-align:top;">
+                  <div style="font-size:11.5pt; font-weight:bold; text-transform:uppercase;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                  <div style="font-size:12pt; font-weight:bold;">Độc lập - Tự do - Hạnh phúc</div>
+                  <div style="width:160px; border-bottom:1px solid #000; margin:4px auto 0;"></div>
+                  <div style="font-size:11pt; font-style:italic; margin-top:6px;">Tây Phú, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Tiêu đề văn bản -->
+            <div style="text-align:center; margin:18px 0 16px;">
+              <div style="font-size:16pt; font-weight:bold; text-transform:uppercase; color:#0f172a;">
+                PHIẾU THEO DÕI THI ĐUA VÀ RÈN LUYỆN CÁ NHÂN
+              </div>
+              <div style="font-size:12pt; font-weight:bold; color:#1e3a8a; margin-top:4px;">
+                Đánh giá: ${periodLabel} • Năm học 2026 - 2027
+              </div>
+            </div>
+
+            <!-- Thông tin học sinh -->
+            <table style="width:100%; border-collapse:collapse; margin-bottom:14px; font-size:13pt;">
+              <tr>
+                <td style="padding:4px 0; width:55%;"><b>Họ và tên học sinh:</b> <span style="text-transform:uppercase; font-weight:bold; color:#1e40af;">${currentStudent.name}</span></td>
+                <td style="padding:4px 0; width:45%;"><b>Mã số học sinh:</b> ${currentStudent.code || currentStudent.id}</td>
+              </tr>
+              <tr>
+                <td style="padding:4px 0;"><b>Lớp:</b> 9A4 (${classData.settings ? classData.settings.className : 'Lớp 9A4'})</td>
+                <td style="padding:4px 0;"><b>Thuộc:</b> Tổ ${currentStudent.group} (${currentStudent.roleName || 'Thành viên'})</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding:4px 0;"><b>Giáo viên chủ nhiệm:</b> ${classData.settings ? classData.settings.teacherName : 'Thầy Võ Văn Hà'}</td>
+              </tr>
+            </table>
+
+            <!-- Bảng kết quả tổng quan -->
+            <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin:14px 0 6px; color:#1e3a8a;">
+              I. KẾT QUẢ ĐIỂM SỐ VÀ XẾP LOẠI DỰ KIẾN (THEO TT 22/2021/TT-BGDĐT)
+            </div>
+            <table style="width:100%; border-collapse:collapse; border:1px solid #000; text-align:center; margin-bottom:16px; font-size:12pt;">
+              <tr style="background:#f1f5f9; font-weight:bold;">
+                <th style="border:1px solid #000; padding:6px;">Điểm gốc</th>
+                <th style="border:1px solid #000; padding:6px; color:#16a34a;">Điểm cộng</th>
+                <th style="border:1px solid #000; padding:6px; color:#dc2626;">Điểm trừ</th>
+                <th style="border:1px solid #000; padding:6px;">Tổng kết</th>
+                <th style="border:1px solid #000; padding:6px;">Hạng thi đua</th>
+                <th style="border:1px solid #000; padding:6px; background:#eff6ff; color:#1e40af;">Dự kiến TT22</th>
+              </tr>
+              <tr>
+                <td style="border:1px solid #000; padding:8px;">100</td>
+                <td style="border:1px solid #000; padding:8px; font-weight:bold; color:#16a34a;">+${score.plus}</td>
+                <td style="border:1px solid #000; padding:8px; font-weight:bold; color:#dc2626;">-${score.minus}</td>
+                <td style="border:1px solid #000; padding:8px; font-weight:bold; font-size:13pt;">${score.total}</td>
+                <td style="border:1px solid #000; padding:8px; font-weight:bold;">${score.rank}</td>
+                <td style="border:1px solid #000; padding:8px; font-weight:bold; font-size:13pt; color:${tt22.color}; background:${tt22.bg};">${tt22.display}</td>
+              </tr>
+            </table>
+
+            <!-- Bảng việc tốt ghi nhận -->
+            <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin:14px 0 6px; color:#16a34a;">
+              II. GHI NHẬN VIỆC TỐT & ĐIỂM CỘNG NỀ NẾP (+${score.plus} ĐIỂM)
+            </div>
+            <table style="width:100%; border-collapse:collapse; border:1px solid #000; margin-bottom:14px; font-size:11.5pt;">
+              <tr style="background:#f8fafc; font-weight:bold; text-align:center;">
+                <th style="border:1px solid #000; padding:6px; width:40px;">STT</th>
+                <th style="border:1px solid #000; padding:6px;">Nội dung biểu dương / Việc tốt</th>
+                <th style="border:1px solid #000; padding:6px; width:90px;">Thời gian</th>
+                <th style="border:1px solid #000; padding:6px; width:80px;">Điểm</th>
+              </tr>
+              ${plusEvents.length === 0 ? `
+                <tr><td colspan="4" style="border:1px solid #000; padding:10px; text-align:center; font-style:italic; color:#64748b;">Chưa có lượt ghi nhận việc tốt bổ sung trong kỳ này.</td></tr>
+              ` : plusEvents.map(function(ev, idx) {
+                var crit = (classData.criteria || []).find(function(c) { return c.id === ev.criteriaId; });
+                return `
+                  <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${idx + 1}</td>
+                    <td style="border:1px solid #000; padding:6px;">${crit ? crit.name : 'Thực hiện việc tốt'}${ev.note ? ' - <i>' + ev.note + '</i>' : ''}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">Thứ ${(ev.day || '').replace('T','')}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center; font-weight:bold; color:#16a34a;">+${ev.points}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </table>
+
+            <!-- Bảng vi phạm cần rút kinh nghiệm -->
+            <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin:14px 0 6px; color:#dc2626;">
+              III. CÁC LỖI CẦN RÚT KINH NGHIỆM (-${score.minus} ĐIỂM)
+            </div>
+            <table style="width:100%; border-collapse:collapse; border:1px solid #000; margin-bottom:18px; font-size:11.5pt;">
+              <tr style="background:#f8fafc; font-weight:bold; text-align:center;">
+                <th style="border:1px solid #000; padding:6px; width:40px;">STT</th>
+                <th style="border:1px solid #000; padding:6px;">Nội dung cần khắc phục</th>
+                <th style="border:1px solid #000; padding:6px; width:90px;">Thời gian</th>
+                <th style="border:1px solid #000; padding:6px; width:80px;">Điểm trừ</th>
+              </tr>
+              ${minusEvents.length === 0 ? `
+                <tr><td colspan="4" style="border:1px solid #000; padding:10px; text-align:center; font-style:italic; color:#16a34a; font-weight:bold;">Học sinh chấp hành rất tốt nề nếp, không có vi phạm nào trong kỳ đánh giá này! 🌟</td></tr>
+              ` : minusEvents.map(function(ev, idx) {
+                var crit = (classData.criteria || []).find(function(c) { return c.id === ev.criteriaId; });
+                return `
+                  <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${idx + 1}</td>
+                    <td style="border:1px solid #000; padding:6px;">${crit ? crit.name : 'Vi phạm nội quy'}${ev.note ? ' - <i>' + ev.note + '</i>' : ''}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">Thứ ${(ev.day || '').replace('T','')}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center; font-weight:bold; color:#dc2626;">-${ev.points}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </table>
+
+            <!-- Nhận xét của GVCN -->
+            <div style="border:1px dashed #64748b; border-radius:6px; padding:10px 14px; margin-bottom:18px; font-size:12pt; background:#fafafa;">
+              <b>Nhận xét & Lời nhắn của GVCN Thầy Võ Văn Hà:</b>
+              <div style="margin-top:4px; font-style:italic; color:#334155;">
+                ${score.total >= 140 
+                  ? 'Em có ý thức nề nếp và học tập rất xuất sắc. Thầy mong em tiếp tục giữ vững phong độ và giúp đỡ các bạn cùng tiến bộ!' 
+                  : (score.total >= 120 
+                    ? 'Em thực hiện tốt các quy định của trường lớp. Cần tiếp tục phát huy tinh thần tự giác trong học tập.' 
+                    : 'Em cần chú ý khắc phục các lỗi nề nếp đã nhắc nhở, tích cực chuẩn bị bài và tham gia xây dựng bài học.')}
+              </div>
+            </div>
+
+            <!-- Chữ ký -->
+            <table style="width:100%; border-collapse:collapse; margin-top:20px; font-size:12pt;">
+              <tr>
+                <td style="width:50%; text-align:center; vertical-align:top;">
+                  <div style="font-weight:bold; text-transform:uppercase;">Ý KIẾN PHỤ HUYNH HỌC SINH</div>
+                  <div style="font-size:10pt; font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                  <div style="height:70px;"></div>
+                </td>
+                <td style="width:50%; text-align:center; vertical-align:top;">
+                  <div style="font-weight:bold; text-transform:uppercase;">GIÁO VIÊN CHỦ NHIỆM</div>
+                  <div style="font-size:10pt; font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                  <div style="height:55px;"></div>
+                  <div style="font-weight:bold; font-size:13pt; color:#1e3a8a;">Thầy Võ Văn Hà</div>
+                </td>
+              </tr>
+            </table>
+
+          </div>
+        `;
+
+        document.getElementById('student-report-content').innerHTML = html;
+      }
+
+      // Xuất PDF 1-click
+      window.exportPdf = function() {
+        if (!currentStudent) return;
+        var element = document.getElementById('student-report-content');
+        var periodLabel = getPeriodLabel(currentPeriodType, currentPeriodValue);
+        var fname = 'PhieuThiDua_' + currentStudent.name.replace(/\s+/g, '_') + '_' + periodLabel.replace(/\s+/g, '_') + '.pdf';
+
+        var opt = {
+          margin: [10, 10, 10, 10],
+          filename: fname,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, scrollX: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        if (window.html2pdf) {
+          window.html2pdf().set(opt).from(element).save();
+        } else {
+          window.print();
+        }
+      };
+
+    })();
+  </script>
+</body>
+</html>

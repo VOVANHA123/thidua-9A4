@@ -480,7 +480,11 @@ class AppController {
   switchTab(tabId) {
     this.currentTab = tabId;
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.classList.toggle('active', tab.dataset.tab === tabId);
+      const isActive = tab.dataset.tab === tabId;
+      tab.classList.toggle('active', isActive);
+      if (isActive && typeof tab.scrollIntoView === 'function') {
+        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
     });
 
     document.querySelectorAll('.tab-pane').forEach(pane => {
@@ -490,6 +494,11 @@ class AppController {
     const targetPane = document.getElementById(`tab-${tabId}`);
     if (targetPane) {
       targetPane.classList.add('active');
+    }
+
+    // Smooth scroll into view on mobile if scrolled far down
+    if (window.innerWidth <= 768 && window.scrollY > 240) {
+      window.scrollTo({ top: 140, behavior: 'smooth' });
     }
 
     if (window.chibiSound) window.chibiSound.playClick();

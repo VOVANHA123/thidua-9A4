@@ -265,7 +265,7 @@ body {
 }
 
 .header-container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -434,7 +434,7 @@ body {
    NAV TABS & TIME SELECTOR BAR
    ========================================================================== */
 .controls-container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: -12px auto 16px;
   padding: 0 16px;
   position: relative;
@@ -518,7 +518,7 @@ body {
    MAIN CONTENT AREA
    ========================================================================== */
 .main-wrapper {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto 30px;
   padding: 0 16px;
   width: 100%;
@@ -1842,83 +1842,188 @@ body {
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN & MOBILE OPTIMIZATION
+/* ==========================================================================
+   RESPONSIVE DESIGN & ADAPTIVE SIZING (DESKTOP, TABLET & MOBILE)
    ========================================================================== */
+
+/* --- LARGE SCREENS & DESKTOP (>= 1200px) --- */
+@media (min-width: 1200px) {
+  .header-container,
+  .controls-container,
+  .main-wrapper {
+    max-width: 1400px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .nav-glass-bar {
+    padding: 12px 20px;
+  }
+
+  .nav-tab {
+    padding: 9px 18px;
+    font-size: 0.92rem;
+  }
+
+  .thidua-table th, 
+  .thidua-table td {
+    padding: 10px 10px;
+  }
+
+  .summary-boxes-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .stats-kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .leaderboard-container {
+    grid-template-columns: 1.05fr 1fr;
+    gap: 24px;
+  }
+}
+
+/* --- MEDIUM SCREENS & LAPTOPS / TABLETS IN LANDSCAPE (993px - 1199px) --- */
+@media (max-width: 1199px) and (min-width: 993px) {
+  .header-container,
+  .controls-container,
+  .main-wrapper {
+    max-width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .summary-boxes-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .summary-boxes-grid > .summary-box:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  .stats-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- TABLETS & SMALL LAPTOPS (<= 992px) --- */
 @media (max-width: 992px) {
   .leaderboard-container,
   .student-portal-grid,
   .messages-container {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .feedback-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .stats-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stats-filter-row-secondary {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .stats-scope-group {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
+/* --- MOBILE PHONES & TABLETS IN PORTRAIT (<= 768px) --- */
 @media (max-width: 768px) {
-  /* Top Switcher Mobile Touch Scroll */
+  /* Layout Root & Base Container */
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    background-size: 20px 20px;
+  }
+
+  .main-wrapper {
+    padding: 0 10px;
+    margin-bottom: 20px;
+  }
+
+  /* Top Bar Actions on Mobile */
   .top-bar {
     padding: 6px 10px;
-    gap: 8px;
-  }
-  .top-bar-switcher {
-    width: 100%;
-    overflow-x: auto;
+    gap: 6px;
     flex-wrap: nowrap;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
     scrollbar-width: none;
   }
-  .top-bar-switcher::-webkit-scrollbar {
+  .top-bar::-webkit-scrollbar {
     display: none;
+  }
+  .top-bar-left {
+    white-space: nowrap;
+    font-size: 0.76rem;
+    flex-shrink: 0;
+  }
+  .top-bar-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    flex-shrink: 0;
   }
   .role-pill {
     flex-shrink: 0;
     font-size: 0.72rem;
     padding: 3px 8px;
+    white-space: nowrap;
   }
 
-  /* Header Brand on Mobile */
+  /* Header Hero on Mobile */
   .header-hero {
-    padding: 14px 12px 16px;
+    padding: 12px 10px 16px;
   }
   .header-container {
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 12px;
   }
   .header-brand {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-align: left;
   }
   .chibi-avatar-hero {
-    width: 58px;
-    height: 58px;
+    width: 52px;
+    height: 52px;
     border-width: 2.5px;
     flex-shrink: 0;
   }
   .school-tagline {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     letter-spacing: 0.5px;
   }
   .main-title {
-    font-size: 1.25rem;
-    flex-wrap: wrap;
+    font-size: 1.2rem;
     line-height: 1.25;
+    flex-wrap: wrap;
+    gap: 4px;
   }
   .main-title span:last-child {
-    font-size: 1.15rem !important;
+    font-size: 1.05rem !important;
   }
   .teacher-info {
-    font-size: 0.8rem;
-    flex-wrap: wrap;
+    font-size: 0.78rem;
+    margin-top: 2px;
   }
 
-  /* Header Action Buttons */
   .header-actions {
     width: 100%;
     display: grid;
@@ -1929,29 +2034,34 @@ body {
     grid-column: 1 / -1;
     width: 100%;
     justify-content: center;
+    padding: 6px 12px;
   }
   .btn-hero {
-    padding: 8px 10px;
+    padding: 8px 12px;
     font-size: 0.8rem;
     justify-content: center;
+    white-space: nowrap;
   }
 
-  /* Controls Navigation Tabs */
+  /* Controls Navigation Tabs - Touch Horizontal Scroll */
   .controls-container {
     padding: 0 10px;
+    margin: -8px auto 12px;
   }
   .nav-glass-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
-    padding: 10px;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 14px;
   }
   .nav-tabs-group {
     width: 100%;
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
+    padding: 2px 2px 6px;
+    gap: 6px;
     scrollbar-width: none;
   }
   .nav-tabs-group::-webkit-scrollbar {
@@ -1962,38 +2072,49 @@ body {
     padding: 7px 12px;
     font-size: 0.8rem;
     white-space: nowrap;
+    min-height: 38px;
   }
   .time-selector-group {
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #f8fafc;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .time-selector-group label {
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .select-custom {
+    flex: 1;
     width: 100%;
     font-size: 0.82rem;
-    padding: 6px 12px;
+    padding: 6px 10px;
   }
 
-  /* Summary Boxes Grid */
-  .summary-boxes-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+  /* ================= TAB 1: THI ĐUA TABLE RESPONSIVE ================= */
+  .table-card {
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .table-card-header {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
   }
-  .sum-box {
-    padding: 10px 8px;
-  }
-  .sum-box-value {
-    font-size: 1.3rem;
-  }
-  .sum-box-label {
-    font-size: 0.68rem;
-  }
-
-  /* Group Filter Pills */
   .group-filter-pills {
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     width: 100%;
     padding-bottom: 4px;
+    gap: 5px;
     scrollbar-width: none;
   }
   .group-filter-pills::-webkit-scrollbar {
@@ -2001,119 +2122,389 @@ body {
   }
   .group-pill {
     flex-shrink: 0;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     padding: 5px 10px;
+    white-space: nowrap;
   }
 
-  /* Table Horizontal Scrolling with Sticky Name Column */
+  /* Table Horizontal Scrolling with Sticky STT & Name Column */
   .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     position: relative;
+    border-radius: 0;
   }
   .thidua-table {
-    min-width: 680px;
+    min-width: 660px;
     font-size: 0.8rem;
   }
-  .thidua-table th, .thidua-table td {
+  .thidua-table th, 
+  .thidua-table td {
     padding: 6px 4px;
   }
   .col-stt {
     position: sticky;
     left: 0;
-    background: #fff;
+    background: #ffffff;
     z-index: 3;
     width: 32px;
   }
   .col-name {
     position: sticky;
     left: 32px;
-    background: #fff;
+    background: #ffffff;
     z-index: 3;
-    min-width: 140px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    min-width: 135px;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.06);
   }
-  thead .col-stt, thead .col-name {
+  thead .col-stt, 
+  thead .col-name {
     background: #f8fafc !important;
     z-index: 6;
   }
-  thead tr:first-child .col-stt, thead tr:first-child .col-name {
+  thead tr:first-child .col-stt, 
+  thead tr:first-child .col-name {
     background: #e0f2fe !important;
   }
-  tbody tr:hover .col-stt, tbody tr:hover .col-name {
+  tbody tr:hover .col-stt, 
+  tbody tr:hover .col-name {
     background: #f8fafc;
   }
-
-  /* Modal on Mobile */
-  .modal-content {
-    margin: 8px;
-    max-height: 94vh;
-    border-radius: var(--radius-md);
-  }
-  .modal-body {
-    padding: 14px;
+  .score-cell-btn {
+    min-height: 32px;
+    font-size: 0.76rem;
   }
 
+  /* Summary Boxes Grid - 1 Column Stacked on Mobile */
+  .summary-boxes-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .summary-box {
+    border-radius: 12px;
+  }
+  .summary-box-header {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
+  .summary-box-body {
+    padding: 12px;
+  }
+  .formula-display {
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    gap: 4px;
+    padding: 8px;
+  }
+  .formula-box {
+    padding: 3px 8px;
+    font-size: 0.9rem;
+  }
+  .criteria-columns {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Feedback Card */
+  .footer-feedback-card {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
   .feedback-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .feedback-input {
+    min-height: 60px;
+    font-size: 0.82rem;
+  }
+  .chibi-study-img {
+    max-height: 90px;
+  }
+  .slogan-ribbon {
+    font-size: 0.78rem;
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  /* ================= TAB 2: LEADERBOARD RESPONSIVE ================= */
+  .podium-section {
+    padding: 18px 12px;
+    border-radius: 14px;
+  }
+  .podium-section h2 {
+    font-size: 1.15rem !important;
+  }
+  .podium-display {
+    height: 185px;
+    gap: 8px;
+    margin: 20px 0 16px;
+  }
+  .podium-item {
+    width: 82px;
+  }
+  .podium-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+  .podium-rank-1 .podium-avatar {
+    width: 62px;
+    height: 62px;
+    font-size: 1.85rem;
+  }
+  .pillar-1 { height: 105px; font-size: 1.25rem; }
+  .pillar-2 { height: 75px; font-size: 1.05rem; }
+  .pillar-3 { height: 55px; font-size: 0.95rem; }
+
+  .group-rank-cards {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .group-rank-card {
+    padding: 12px;
+  }
+
+  /* ================= TAB 3: STATS ANALYTICS RESPONSIVE ================= */
+  .stats-dashboard-card {
+    padding: 14px 10px;
+    border-radius: 14px;
+  }
+  .stats-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  .stats-main-title {
+    font-size: 1.1rem;
+    line-height: 1.35;
+  }
+  .stats-sub-title {
+    font-size: 0.78rem;
+  }
+  .stats-action-btns {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .stats-action-btns .btn-hero {
+    width: 100%;
+  }
+
+  .stats-filter-bar {
+    padding: 10px 8px;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stats-filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .stats-period-pills {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px;
+  }
+  .stats-period-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .stats-period-btn {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+  }
+  .stats-type-pills {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px;
+  }
+  .stats-type-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .stats-type-btn {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .stats-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .stats-kpi-card {
+    padding: 10px 12px;
+  }
+  .stats-kpi-val {
+    font-size: 1.4rem;
+  }
+  .stats-kpi-header {
+    font-size: 0.7rem;
+  }
+  .stats-kpi-sub {
+    font-size: 0.72rem;
+  }
+
+  .stats-section-box {
+    padding: 12px 10px;
+  }
+  .stats-section-title {
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .stats-category-grid {
     grid-template-columns: 1fr;
   }
 
-  .slogan-ribbon {
-    font-size: 0.8rem;
-    padding: 8px 12px;
+  /* ================= TAB 4: MAILBOX RESPONSIVE ================= */
+  .messages-container {
+    grid-template-columns: 1fr;
+    border-radius: 14px;
+    min-height: auto;
+  }
+  .messages-sidebar {
+    border-right: none;
+    border-bottom: 2px solid #e2e8f0;
+    max-height: 280px;
+  }
+  .message-detail-pane {
+    padding: 14px 12px;
+    min-height: 200px;
+  }
+
+  /* ================= TAB 5: DUTY RESPONSIVE ================= */
+  #duty-cards-container {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* ================= MODALS RESPONSIVE ================= */
+  .modal-backdrop {
+    padding: 8px;
+  }
+  .modal-content {
+    margin: 4px auto;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94vh;
+    border-radius: 16px;
+  }
+  .modal-header {
+    padding: 12px 14px;
+  }
+  .modal-title {
+    font-size: 1.05rem;
+  }
+  .modal-body {
+    padding: 14px 12px;
+    max-height: calc(94vh - 120px);
+    overflow-y: auto;
+  }
+  .modal-footer {
+    padding: 10px 14px;
+  }
+
+  /* Score Modal Mobile Adaptation */
+  #modal-score .score-day-picker {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    padding: 4px;
+  }
+  #modal-score .day-select-btn {
+    padding: 6px 1px;
+    border-radius: 6px;
+  }
+  #modal-score .day-select-btn .day-name {
+    font-size: 0.72rem;
+  }
+  #modal-score .day-select-btn .day-badge {
+    font-size: 0.6rem;
+  }
+  #modal-score .score-week-table {
+    font-size: 0.74rem;
+  }
+  #modal-score .col-day-header {
+    width: 58px;
+  }
+  #modal-score .day-pill {
+    padding: 2px 4px;
+    font-size: 0.72rem;
+  }
+  #modal-score .score-event-chip {
+    padding: 3px 5px;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  #modal-score .score-event-chip .chip-pts {
+    font-size: 0.72rem;
+    padding: 1px 3px;
+  }
+  #modal-score .btn-chip-del {
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
   }
 }
 
-@media (max-width: 640px) {
-  .summary-boxes-grid {
-    grid-template-columns: 1fr;
-  }
+/* --- EXTRA SMALL MOBILE (< 480px) --- */
+@media (max-width: 480px) {
   .header-actions {
     grid-template-columns: 1fr;
   }
+  .top-bar-left span:nth-child(2) {
+    display: none;
+  }
+  .summary-boxes-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .podium-display {
+    height: 170px;
+    gap: 4px;
+  }
+  .podium-item {
+    width: 76px;
+  }
+  .podium-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+  .podium-rank-1 .podium-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 1.6rem;
+  }
 
-  /* --- Full Screen Login Responsive Tuning --- */
+  /* Full Screen Login Extra Small Screen */
   #view-login {
-    padding: 16px 12px;
+    padding: 12px 8px;
   }
   .login-portal-card {
-    padding: 22px 14px;
-    border-radius: 20px;
-    max-width: 100%;
-    margin: 0 auto;
-    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25);
+    padding: 18px 10px;
+    border-radius: 16px;
   }
   .login-portal-logo {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 8px;
-  }
-  .login-portal-school {
-    font-size: 0.8rem;
+    width: 64px;
+    height: 64px;
   }
   .login-portal-title {
-    font-size: 1.12rem;
-    line-height: 1.35;
-    margin-bottom: 4px;
-  }
-  .login-portal-subtitle {
-    font-size: 0.76rem;
-    margin-bottom: 14px;
-  }
-  .login-tabs-nav {
-    gap: 4px;
-    padding: 4px;
-    margin-bottom: 16px;
-  }
-  .login-tab-btn {
-    font-size: 0.78rem;
-    padding: 7px 6px;
-    min-width: 0;
-    white-space: nowrap;
-  }
-  .btn-block {
-    padding: 11px 16px;
-    font-size: 0.92rem;
+    font-size: 1.05rem;
   }
 }
 

@@ -2076,7 +2076,7 @@ class AppController {
     }
 
     this.activeScoringStudentId = studentId;
-    this.activeScoringDay = day;
+    this.activeScoringDay = day || 'T2';
 
     const modal = document.getElementById('modal-score');
     if (!modal) return;
@@ -2098,10 +2098,16 @@ class AppController {
       } else {
         selectWeek.value = 1;
       }
+
+      // Refresh 6-day history when switching week
+      selectWeek.onchange = () => {
+        const w = parseInt(selectWeek.value, 10);
+        this.renderScoreModalHistory(studentId, w);
+      };
     }
 
-    const selectDay = document.getElementById('score-modal-day');
-    if (selectDay) selectDay.value = day;
+    // Set & highlight active day in 6-day picker (T2..T7)
+    this.selectScoreModalDay(this.activeScoringDay);
 
     // Render Criteria select options
     const selectCriteria = document.getElementById('score-modal-criteria');
@@ -2140,62 +2146,189 @@ class AppController {
       };
     }
 
-    // Render Student Past Events for this period
-    this.renderScoreModalHistory(studentId);
+    // Render Student Past Events: 6 rows for 6 days, 2 cols (plus & minus)
+    const curW = selectWeek ? parseInt(selectWeek.value, 10) : (typeof this.currentWeek === 'number' ? this.currentWeek : 1);
+    this.renderScoreModalHistory(studentId, curW);
 
     modal.classList.add('show');
     if (window.chibiSound) window.chibiSound.playClick();
   }
 
-  renderScoreModalHistory(studentId) {
+  selectScoreModalDay(day) {
+    const validDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    if (!validDays.includes(day)) day = 'T2';
+    this.activeScoringDay = day;
+
+    const dayInput = document.getElementById('score-modal-day');
+    if (dayInput) dayInput.value = day;
+
+    const dayMap = {
+      'T2': 'Thứ 2 (T2)',
+      'T3': 'Thứ 3 (T3)',
+      'T4': 'Thứ 4 (T4)',
+      'T5': 'Thứ 5 (T5)',
+      'T6': 'Thứ 6 (T6)',
+      'T7': 'Thứ 7 (T7)'
+    };
+
+    const dayDisplay = document.getElementById('score-modal-day-display');
+    if (dayDisplay) dayDisplay.textContent = dayMap[day] || day;
+
+    // Update active buttons in 6-day picker
+    const buttons = document.querySelectorAll('.day-select-btn');
+    buttons.forEach(btn => {
+      if (btn.dataset.day === day) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Highlight row in 6-day history table
+    const rows = document.querySelectorAll('#score-modal-history tr[data-day]');
+    rows.forEach(r => {
+      if (r.dataset.day === day) {
+        r.classList.add('row-selected-day');
+      } else {
+        r.classList.remove('row-selected-day');
+      }
+    });
+  }
+
+  renderScoreModalHistory(studentId, targetWeek = null) {
     const historyContainer = document.getElementById('score-modal-history');
     if (!historyContainer) return;
 
-    const events = window.classData.getStudentEvents(studentId, this.currentWeek);
-    historyContainer.innerHTML = '';
+    const selectWeek = document.getElementById('score-modal-week');
+    const week = targetWeek !== null ? targetWeek : (selectWeek ? parseInt(selectWeek.value, 10) : (typeof this.currentWeek === 'number' ? this.currentWeek : 1));
 
-    if (events.length === 0) {
-      historyContainer.innerHTML = '<div style="font-size: 0.8rem; color: #94a3b8; text-align: center; padding: 8px;">Chưa có điểm cộng/trừ nào trong đợt này.</div>';
-      return;
+    const weekLabel = document.getElementById('score-modal-week-label');
+    if (weekLabel) {
+      weekLabel.textContent = `Tuần ${week}`;
     }
 
+    const events = window.classData.getStudentEvents(studentId, week);
     const allCriteria = window.classData.getCriteria();
     const canDelete = window.authManager.canDeleteScore();
 
-    events.forEach(e => {
-      const cr = allCriteria.find(c => c.id === e.criteriaId);
-      const crName = cr ? cr.name : 'Điểm khác';
-      const crIcon = cr ? cr.icon : (e.type === 'plus' ? '🌸' : '⚠️');
-      const item = document.createElement('div');
-      item.style.cssText = `
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 8px 10px;
-        margin-bottom: 6px;
+    const days = [
+      { code: 'T2', name: 'Thứ 2' },
+      { code: 'T3', name: 'Thứ 3' },
+      { code: 'T4', name: 'Thứ 4' },
+      { code: 'T5', name: 'Thứ 5' },
+      { code: 'T6', name: 'Thứ 6' },
+      { code: 'T7', name: 'Thứ 7' }
+    ];
+
+    let totalWeekPlus = 0;
+    let totalWeekMinus = 0;
+
+    // Xếp sẵn 6 dòng theo 6 ngày (T2..T7), mỗi dòng có 2 cột Điểm cộng và Điểm trừ
+    let tableHtml = `
+      <table class="score-week-table">
+        <thead>
+          <tr>
+            <th class="col-day-header">Ngày</th>
+            <th class="col-plus-header">➕ Điểm Cộng (Thưởng)</th>
+            <th class="col-minus-header">➖ Điểm Trừ (Nhắc nhở)</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    days.forEach(d => {
+      const isSelected = (d.code === this.activeScoringDay);
+      const dayEvents = events.filter(e => e.day === d.code);
+      const plusEvents = dayEvents.filter(e => e.type === 'plus');
+      const minusEvents = dayEvents.filter(e => e.type === 'minus');
+
+      const dayPlusPoints = plusEvents.reduce((sum, e) => sum + (e.points || 0), 0);
+      const dayMinusPoints = minusEvents.reduce((sum, e) => sum + (e.points || 0), 0);
+
+      totalWeekPlus += dayPlusPoints;
+      totalWeekMinus += dayMinusPoints;
+
+      // Cột Điểm Cộng
+      let plusCellHtml = '';
+      if (plusEvents.length === 0) {
+        plusCellHtml = '<span class="chip-empty">—</span>';
+      } else {
+        plusEvents.forEach(e => {
+          const cr = allCriteria.find(c => c.id === e.criteriaId);
+          const crName = cr ? cr.name : 'Điểm khác';
+          const crIcon = cr ? (cr.icon || '🌸') : '🌸';
+          plusCellHtml += `
+            <div class="score-event-chip chip-plus" title="Người chấm: ${e.byName || 'GVCN'} (${e.recordedAt || ''})">
+              <div class="chip-main">
+                <span class="chip-pts">+${e.points}đ</span>
+                <span class="chip-desc"><b>${crIcon} ${crName}</b>${e.note ? ` <i class="chip-note">(${e.note})</i>` : ''}</span>
+              </div>
+              ${canDelete ? `<button type="button" class="btn-chip-del" onclick="event.stopPropagation(); window.appController.deleteScore('${e.id}')" title="Xóa điểm này">✕</button>` : ''}
+            </div>
+          `;
+        });
+        if (plusEvents.length > 1) {
+          plusCellHtml += `<div class="day-subtotal day-subtotal-plus">Tổng cộng: <b>+${dayPlusPoints}đ</b></div>`;
+        }
+      }
+
+      // Cột Điểm Trừ
+      let minusCellHtml = '';
+      if (minusEvents.length === 0) {
+        minusCellHtml = '<span class="chip-empty">—</span>';
+      } else {
+        minusEvents.forEach(e => {
+          const cr = allCriteria.find(c => c.id === e.criteriaId);
+          const crName = cr ? cr.name : 'Điểm khác';
+          const crIcon = cr ? (cr.icon || '⚠️') : '⚠️';
+          minusCellHtml += `
+            <div class="score-event-chip chip-minus" title="Người chấm: ${e.byName || 'GVCN'} (${e.recordedAt || ''})">
+              <div class="chip-main">
+                <span class="chip-pts">-${e.points}đ</span>
+                <span class="chip-desc"><b>${crIcon} ${crName}</b>${e.note ? ` <i class="chip-note">(${e.note})</i>` : ''}</span>
+              </div>
+              ${canDelete ? `<button type="button" class="btn-chip-del" onclick="event.stopPropagation(); window.appController.deleteScore('${e.id}')" title="Xóa điểm này">✕</button>` : ''}
+            </div>
+          `;
+        });
+        if (minusEvents.length > 1) {
+          minusCellHtml += `<div class="day-subtotal day-subtotal-minus">Tổng trừ: <b>-${dayMinusPoints}đ</b></div>`;
+        }
+      }
+
+      tableHtml += `
+        <tr data-day="${d.code}" class="${isSelected ? 'row-selected-day' : ''}">
+          <td class="col-day-cell" onclick="window.appController.selectScoreModalDay('${d.code}')" title="Nhấp để chọn ngày ${d.name}">
+            <div class="day-pill">${d.name}</div>
+            <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">${d.code}</div>
+          </td>
+          <td class="col-score-cell col-plus-cell">
+            ${plusCellHtml}
+          </td>
+          <td class="col-score-cell col-minus-cell">
+            ${minusCellHtml}
+          </td>
+        </tr>
       `;
-      item.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <span style="font-weight: 800; color: ${e.type === 'plus' ? '#15803d' : '#b91c1c'}; font-size: 0.88rem;">
-              ${e.type === 'plus' ? '🌸 +' : '⚠️ -'}${e.points} điểm
-            </span>
-            <b style="margin-left: 6px; color: #1e293b;">${crIcon} ${crName}</b>
-            <span style="background: #e2e8f0; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; margin-left: 4px; color: #475569; font-weight: 700;">Tuần ${e.week} - ${e.day}</span>
-          </div>
-          ${canDelete ? `
-            <button class="btn-icon-sm" style="background: #ef4444; width: 22px; height: 22px; font-size: 0.7rem;" title="Xóa điểm này (Chỉ Admin)" onclick="window.appController.deleteScore('${e.id}')">🗑️</button>
-          ` : ''}
-        </div>
-        ${e.note ? `<div style="font-size: 0.78rem; color: #475569; margin-top: 3px;">📝 <i>${e.note}</i></div>` : ''}
-        <div style="font-size: 0.72rem; color: #64748b; margin-top: 4px; display: flex; align-items: center; gap: 6px; border-top: 1px dashed #e2e8f0; padding-top: 4px;">
-          <span>⏰ <b>${e.recordedAt || 'Vừa xong'}</b></span>
-          <span>•</span>
-          <span>👤 Người chấm: <b style="color: #1e40af;">${e.byName || e.by || 'Thầy Võ Văn Hà'} (${e.byRole || 'GVCN'})</b></span>
-        </div>
-      `;
-      historyContainer.appendChild(item);
     });
+
+    tableHtml += `
+        </tbody>
+        <tfoot>
+          <tr style="background: #f8fafc; font-weight: 800; border-top: 2px solid #cbd5e1;">
+            <td style="text-align: center; padding: 6px; font-size: 0.78rem; color: #475569;">Tổng tuần</td>
+            <td style="padding: 6px 10px; color: #15803d; font-size: 0.82rem;">
+              Tổng cộng: <b>+${totalWeekPlus}đ</b>
+            </td>
+            <td style="padding: 6px 10px; color: #b91c1c; font-size: 0.82rem;">
+              Tổng trừ: <b>-${totalWeekMinus}đ</b>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    historyContainer.innerHTML = tableHtml;
   }
 
   setQuickScore(type, points, defaultCriteriaId, defaultNote) {

@@ -632,9 +632,9 @@
 
   </main>
 
-  <!-- ================= MODAL: CHẤM ĐIỂM (QUICK SCORING) ================= -->
+  <!-- ================= MODAL: CHẤM ĐIỂM THI ĐUA HỌC SINH ================= -->
   <div class="modal-backdrop" id="modal-score">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 680px;">
       <div class="modal-header header-primary">
         <div class="modal-title">
           <span>✍️</span> Chấm Điểm Thi Đua: <span id="score-modal-student-name">Học sinh</span>
@@ -643,25 +643,14 @@
       </div>
       <form id="form-add-score">
         <div class="modal-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-            <div class="form-group">
+          <!-- Row 1: Chọn tuần & Loại điểm -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Chọn tuần:</label>
               <select id="score-modal-week" class="form-control"></select>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Chọn ngày:</label>
-              <select id="score-modal-day" class="form-control">
-                <option value="T2">Thứ 2 (T2)</option>
-                <option value="T3">Thứ 3 (T3)</option>
-                <option value="T4">Thứ 4 (T4)</option>
-                <option value="T5">Thứ 5 (T5)</option>
-                <option value="T6">Thứ 6 (T6)</option>
-                <option value="T7">Thứ 7 (T7)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Loại điểm:</label>
               <select id="score-modal-type" class="form-control">
                 <option value="plus">➕ Điểm Cộng (Thưởng)</option>
@@ -670,36 +659,75 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <!-- Row 2: Chọn ngày - Liệt kê sẵn 6 ngày (Thứ 2 đến Thứ 7) -->
+          <div class="form-group" style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700;">📅 Chọn ngày chấm điểm (6 ngày trong tuần):</label>
+              <span id="score-modal-day-display" style="font-weight: 800; color: #2563eb; font-size: 0.85rem; background: #eff6ff; padding: 2px 10px; border-radius: 999px; border: 1px solid #bfdbfe;">
+                Thứ 2 (T2)
+              </span>
+            </div>
+            <input type="hidden" id="score-modal-day" value="T2" />
+            <div class="score-day-picker" id="score-day-picker">
+              <button type="button" class="day-select-btn active" data-day="T2" onclick="window.appController.selectScoreModalDay('T2')">
+                <span class="day-name">Thứ 2</span>
+                <span class="day-badge">T2</span>
+              </button>
+              <button type="button" class="day-select-btn" data-day="T3" onclick="window.appController.selectScoreModalDay('T3')">
+                <span class="day-name">Thứ 3</span>
+                <span class="day-badge">T3</span>
+              </button>
+              <button type="button" class="day-select-btn" data-day="T4" onclick="window.appController.selectScoreModalDay('T4')">
+                <span class="day-name">Thứ 4</span>
+                <span class="day-badge">T4</span>
+              </button>
+              <button type="button" class="day-select-btn" data-day="T5" onclick="window.appController.selectScoreModalDay('T5')">
+                <span class="day-name">Thứ 5</span>
+                <span class="day-badge">T5</span>
+              </button>
+              <button type="button" class="day-select-btn" data-day="T6" onclick="window.appController.selectScoreModalDay('T6')">
+                <span class="day-name">Thứ 6</span>
+                <span class="day-badge">T6</span>
+              </button>
+              <button type="button" class="day-select-btn" data-day="T7" onclick="window.appController.selectScoreModalDay('T7')">
+                <span class="day-name">Thứ 7</span>
+                <span class="day-badge">T7</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 3: Tiêu chí chấm điểm -->
+          <div class="form-group" style="margin-bottom: 12px;">
             <label class="form-label" id="label-score-modal-criteria">Tiêu chí chấm điểm:</label>
             <select id="score-modal-criteria" class="form-control"></select>
           </div>
 
-          <!-- Quick Scoring Shortcuts -->
-          <label class="form-label">⚡ Nút chấm nhanh:</label>
-          <div class="quick-score-pills">
-            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c1', 'Đi học đúng giờ')">+1 Đúng giờ</button>
-            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c2', 'Chuẩn bị bài đầy đủ')">+1 Đủ bài</button>
-            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 1, 'c3', 'Phát biểu xây dựng bài')">+1 Phát biểu</button>
-            <button type="button" class="score-pill-btn score-pill-plus" onclick="window.appController.setQuickScore('plus', 2, 'c8', 'Được cô giáo khen')">+2 Khen ngợi</button>
-            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 2, 'c9', 'Đi học muộn')">-2 Đi muộn</button>
-            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 1, 'c12', 'Nói chuyện riêng')">-1 Nói chuyện</button>
-            <button type="button" class="score-pill-btn score-pill-minus" onclick="window.appController.setQuickScore('minus', 2, 'c10', 'Không làm bài')">-2 Quên bài</button>
+          <!-- Row 4: Số điểm & Ghi chú (đã bỏ các nút chấm nhanh) -->
+          <div style="display: grid; grid-template-columns: 130px 1fr; gap: 12px; margin-bottom: 8px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Số điểm:</label>
+              <input type="number" id="score-modal-points" class="form-control" value="1" min="1" max="10" step="1" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Ghi chú lý do:</label>
+              <input type="text" id="score-modal-note" class="form-control" placeholder="VD: Phát biểu tốt môn Toán, giúp bạn lau bảng..." />
+            </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Số điểm:</label>
-            <input type="number" id="score-modal-points" class="form-control" value="1" min="1" max="10" step="1" required />
+          <hr style="margin: 16px 0 12px; border: none; border-top: 1px solid #e2e8f0;" />
+
+          <!-- Row 5: Lịch sử điểm tuần của học sinh - Xếp sẵn 6 dòng theo 6 ngày, mỗi dòng 2 cột điểm cộng & điểm trừ -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="font-size: 0.88rem; font-weight: 800; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 6px;">
+              <span>📊</span> Lịch sử điểm tuần của học sinh:
+            </h4>
+            <span id="score-modal-week-label" style="font-size: 0.78rem; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 999px;">
+              Tuần 1
+            </span>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Ghi chú lý do:</label>
-            <input type="text" id="score-modal-note" class="form-control" placeholder="VD: Phát biểu tốt môn Toán, giúp bạn lau bảng..." />
-          </div>
-
-          <hr style="margin: 16px 0; border: none; border-top: 1px solid #e2e8f0;" />
-          <h4 style="font-size: 0.88rem; font-weight: 800; margin-bottom: 8px;">Lịch sử điểm tuần này của học sinh:</h4>
-          <div id="score-modal-history" style="max-height: 120px; overflow-y: auto;"></div>
+          <div id="score-modal-history" style="max-height: 230px; overflow-y: auto;"></div>
         </div>
 
         <div class="modal-footer">

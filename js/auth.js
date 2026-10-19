@@ -125,7 +125,6 @@ class AuthManager {
     const isMatch = (cleanPass === teacherPass) || 
                     (cleanPass === settingsPass) || 
                     (cleanPass === 'admin123') ||
-                    (cleanPass === '123456') ||
                     (cleanPass === '351711');
 
     if (isMatch) {
@@ -171,7 +170,8 @@ class AuthManager {
     const cleanPass = (password || '').trim();
     const studentPass = (student.pass || '123456').trim();
 
-    if (cleanPass === studentPass || cleanPass === '123456' || cleanPass === 'admin123' || cleanPass === '351711') {
+    // Chỉ cho phép mật khẩu hiện tại của học sinh hoặc mật khẩu Admin/GVCN bypass
+    if (cleanPass === studentPass || cleanPass === 'admin123' || cleanPass === '351711') {
       // Đăng nhập Firebase Auth (Anonymous) để được cấp token xác thực theo Rules
       if (window.firebase && window.firebase.auth) {
         try {
@@ -211,7 +211,10 @@ class AuthManager {
       this.setCurrentUser(userObj);
       return { success: true, user: userObj, requirePassChange: false };
     } else {
-      return { success: false, message: 'Mật khẩu học sinh không chính xác! (Mặc định: 123456)' };
+      const errMsg = student.pass && student.pass !== '123456'
+        ? 'Mật khẩu học sinh không chính xác! (Tài khoản này đã đổi mật khẩu, vui lòng nhập mật khẩu mới).'
+        : 'Mật khẩu học sinh không chính xác! (Mặc định: 123456)';
+      return { success: false, message: errMsg };
     }
   }
 

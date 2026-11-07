@@ -278,20 +278,6 @@ const DEFAULT_STUDENTS = [
     "hasChangedPass": false
   },
   {
-    "id": "hs09",
-    "code": "9A409",
-    "username": "khang.vt",
-    "name": "Võ Trọng Khang",
-    "group": 1,
-    "role": "leader",
-    "roleName": "Tổ trưởng Tổ 1",
-    "avatar": "📚",
-    "pass": "123456",
-    "canScore": true,
-    "scoreScope": "class",
-    "hasChangedPass": false
-  },
-  {
     "id": "hs10",
     "code": "9A410",
     "username": "khanh.pdh",

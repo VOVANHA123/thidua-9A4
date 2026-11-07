@@ -132,10 +132,42 @@
     },
     {
       "category": "Lao động",
-      "icon": "🧹",
+      "icon": "🌸",
       "id": "c717156",
       "name": "Không trực vệ sinh theo phân công",
       "points": 3,
+      "type": "minus"
+    },
+    {
+      "category": "Kỷ luật",
+      "icon": "🌸",
+      "id": "c132501",
+      "name": "Không đồng phục",
+      "points": 2,
+      "type": "minus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "🌸",
+      "id": "c160961",
+      "name": "Tự ý đổi chỗ ngồi",
+      "points": 1,
+      "type": "minus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "🌸",
+      "id": "c199455",
+      "name": "Điểm tốt",
+      "points": 3,
+      "type": "plus"
+    },
+    {
+      "category": "Học tập",
+      "icon": "🌸",
+      "id": "c252785",
+      "name": "Không chép bài đầy đủ",
+      "points": 1,
       "type": "minus"
     }
   ],
@@ -30227,7 +30259,7 @@
       "name": "Nguyễn Văn Bảo",
       "pass": "123456",
       "role": "monitor",
-      "roleName": "Thành viên",
+      "roleName": "Lớp trưởng",
       "scoreScope": "class",
       "username": "bao.nv"
     },
@@ -30297,7 +30329,7 @@
       "name": "Lê Thị Trúc Huỳnh",
       "pass": "123456",
       "role": "leader",
-      "roleName": "Tổ trưởng Tổ 3",
+      "roleName": "Tổ trưởng",
       "scoreScope": "none",
       "username": "huynh.ltt"
     },
@@ -30316,20 +30348,6 @@
       "username": "khang.nv"
     },
     {
-      "avatar": "📚",
-      "canScore": true,
-      "code": "9A409",
-      "group": 1,
-      "hasChangedPass": false,
-      "id": "hs09",
-      "name": "Võ Trọng Khang",
-      "pass": "123456",
-      "role": "leader",
-      "roleName": "Tổ trưởng Tổ 1",
-      "scoreScope": "class",
-      "username": "khang.vt"
-    },
-    {
       "avatar": "🎯",
       "canScore": false,
       "code": "9A410",
@@ -30339,7 +30357,7 @@
       "name": "Phạm Đoàn Huy Khánh",
       "pass": "123456",
       "role": "vice",
-      "roleName": "Lớp phó học tập",
+      "roleName": "Lớp phó",
       "scoreScope": "none",
       "username": "khanh.pdh"
     },
@@ -30437,7 +30455,7 @@
       "name": "Lê Thành Phát",
       "pass": "123456",
       "role": "vice",
-      "roleName": "Lớp phó trật tự",
+      "roleName": "Lớp phó",
       "scoreScope": "none",
       "username": "phat.lt"
     },
@@ -30479,7 +30497,7 @@
       "name": "Lê Thị Mỹ Quyên",
       "pass": "123456",
       "role": "leader",
-      "roleName": "Tổ trưởng Tổ 2",
+      "roleName": "Tổ trưởng",
       "scoreScope": "none",
       "username": "quyen.ltm"
     },
@@ -30507,7 +30525,7 @@
       "name": "Huỳnh Nhật Tân",
       "pass": "123456",
       "role": "vice",
-      "roleName": "Lớp phó lao động",
+      "roleName": "Lớp phó",
       "scoreScope": "group",
       "username": "tan.hn"
     },
@@ -30549,7 +30567,7 @@
       "name": "Nguyễn Thị Huyền Trang",
       "pass": "123456",
       "role": "leader",
-      "roleName": "Tổ trưởng Tổ 4",
+      "roleName": "Tổ trưởng",
       "scoreScope": "none",
       "username": "trang.nth"
     },
@@ -30563,22 +30581,22 @@
       "name": "Lê Minh Trí",
       "pass": "123456",
       "role": "vice",
-      "roleName": "Lớp trưởng",
+      "roleName": "Lớp phó",
       "scoreScope": "none",
       "username": "tri.lm"
     },
     {
       "avatar": "💎",
-      "canScore": false,
+      "canScore": true,
       "code": "9A427",
       "group": 1,
       "hasChangedPass": false,
       "id": "hs27",
       "name": "Bùi Thị Như Tuyết",
       "pass": "123456",
-      "role": "member",
-      "roleName": "Thành viên",
-      "scoreScope": "none",
+      "role": "leader",
+      "roleName": "Tổ trưởng",
+      "scoreScope": "group",
       "username": "tuyet.btn"
     },
     {

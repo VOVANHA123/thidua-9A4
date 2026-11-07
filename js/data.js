@@ -713,14 +713,15 @@ class ClassDataManager {
                   this.data.criteria = fbData.criteria;
                 }
               }
-              if (Array.isArray(fbData.events)) {
+              const fbEvents = Array.isArray(fbData.events) ? fbData.events : (fbData.events && typeof fbData.events === 'object' ? Object.values(fbData.events) : []);
+              if (fbEvents.length > 0) {
                 const eventMap = new Map();
                 const deletedSet = new Set([
                   ...(this.data.deletedEventIds || []),
                   ...(fbData.deletedEventIds || [])
                 ]);
                 this.data.deletedEventIds = Array.from(deletedSet);
-                fbData.events.forEach(e => {
+                fbEvents.forEach(e => {
                   if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
                 });
                 (this.data.events || []).forEach(e => {
@@ -764,14 +765,15 @@ class ClassDataManager {
             // tự động gom sự kiện máy chủ + sự kiện máy này và đẩy bù lên Firebase ngay lập tức!
             if (localEventsLen > serverEventsLen && !this.isFreshDevice && this.hasSuccessfullySyncedWithCloud) {
               console.log(`[SYNC TỰ ĐỘNG BÙ] Thiết bị có ${localEventsLen} sự kiện (Server có ${serverEventsLen}). Đang tự động bù đắp dữ liệu lên Firebase...`);
-              if (Array.isArray(fbData.events)) {
+              const fbEvents = Array.isArray(fbData.events) ? fbData.events : (fbData.events && typeof fbData.events === 'object' ? Object.values(fbData.events) : []);
+              if (fbEvents.length > 0) {
                 const eventMap = new Map();
                 const deletedSet = new Set([
                   ...(this.data.deletedEventIds || []),
                   ...(fbData.deletedEventIds || [])
                 ]);
                 this.data.deletedEventIds = Array.from(deletedSet);
-                fbData.events.forEach(e => {
+                fbEvents.forEach(e => {
                   if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
                 });
                 (this.data.events || []).forEach(e => {

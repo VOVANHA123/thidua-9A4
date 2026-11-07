@@ -475,6 +475,9 @@
         fetch(FIREBASE_URL)
           .then(function(res) { return res.json(); })
           .then(function(data) {
+            if (data && data.events && !Array.isArray(data.events) && typeof data.events === 'object') {
+              data.events = Object.values(data.events);
+            }
             if (isRefresh) {
               var btn = document.querySelector('.btn-refresh');
               if (btn) btn.textContent = '🔄 Cập nhật';

@@ -181,14 +181,15 @@
             }
           }
           // Chỉ hợp nhất sự kiện điểm số (giữ nguyên cấu hình của máy này)
-          if (Array.isArray(cloudData.events)) {
+          const cloudEvents = Array.isArray(cloudData.events) ? cloudData.events : (cloudData.events && typeof cloudData.events === 'object' ? Object.values(cloudData.events) : null);
+          if (cloudEvents) {
             const eventMap = new Map();
             const deletedSet = new Set([
               ...(dm.data.deletedEventIds || []),
               ...(cloudData.deletedEventIds || [])
             ]);
             dm.data.deletedEventIds = Array.from(deletedSet);
-            cloudData.events.forEach(e => {
+            cloudEvents.forEach(e => {
               if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
             });
             (dm.data.events || []).forEach(e => {
@@ -253,6 +254,11 @@
 
     /**
      * Đẩy dữ liệu mới lên Firebase Realtime Database
+     * CƠ CHẾ BẢO VỆ CHỐNG GHI ĐÈ ĐA TẦNG (BULLETPROOF OVERWRITE SHIELD):
+     * 1. SCORE_ADD: Ghi độc lập vào events/{id}, không bao giờ ghi đè danh sách
+     * 2. SCORE_DELETE: Xóa độc lập events/{eventId}, không bao giờ ghi đè danh sách
+     * 3. SETTINGS_UPDATE: Chỉ cập nhật settings/criteria/students, không chạm vào events
+     * 4. FULL SET / SYNC: Luôn kiểm tra Cloud, hợp nhất (Union) và cấm sụt giảm số lượng sự kiện
      */
     async pushToCloud(data, extraMeta = {}) {
       if (this.isRemoteUpdate) {
@@ -260,84 +266,203 @@
       }
 
       const dm = window.classData || window.dataManager;
-
-      const isScoreOnlyAction = Boolean(extraMeta && (extraMeta.recentAction === 'SCORE_ADD' || extraMeta.recentAction === 'SCORE_DELETE'));
-      const isSettingsChange = !isScoreOnlyAction;
-      const isExplicitSettingsSave = isSettingsChange || (extraMeta && (extraMeta.allowSettingsOverwrite || extraMeta.actionType === 'SETTINGS_UPDATE'));
-
-      // SAFEGUARD: Chặn tuyệt đối thiết bị chưa từng đồng bộ thành công hoặc máy mới tinh ghi đè lên Firebase (NGOẠI TRỪ hành động sửa cài đặt/tiêu chí của Thầy Cô)
-      if (dm && (!dm.hasSuccessfullySyncedWithCloud || dm.isFreshDevice) && !isExplicitSettingsSave && (!extraMeta || !extraMeta.allowEmptyReset)) {
-        console.warn('[FIREBASE SAFEGUARD] Prevented un-synced or fresh device from pushing to Firebase.');
-        return { success: false, blocked: true };
-      }
-      const eventsCount = (data && Array.isArray(data.events)) ? data.events.length : 0;
-      if (eventsCount === 0 && !isExplicitSettingsSave && (!extraMeta || !extraMeta.allowEmptyReset)) {
-        if (dm && (!dm.hasUserModification || (dm.data && dm.data.settings && dm.data.settings.updatedAt === 0))) {
-          console.warn('[FIREBASE SAFEGUARD] Prevented 0-event unverified push to Firebase.');
-          return { success: false, blocked: true };
-        }
-      }
-
       const cleanUrl = this.getCleanDatabaseUrl();
+      const currentClientId = (dm && dm.CLIENT_SESSION_ID) || 'admin_web';
+      const now = Date.now();
 
-      let payloadSettings = (data && data.settings) ? { ...data.settings } : {};
-      let payloadStudents = (data && data.students) ? [...data.students] : [];
-      let payloadCriteria = (data && data.criteria) ? [...data.criteria] : [];
-      let payloadTeachers = (data && data.teachers) ? [...data.teachers] : [];
+      // --- TẦNG 1: THÊM 1 ĐIỂM (SCORE_ADD) - GHI ĐỘC LẬP TỪNG PHẦN TỬ ---
+      if (extraMeta && extraMeta.recentAction === 'SCORE_ADD' && extraMeta.recentData && extraMeta.recentData.id) {
+        const item = extraMeta.recentData;
+        let written = false;
 
-      if (isSettingsChange) {
-        payloadSettings.updatedAt = Date.now();
-        if (dm && dm.data && dm.data.settings) {
-          dm.data.settings.updatedAt = payloadSettings.updatedAt;
+        if (this.dbRef) {
+          try {
+            await this.dbRef.child('events').child(item.id).set(item);
+            await this.dbRef.child('lastSenderClientId').set(currentClientId);
+            await this.dbRef.child('lastPushedAt').set(now);
+            written = true;
+          } catch (e) {
+            console.warn('Per-event SDK write failed, falling back to REST:', e);
+          }
+        }
+
+        if (!written) {
+          try {
+            const r1 = await fetch(`${cleanUrl}/classes/lop9a4/events/${item.id}.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(item)
+            });
+            if (r1.ok) {
+              fetch(`${cleanUrl}/classes/lop9a4/lastPushedAt.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(now)
+              }).catch(() => {});
+              written = true;
+            }
+          } catch(re) {
+            console.error('REST per-event score add failed:', re);
+          }
+        }
+
+        if (written) {
+          this.lastSyncTimestamp = now;
+          this.updateStatusBadge('connected', 'Đã Lưu Điểm ⚡');
+          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+          return { success: true, method: 'isolated_event_add' };
         }
       }
 
-      // MERGE EVENTS & PROTECT SETTINGS WITH CLOUD FIRST TO PREVENT OVERWRITE
-      let mergedEvents = Array.isArray(data.events) ? [...data.events] : [];
-      if (!extraMeta || !extraMeta.allowEmptyReset) {
-        try {
-          const checkRes = await fetch(`${cleanUrl}/classes/lop9a4.json?t=${Date.now()}`, { cache: 'no-cache' });
-          if (checkRes.ok) {
-            const remote = await checkRes.json();
-            if (remote) {
-              if (remote.events) {
-                const remoteList = Array.isArray(remote.events) ? remote.events : Object.values(remote.events);
-                const eventMap = new Map();
-                const deletedSet = new Set([...(dm && dm.data && dm.data.deletedEventIds || [])]);
-                if (extraMeta && extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
-                  deletedSet.add(extraMeta.recentData.eventId);
-                }
-                remoteList.forEach(e => {
-                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
-                });
-                mergedEvents.forEach(e => {
-                  if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
-                });
-                mergedEvents = Array.from(eventMap.values());
-              }
+      // --- TẦNG 2: XÓA 1 ĐIỂM (SCORE_DELETE) - XÓA ĐỘC LẬP TỪNG PHẦN TỬ ---
+      if (extraMeta && extraMeta.recentAction === 'SCORE_DELETE' && extraMeta.recentData && extraMeta.recentData.eventId) {
+        const delId = extraMeta.recentData.eventId;
+        let deleted = false;
 
-              // Chỉ bảo vệ settings nếu là học sinh chấm điểm (score-only action)
-              if (isScoreOnlyAction) {
-                const remoteUpdated = (remote.settings && remote.settings.updatedAt) || 0;
-                const localUpdated = (payloadSettings.updatedAt) || 0;
-                if (remoteUpdated >= localUpdated) {
-                  if (remote.settings) payloadSettings = remote.settings;
-                  if (remote.students) payloadStudents = Array.isArray(remote.students) ? remote.students : Object.values(remote.students);
-                  if (remote.criteria) payloadCriteria = Array.isArray(remote.criteria) ? remote.criteria : Object.values(remote.criteria);
-                  if (remote.teachers) payloadTeachers = Array.isArray(remote.teachers) ? remote.teachers : Object.values(remote.teachers);
-                  if (dm && dm.data) {
-                    dm.data.settings = payloadSettings;
-                    dm.data.students = payloadStudents;
-                    dm.data.criteria = payloadCriteria;
-                    dm.data.teachers = payloadTeachers;
-                    if (typeof dm.saveToStorageLocal === 'function') dm.saveToStorageLocal();
-                  }
-                }
-              }
+        if (this.dbRef) {
+          try {
+            await this.dbRef.child('events').child(delId).remove();
+            await this.dbRef.child('lastSenderClientId').set(currentClientId);
+            await this.dbRef.child('lastPushedAt').set(now);
+            deleted = true;
+          } catch(e) {
+            console.warn('Per-event SDK delete failed, falling back to REST:', e);
+          }
+        }
+
+        if (!deleted) {
+          try {
+            const r2 = await fetch(`${cleanUrl}/classes/lop9a4/events/${delId}.json`, {
+              method: 'DELETE'
+            });
+            if (r2.ok) {
+              fetch(`${cleanUrl}/classes/lop9a4/lastPushedAt.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(now)
+              }).catch(() => {});
+              deleted = true;
+            }
+          } catch(re) {
+            console.error('REST per-event score delete failed:', re);
+          }
+        }
+
+        if (deleted) {
+          this.lastSyncTimestamp = now;
+          this.updateStatusBadge('connected', 'Đã Xóa Điểm ⚡');
+          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+          return { success: true, method: 'isolated_event_delete' };
+        }
+      }
+
+      // --- TẦNG 3: CẬP NHẬT CÀI ĐẶT / TIÊU CHÍ / HỌC SINH (SETTINGS_UPDATE) ---
+      // Chỉ lưu nhánh cấu hình, TUYỆT ĐỐI KHÔNG BAO GIỜ chạm hay ghi đè vào events!
+      const isSettingsUpdateOnly = Boolean(extraMeta && (extraMeta.actionType === 'SETTINGS_UPDATE' || extraMeta.allowSettingsOverwrite));
+      if (isSettingsUpdateOnly) {
+        let payloadSettings = (data && data.settings) ? { ...data.settings, updatedAt: now } : { updatedAt: now };
+        let payloadStudents = (data && data.students) ? [...data.students] : [];
+        let payloadCriteria = (data && data.criteria) ? [...data.criteria] : [];
+        let payloadTeachers = (data && data.teachers) ? [...data.teachers] : [];
+
+        if (dm && dm.data && dm.data.settings) dm.data.settings.updatedAt = now;
+
+        if (this.dbRef) {
+          try {
+            await this.dbRef.child('settings').set(payloadSettings);
+            if (payloadCriteria.length > 0) await this.dbRef.child('criteria').set(payloadCriteria);
+            if (payloadStudents.length > 0) await this.dbRef.child('students').set(payloadStudents);
+            if (payloadTeachers.length > 0) await this.dbRef.child('teachers').set(payloadTeachers);
+            await this.dbRef.child('lastPushedAt').set(now);
+          } catch(e) {}
+        }
+
+        try {
+          fetch(`${cleanUrl}/classes/lop9a4/settings.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadSettings)
+          }).catch(() => {});
+          if (payloadCriteria.length > 0) {
+            fetch(`${cleanUrl}/classes/lop9a4/criteria.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payloadCriteria)
+            }).catch(() => {});
+          }
+          if (payloadStudents.length > 0) {
+            fetch(`${cleanUrl}/classes/lop9a4/students.json`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payloadStudents)
+            }).catch(() => {});
+          }
+        } catch(e) {}
+
+        this.lastSyncTimestamp = now;
+        this.updateStatusBadge('connected', 'Đã Lưu Cài Đặt ⚡');
+        setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+        return { success: true, method: 'settings_only' };
+      }
+
+      // --- TẦNG 4: ĐỒNG BỘ ĐẦY ĐỦ (FULL SET) VỚI KHÓA AN TOÀN CHỐNG GHI ĐÈ ---
+      let remoteEventsList = [];
+      let canReadRemote = false;
+
+      if (this.dbRef) {
+        try {
+          const snap = await this.dbRef.child('events').once('value');
+          const val = snap.val();
+          if (val) {
+            remoteEventsList = Array.isArray(val) ? val : Object.values(val);
+            canReadRemote = true;
+          }
+        } catch(e) {}
+      }
+
+      if (!canReadRemote) {
+        try {
+          const res = await fetch(`${cleanUrl}/classes/lop9a4/events.json?t=${Date.now()}`);
+          if (res.ok) {
+            const val = await res.json();
+            if (val) {
+              remoteEventsList = Array.isArray(val) ? val : Object.values(val);
+              canReadRemote = true;
             }
           }
         } catch(e) {}
       }
+
+      // Chặn thiết bị mới tinh hoặc chưa đồng bộ được cloud mà đòi ghi đè full set
+      if (!canReadRemote && (!extraMeta || !extraMeta.allowEmptyReset)) {
+        console.warn('[FIREBASE SHIELD] Cannot verify remote events from cloud. Overwrite blocked to protect data.');
+        return { success: false, blocked: true, reason: 'CLOUD_VERIFICATION_FAILED' };
+      }
+
+      const eventMap = new Map();
+      const deletedSet = new Set([...(dm && dm.data && dm.data.deletedEventIds || [])]);
+
+      // Luôn gộp sự kiện remote trước để bảo toàn 100%
+      remoteEventsList.forEach(e => {
+        if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+      });
+      // Gộp thêm sự kiện local của máy này
+      (Array.isArray(data.events) ? data.events : []).forEach(e => {
+        if (e && e.id && !deletedSet.has(e.id)) eventMap.set(e.id, e);
+      });
+
+      const mergedEvents = Array.from(eventMap.values());
+
+      // KHÓA AN TOÀN TUYỆT ĐỐI: Không bao giờ cho phép ghi đè nếu số sự kiện sau khi gộp ít hơn trên Cloud
+      if (canReadRemote && remoteEventsList.length > 0 && mergedEvents.length < remoteEventsList.length && (!extraMeta || !extraMeta.allowEmptyReset)) {
+        console.warn(`[FIREBASE SHIELD] Overwrite blocked: remote has ${remoteEventsList.length} events, merged only has ${mergedEvents.length}`);
+        return { success: false, blocked: true, reason: 'PREVENTED_EVENT_COUNT_DROP' };
+      }
+
+      let payloadSettings = (data && data.settings) ? { ...data.settings, updatedAt: now } : { updatedAt: now };
+      let payloadStudents = (data && data.students) ? [...data.students] : [];
+      let payloadCriteria = (data && data.criteria) ? [...data.criteria] : [];
+      let payloadTeachers = (data && data.teachers) ? [...data.teachers] : [];
 
       const payload = {
         ...data,
@@ -346,64 +471,23 @@
         criteria: payloadCriteria,
         teachers: payloadTeachers,
         events: mergedEvents,
-        lastSenderClientId: (dm && dm.CLIENT_SESSION_ID) || 'admin_web',
-        lastPushedAt: Date.now(),
+        lastSenderClientId: currentClientId,
+        lastPushedAt: now,
         ...extraMeta
       };
 
-      // Nếu là sửa cài đặt/tiêu chí: Gửi trực tiếp nhánh criteria & settings trước để đảm bảo lưu tức thì
-      if (isSettingsChange && payloadCriteria && payloadCriteria.length > 0) {
-        if (this.dbRef) {
-          try {
-            this.dbRef.child('criteria').set(payloadCriteria);
-            this.dbRef.child('settings').set(payloadSettings);
-          } catch(e) {}
-        }
-        try {
-          fetch(`${cleanUrl}/classes/lop9a4/criteria.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payloadCriteria)
-          }).catch(() => {});
-          fetch(`${cleanUrl}/classes/lop9a4/settings.json`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payloadSettings)
-          }).catch(() => {});
-        } catch(e) {}
-      }
-
-      // Cách 1: Nếu là hành động thêm điểm (SCORE_ADD), ghi trực tiếp vào events/{id}
-      if (this.dbRef && extraMeta && extraMeta.recentAction === 'SCORE_ADD' && extraMeta.recentData && extraMeta.recentData.id) {
-        try {
-          await this.dbRef.child('events').child(extraMeta.recentData.id).set(extraMeta.recentData);
-          await this.dbRef.child('lastSenderClientId').set(payload.lastSenderClientId || 'unknown');
-          await this.dbRef.child('lastPushedAt').set(Date.now());
-          this.lastSyncTimestamp = Date.now();
-          this.updateStatusBadge('connected', 'Đã Lưu Điểm ⚡');
-          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
-          return { success: true, method: 'sdk_event_add' };
-        } catch (e) {
-          console.warn('Per-event SDK write failed, falling back to full set:', e);
-        }
-      }
-
-      // Cách 2: Thử đẩy toàn bộ qua Firebase SDK WebSocket (Giáo viên / Admin)
       if (this.dbRef) {
         try {
           await this.dbRef.set(payload);
-          this.lastSyncTimestamp = Date.now();
+          this.lastSyncTimestamp = now;
           this.updateStatusBadge('connected', 'Đã Lưu Đám Mây ⚡');
-          setTimeout(() => {
-            this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢');
-          }, 2000);
-          return { success: true, method: 'sdk' };
+          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+          return { success: true, method: 'sdk_full' };
         } catch (sdkErr) {
-          console.warn('Firebase SDK set failed, falling back to direct REST:', sdkErr);
+          console.warn('Firebase SDK full set failed, falling back to direct REST:', sdkErr);
         }
       }
 
-      // Cách 2: Đẩy trực tiếp qua REST API (Bảo đảm 100% thành công không phụ thuộc SDK)
       try {
         const restUrl = `${cleanUrl}/classes/lop9a4.json`;
         const res = await fetch(restUrl, {
@@ -413,12 +497,10 @@
         });
 
         if (res.ok) {
-          this.lastSyncTimestamp = Date.now();
+          this.lastSyncTimestamp = now;
           this.updateStatusBadge('connected', 'Đã Lưu Đám Mây ⚡');
-          setTimeout(() => {
-            this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢');
-          }, 2000);
-          return { success: true, method: 'rest' };
+          setTimeout(() => this.updateStatusBadge('connected', 'Firebase Trực Tuyến 🟢'), 2000);
+          return { success: true, method: 'rest_full' };
         } else {
           throw new Error('Mã phản hồi: ' + res.status);
         }

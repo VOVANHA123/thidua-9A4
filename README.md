@@ -65,13 +65,14 @@ vercel deploy --prod
 
 | Vai trò | Tên học sinh | Tên tài khoản (Username / Mã HS) | Mật khẩu |
 |---|---|---|---|
-| **Giáo viên chủ nhiệm (GVCN)** | **Thầy Võ Văn Hà** | `admin` (hoặc `thayvovanha`, `thayha`) | `admin123` |
-| **Tổ trưởng Tổ 1** | Nguyễn Ngọc Bảo Anh | `baoanh.nnb` (hoặc `9A401`) | `123456` |
-| **Lớp trưởng** | Nguyễn Văn Bảo | `bao.nv` (hoặc `9A402`) | `123456` |
-| **Tổ trưởng Tổ 2** | Nguyễn Văn Khang | `khang.nv` (hoặc `9A408`) | `123456` |
-| **Lớp phó Học tập** | Võ Trọng Khang | `khang.vt` (hoặc `9A409`) | `123456` |
-| **Tổ trưởng Tổ 3** | Lê Trần Quang Nghĩa | `nghia.ltq` (hoặc `9A415`) | `123456` |
-| **Lớp phó Lao động** | Võ Quốc Nhựt | `nhut.vq` (hoặc `9A416`) | `123456` |
-| **Tổ trưởng Tổ 4** | Huỳnh Nhật Tân | `tan.hn` (hoặc `9A422`) | `123456` |
-| **29 Học sinh trong lớp** | 29 HS Lớp 9A4 | `9A401` $\rightarrow$ `9A429` | `123456` |
+| **Giáo viên chủ nhiệm (GVCN)** | **Thầy Võ Văn Hà** | `admin` (hoặc `thayvovanha`, `thayha`) | `admin123` (hoặc `351711`) |
+| **Lớp trưởng** | Lê Minh Trí | `tri.lm` (hoặc `9A426`) | `tri9a4` |
+| **Lớp phó** | Lê Thành Phát | `phat.lt` (hoặc `9A417`) | `phat9a4` |
+| **Lớp phó** | Phạm Đoàn Huy Khánh | `khanh.pdh` (hoặc `9A410`) | `khanh9a4` |
+| **Lớp phó** | Lê Trần Quang Nghĩa | `nghia.ltq` (hoặc `9A415`) | `nghia9a4` |
+| **Tổ trưởng Tổ 1** | Bùi Thị Như Tuyết | `tuyet.btn` (hoặc `9A427`) | `tuyet9a4` |
+| **Tổ trưởng Tổ 2** | Lê Thị Mỹ Quyên | `quyen.ltm` (hoặc `9A420`) | `quyen9a4` |
+| **Tổ trưởng Tổ 3** | Lê Thị Ngọc Quỳnh | `quynh.ltn` (hoặc `9A421`) | `quynh9a4` |
+| **Tổ trưởng Tổ 4** | Lê Thu Hà | `ha.lt` (hoặc `9A405`) | `ha9a4` |
+| **Thành viên trong lớp** | 20 Học sinh còn lại | Mã HS tương ứng | `123456` |
 *(Thầy/Cô có thể đổi mật khẩu, phân lại tổ và chức vụ trong mục Cài Đặt Lớp)*

@@ -185,12 +185,12 @@ const DEFAULT_STUDENTS = [
     "username": "bao.nv",
     "name": "Nguyễn Văn Bảo",
     "group": 1,
-    "role": "monitor",
-    "roleName": "Lớp trưởng",
+    "role": "member",
+    "roleName": "Thành viên",
     "avatar": "🌸",
     "pass": "123456",
-    "canScore": true,
-    "scoreScope": "class",
+    "canScore": false,
+    "scoreScope": "none",
     "hasChangedPass": false
   },
   {
@@ -227,13 +227,13 @@ const DEFAULT_STUDENTS = [
     "username": "ha.lt",
     "name": "Lê Thu Hà",
     "group": 4,
-    "role": "member",
-    "roleName": "Thành viên",
+    "role": "leader",
+    "roleName": "Tổ trưởng Tổ 4",
     "avatar": "🌷",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "ha9a4",
+    "canScore": true,
+    "scoreScope": "group",
+    "hasChangedPass": true
   },
   {
     "id": "hs06",
@@ -255,8 +255,8 @@ const DEFAULT_STUDENTS = [
     "username": "huynh.ltt",
     "name": "Lê Thị Trúc Huỳnh",
     "group": 3,
-    "role": "leader",
-    "roleName": "Tổ trưởng Tổ 3",
+    "role": "member",
+    "roleName": "Thành viên",
     "avatar": "✨",
     "pass": "123456",
     "canScore": false,
@@ -284,12 +284,12 @@ const DEFAULT_STUDENTS = [
     "name": "Phạm Đoàn Huy Khánh",
     "group": 4,
     "role": "vice",
-    "roleName": "Lớp phó học tập",
+    "roleName": "Lớp phó",
     "avatar": "🎯",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "khanh9a4",
+    "canScore": true,
+    "scoreScope": "class",
+    "hasChangedPass": true
   },
   {
     "id": "hs11",
@@ -353,13 +353,13 @@ const DEFAULT_STUDENTS = [
     "username": "nghia.ltq",
     "name": "Lê Trần Quang Nghĩa",
     "group": 4,
-    "role": "member",
-    "roleName": "Thành viên",
+    "role": "vice",
+    "roleName": "Lớp phó",
     "avatar": "👦",
-    "pass": "123456",
+    "pass": "nghia9a4",
     "canScore": true,
-    "scoreScope": "group",
-    "hasChangedPass": false
+    "scoreScope": "class",
+    "hasChangedPass": true
   },
   {
     "id": "hs16",
@@ -382,12 +382,12 @@ const DEFAULT_STUDENTS = [
     "name": "Lê Thành Phát",
     "group": 3,
     "role": "vice",
-    "roleName": "Lớp phó trật tự",
+    "roleName": "Lớp phó",
     "avatar": "⚡",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "phat9a4",
+    "canScore": true,
+    "scoreScope": "class",
+    "hasChangedPass": true
   },
   {
     "id": "hs18",
@@ -422,14 +422,14 @@ const DEFAULT_STUDENTS = [
     "code": "9A420",
     "username": "quyen.ltm",
     "name": "Lê Thị Mỹ Quyên",
-    "group": 3,
+    "group": 2,
     "role": "leader",
     "roleName": "Tổ trưởng Tổ 2",
     "avatar": "💖",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "quyen9a4",
+    "canScore": true,
+    "scoreScope": "group",
+    "hasChangedPass": true
   },
   {
     "id": "hs21",
@@ -437,13 +437,13 @@ const DEFAULT_STUDENTS = [
     "username": "quynh.ltn",
     "name": "Lê Thị Ngọc Quỳnh",
     "group": 3,
-    "role": "member",
-    "roleName": "Thành viên",
+    "role": "leader",
+    "roleName": "Tổ trưởng Tổ 3",
     "avatar": "🌺",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "quynh9a4",
+    "canScore": true,
+    "scoreScope": "group",
+    "hasChangedPass": true
   },
   {
     "id": "hs22",
@@ -451,12 +451,12 @@ const DEFAULT_STUDENTS = [
     "username": "tan.hn",
     "name": "Huỳnh Nhật Tân",
     "group": 4,
-    "role": "vice",
-    "roleName": "Lớp phó lao động",
+    "role": "member",
+    "roleName": "Thành viên",
     "avatar": "👦",
     "pass": "123456",
-    "canScore": true,
-    "scoreScope": "group",
+    "canScore": false,
+    "scoreScope": "none",
     "hasChangedPass": false
   },
   {
@@ -493,8 +493,8 @@ const DEFAULT_STUDENTS = [
     "username": "trang.nth",
     "name": "Nguyễn Thị Huyền Trang",
     "group": 4,
-    "role": "leader",
-    "roleName": "Tổ trưởng Tổ 4",
+    "role": "member",
+    "roleName": "Thành viên",
     "avatar": "🦄",
     "pass": "123456",
     "canScore": false,
@@ -507,13 +507,13 @@ const DEFAULT_STUDENTS = [
     "username": "tri.lm",
     "name": "Lê Minh Trí",
     "group": 2,
-    "role": "vice",
+    "role": "monitor",
     "roleName": "Lớp trưởng",
     "avatar": "🏆",
-    "pass": "123456",
-    "canScore": false,
-    "scoreScope": "none",
-    "hasChangedPass": false
+    "pass": "tri9a4",
+    "canScore": true,
+    "scoreScope": "class",
+    "hasChangedPass": true
   },
   {
     "id": "hs27",
@@ -524,10 +524,10 @@ const DEFAULT_STUDENTS = [
     "role": "leader",
     "roleName": "Tổ trưởng Tổ 1",
     "avatar": "💎",
-    "pass": "123456",
+    "pass": "tuyet9a4",
     "canScore": true,
     "scoreScope": "group",
-    "hasChangedPass": false
+    "hasChangedPass": true
   },
   {
     "id": "hs28",

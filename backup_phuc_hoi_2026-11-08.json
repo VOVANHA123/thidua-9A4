@@ -30253,7 +30253,7 @@
       "avatar": "🌸",
       "canScore": true,
       "code": "9A402",
-      "group": 2,
+      "group": 1,
       "hasChangedPass": false,
       "id": "hs02",
       "name": "Nguyễn Văn Bảo",
@@ -30595,7 +30595,7 @@
       "name": "Bùi Thị Như Tuyết",
       "pass": "123456",
       "role": "leader",
-      "roleName": "Tổ trưởng",
+      "roleName": "Tổ trưởng Tổ 1",
       "scoreScope": "group",
       "username": "tuyet.btn"
     },

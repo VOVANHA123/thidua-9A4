@@ -10,20 +10,27 @@
   <meta http-equiv="Expires" content="0">
   <title>Bảng Thi Đua Lớp 9A4 - Trường THCS Tây Phú</title>
   
+  <!-- Preconnect & Resource Hints for Ultra-Fast Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://thidua-lop-9a4-79dca-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap">
+
   <!-- SEO & PWA Meta Tags -->
   <meta name="description" content="Hệ thống Quản lý và Theo dõi Thi Đua Lớp 9A4 - Trường THCS Tây Phú do Thầy Võ Văn Hà chủ nhiệm.">
   <meta name="theme-color" content="#3b82f6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Thi Đua 9A4">
-  <link rel="manifest" href="manifest.json?v=20260930_v53">
+  <link rel="manifest" href="manifest.json?v=20261108_v70">
   <link rel="preload" as="image" href="assets/images/logo.webp" type="image/webp">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <link rel="apple-touch-icon" href="assets/images/logo.png">
 
   <!-- Stylesheets with Cache-busting -->
-  <link rel="stylesheet" href="css/style.css?v=20261001_v61">
-  <link rel="stylesheet" href="css/print.css?v=20261001_v61" media="print">
+  <link rel="stylesheet" href="css/style.css?v=20261108_v70">
+  <link rel="stylesheet" href="css/print.css?v=20261108_v70" media="print">
 </head>
 <body>
 
@@ -54,7 +61,7 @@
       <!-- Login Tabs Nav -->
       <div class="login-tabs-nav">
         <button type="button" class="login-tab-btn active" id="btn-tab-student" onclick="window.appController.switchLoginTab('student')">
-          🧑‍🎓 Học Sinh (29 Bạn)
+          🧑‍🎓 Học Sinh (28 Bạn)
         </button>
         <button type="button" class="login-tab-btn" id="btn-tab-teacher" onclick="window.appController.switchLoginTab('teacher')">
           👨‍🏫 Giáo Viên
@@ -285,7 +292,7 @@
       <div class="table-card">
         <div class="table-card-header no-print">
           <div class="group-filter-pills">
-            <button class="group-pill active" data-group="all">🌟 Toàn Bộ 29 Học Sinh</button>
+            <button class="group-pill active" data-group="all">🌟 Toàn Bộ 28 Học Sinh</button>
             <button class="group-pill" data-group="1">Tổ 1 (7 HS)</button>
             <button class="group-pill" data-group="2">Tổ 2 (7 HS)</button>
             <button class="group-pill" data-group="3">Tổ 3 (7 HS)</button>
@@ -541,12 +548,12 @@
             <div class="stats-scope-group">
               <label for="stats-select-scope"><span>👥</span> <b>Phạm vi:</b></label>
               <select id="stats-select-scope" class="select-custom" onchange="window.appController.onStatsScopeChange()">
-                <option value="all" selected>🏫 Toàn Lớp 9A4 (29 Học Sinh)</option>
+                <option value="all" selected>🏫 Toàn Lớp 9A4 (28 Học Sinh)</option>
                 <option value="group-1">👥 Tổ 1</option>
                 <option value="group-2">👥 Tổ 2</option>
                 <option value="group-3">👥 Tổ 3</option>
                 <option value="group-4">👥 Tổ 4</option>
-                <optgroup label="👤 Từng Học Sinh (29 bạn)" id="stats-select-students-optgroup">
+                <optgroup label="👤 Từng Học Sinh (28 bạn)" id="stats-select-students-optgroup">
                   <!-- Populated dynamically -->
                 </optgroup>
               </select>
@@ -1313,8 +1320,8 @@
           <button type="button" onclick="window.studentBienBanCtrl.exportWord()" style="background:#2563eb; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem;" title="Xuất file Word (.doc)">
             📄 Word
           </button>
-          <button type="button" onclick="window.studentBienBanCtrl.exportAllStudents()" style="background:#7c3aed; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem;" title="Xuất biên bản tất cả 29 học sinh">
-            📦 Xuất Tất Cả (29 HS)
+          <button type="button" onclick="window.studentBienBanCtrl.exportAllStudents()" style="background:#7c3aed; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem;" title="Xuất biên bản tất cả 28 học sinh">
+            📦 Xuất Tất Cả (28 HS)
           </button>
           <button type="button" id="btn-sb-zalo" onclick="window.studentBienBanCtrl.openZaloShareModal()" style="background: linear-gradient(135deg, #0068ff 0%, #0052cc 100%); color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; cursor:pointer; font-size:0.84rem; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 3px 10px rgba(0,104,255,0.4);" title="Gửi Phiếu thi đua cá nhân (Kèm PDF) trực tiếp đến Zalo (Chỉ Admin)">
             <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:white; color:#0068ff; border-radius:50%; font-size:11px; font-weight:900;">Z</span>
@@ -1476,8 +1483,8 @@
 
       <!-- Modal Footer -->
       <div class="modal-footer" style="padding:10px 20px; background:#e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-        <button type="button" onclick="window.studentBienBanCtrl.exportAllPrivateLinks()" style="background:#7c3aed; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; font-size:0.8rem; cursor:pointer;" title="Xuất danh sách gồm tên và link tra cứu riêng của 29 học sinh để gửi cho phụ huynh">
-          📦 Xuất 29 Link Toàn Lớp (Word)
+        <button type="button" onclick="window.studentBienBanCtrl.exportAllPrivateLinks()" style="background:#7c3aed; color:white; border:none; border-radius:8px; padding:6px 14px; font-weight:800; font-size:0.8rem; cursor:pointer;" title="Xuất danh sách gồm tên và link tra cứu riêng của 28 học sinh để gửi cho phụ huynh">
+          📦 Xuất 28 Link Toàn Lớp (Word)
         </button>
         <button type="button" class="btn-hero btn-white" onclick="window.studentBienBanCtrl.closeZaloShareModal()" style="padding:6px 16px; font-size:0.85rem;">Đóng</button>
       </div>
@@ -1502,15 +1509,34 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+  <!-- Lazy loader cho html2pdf (905 KB) - chỉ tải khi bấm xuất PDF/Ảnh để tối ưu tốc độ mở trang -->
+  <script>
+    window.ensureHtml2Pdf = function() {
+      if (typeof window.html2pdf !== 'undefined') return Promise.resolve(window.html2pdf);
+      if (window._html2pdfPromise) return window._html2pdfPromise;
+      window._html2pdfPromise = new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'js/html2pdf.bundle.min.js?v=20261010_v64';
+        s.async = true;
+        s.onload = function() { resolve(window.html2pdf); };
+        s.onerror = function() {
+          window._html2pdfPromise = null;
+          reject(new Error('Không thể tải thư viện html2pdf'));
+        };
+        document.body.appendChild(s);
+      });
+      return window._html2pdfPromise;
+    };
+  </script>
+
   <!-- Scripts with Cache-busting -->
-  <script src="js/firebase-sync.js?v=20261010_v64"></script>
-  <script src="js/data.js?v=20261010_v64"></script>
-  <script src="js/sound.js?v=20261010_v64"></script>
-  <script src="js/confetti.js?v=20261010_v64"></script>
-  <script src="js/notifications.js?v=20261010_v64"></script>
-  <script src="js/auth.js?v=20261019_v65"></script>
-  <script src="js/html2pdf.bundle.min.js?v=20261010_v64"></script>
-  <script src="js/bienban-hocsinh.js?v=20261010_v64"></script>
-  <script src="js/app.js?v=20261010_v64"></script>
+  <script src="js/firebase-sync.js?v=20261108_v70"></script>
+  <script src="js/data.js?v=20261108_v70"></script>
+  <script src="js/sound.js?v=20261108_v70"></script>
+  <script src="js/confetti.js?v=20261108_v70"></script>
+  <script src="js/notifications.js?v=20261108_v70"></script>
+  <script src="js/auth.js?v=20261108_v70"></script>
+  <script src="js/bienban-hocsinh.js?v=20261108_v70"></script>
+  <script src="js/app.js?v=20261108_v70"></script>
 </body>
 </html>

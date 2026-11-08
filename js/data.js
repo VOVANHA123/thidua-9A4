@@ -640,6 +640,7 @@ class ClassDataManager {
     this.lastSyncTime = null;
     this.pushTimeout = null;
     this.pollingInterval = null;
+    this.rebuildEventsIndex();
 
     // 1. Start persistent SSE connection & event catchup
     this.initRealtimeSync();
@@ -1324,9 +1325,37 @@ class ClassDataManager {
   }
 
   saveToStorageLocal() {
+    this.rebuildEventsIndex();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
     } catch(e) {}
+  }
+
+  rebuildEventsIndex() {
+    this._eventsByStudent = new Map();
+    this._eventsByStudentWeek = new Map();
+    const events = (this.data && Array.isArray(this.data.events)) ? this.data.events : [];
+    for (let i = 0; i < events.length; i++) {
+      const ev = events[i];
+      if (!ev || !ev.studentId) continue;
+      
+      // Index by studentId
+      let list = this._eventsByStudent.get(ev.studentId);
+      if (!list) {
+        list = [];
+        this._eventsByStudent.set(ev.studentId, list);
+      }
+      list.push(ev);
+
+      // Index by studentId_week
+      const key = ev.studentId + '_w' + ev.week;
+      let weekList = this._eventsByStudentWeek.get(key);
+      if (!weekList) {
+        weekList = [];
+        this._eventsByStudentWeek.set(key, weekList);
+      }
+      weekList.push(ev);
+    }
   }
 
   updateCloudStatusUI(connected, statusText = null) {
@@ -2166,9 +2195,25 @@ class ClassDataManager {
   }
 
   getStudentEvents(studentId, period = null) {
-    return this.data.events.filter(e => {
-      if (e.studentId !== studentId) return false;
-      if (period === null || period === undefined) return true;
+    if (!this._eventsByStudent) {
+      this.rebuildEventsIndex();
+    }
+
+    // Fast path: if period is an exact week number (e.g. 1, 2, ..., 35 or "9")
+    const w = (period !== null && period !== undefined && period !== 'hk1' && period !== 'hk2' && period !== 'all-year' && period !== 'year' && !(typeof period === 'string' && period.startsWith('month-')))
+      ? parseInt(period, 10)
+      : NaN;
+
+    if (!isNaN(w)) {
+      const weekList = this._eventsByStudentWeek.get(studentId + '_w' + w);
+      return weekList ? weekList.slice() : [];
+    }
+
+    // Otherwise filter from the student's pre-bucketed event list (at most ~150-200 events instead of 5,000+)
+    const studentEvents = this._eventsByStudent.get(studentId) || [];
+    if (period === null || period === undefined) return studentEvents.slice();
+
+    return studentEvents.filter(e => {
       if (period === 'hk1') return e.week >= 1 && e.week <= 18;
       if (period === 'hk2') return e.week >= 19 && e.week <= 35;
       if (period === 'all-year' || period === 'year') return e.week >= 1 && e.week <= 35;
@@ -2176,8 +2221,6 @@ class ClassDataManager {
         const m = parseInt(period.replace('month-', ''), 10);
         return this.isEventInPeriod(e, 'month', m);
       }
-      const w = parseInt(period, 10);
-      if (!isNaN(w) && e.week !== w) return false;
       return true;
     });
   }

@@ -4087,10 +4087,19 @@ class AppController {
     if (window.chibiSound) window.chibiSound.playClick();
 
     if (typeof window.html2pdf === 'undefined') {
-      if (window.chibiNotifications) {
-        window.chibiNotifications.showToast('Thông báo', 'Đang kết nối thư viện PDF hoặc hệ thống sẽ chuyển sang chế độ in chuẩn...', 'warning');
+      if (window.ensureHtml2Pdf) {
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đang nạp mô-đun PDF... ⏳', 'Chờ 1 giây để nạp công cụ kết xuất PDF...', 'info');
+        }
+        try {
+          await window.ensureHtml2Pdf();
+        } catch (e) {
+          console.warn('Lỗi lazy load html2pdf:', e);
+          return this.printBienBan();
+        }
+      } else {
+        return this.printBienBan();
       }
-      return this.printBienBan();
     }
 
     if (window.chibiNotifications) {

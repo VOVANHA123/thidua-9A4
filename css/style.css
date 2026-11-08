@@ -2,7 +2,7 @@
    CSS DESIGN SYSTEM - THI ĐUA CHỦ NHIỆM 9A4 (CHIBI ANIME THEME)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap');
+/* Google Fonts preconnected in index.html for high-performance rendering */
 
 :root {
   /* ==========================================================================

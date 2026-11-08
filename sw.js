@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chibi-thidua-9a4-v65';
+const CACHE_NAME = 'chibi-thidua-9a4-v70';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,7 +11,6 @@ const ASSETS_TO_CACHE = [
   './js/sound.js',
   './js/confetti.js',
   './js/notifications.js',
-  './js/html2pdf.bundle.min.js',
   './js/bienban-hocsinh.js',
   './js/app.js',
   './assets/images/logo.webp',
@@ -48,62 +47,40 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Strict Network-first strategy with cache fallback for offline
+// Stale-While-Revalidate Strategy for lightning-fast loads with automatic background updates
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-  const isCodeOrHtml = url.pathname.endsWith('.html') || 
-                       url.pathname.endsWith('.js') || 
-                       url.pathname.endsWith('.css') || 
-                       url.pathname.endsWith('.json') ||
-                       url.pathname === '/' ||
-                       url.pathname.endsWith('/');
 
-  if (isCodeOrHtml) {
-    // Always try fresh network fetch with no-cache header to prevent stale browser disk cache
-    event.respondWith(
-      fetch(event.request, { cache: 'no-cache' })
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          return caches.match(event.request).then((cached) => {
-            if (cached) return cached;
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
-            }
-          });
-        })
-    );
-  } else {
-    // Images & static assets: Cache first with background network update
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          fetch(event.request).then((netRes) => {
-            if (netRes && netRes.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, netRes));
-            }
-          }).catch(() => {});
-          return cachedResponse;
-        }
-        return fetch(event.request).then((netRes) => {
-          if (netRes && netRes.status === 200) {
-            const clone = netRes.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return netRes;
-        });
-      })
-    );
+  // Skip Firebase RTDB and external APIs
+  if (url.origin !== self.location.origin && !url.hostname.includes('gstatic.com') && !url.hostname.includes('googleapis.com')) {
+    return;
   }
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      }).catch((err) => {
+        // Network failed (offline)
+        return cachedResponse;
+      });
+
+      // If cached, return immediately for instant render, while network updates in background
+      return cachedResponse || fetchPromise;
+    }).catch(() => {
+      if (event.request.mode === 'navigate') {
+        return caches.match('./index.html');
+      }
+    })
+  );
 });
 
 // Push Notification listener for Mobile App

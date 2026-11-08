@@ -1069,8 +1069,16 @@ var StudentBienBanController = {
     if (!container || !student) return;
 
     if (typeof window.html2pdf === 'undefined') {
-      if (window.chibiNotifications) {
-        window.chibiNotifications.showToast('Chế độ In A4', 'Đang mở hộp thoại In để lưu thành PDF...', 'info');
+      if (window.ensureHtml2Pdf) {
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đang nạp mô-đun PDF...', 'Vui lòng chờ trong giây lát...', 'info');
+        }
+        window.ensureHtml2Pdf().then(function() {
+          self.exportPdf();
+        }).catch(function() {
+          self.print();
+        });
+        return;
       }
       return this.print();
     }
@@ -1331,6 +1339,14 @@ var StudentBienBanController = {
     }
 
     if (typeof window.html2pdf === 'undefined') {
+      if (window.ensureHtml2Pdf) {
+        window.ensureHtml2Pdf().then(function() {
+          self.generatePdfBlob(callback);
+        }).catch(function(err) {
+          if (callback) callback(err);
+        });
+        return;
+      }
       if (callback) callback(new Error('Thư viện html2pdf chưa nạp'));
       return;
     }
@@ -1643,6 +1659,22 @@ var StudentBienBanController = {
     var container = document.getElementById('sb-paper-container');
     var student = window.classData ? window.classData.getStudentById(this.currentStudentId) : null;
     if (!container || !student) return;
+
+    if (typeof window.html2pdf === 'undefined') {
+      if (window.ensureHtml2Pdf) {
+        if (window.chibiNotifications) {
+          window.chibiNotifications.showToast('Đang nạp mô-đun đồ họa...', 'Vui lòng chờ trong giây lát...', 'info');
+        }
+        window.ensureHtml2Pdf().then(function() {
+          self.copyStudentConductImage();
+        }).catch(function() {
+          if (window.chibiNotifications) {
+            window.chibiNotifications.showToast('Lỗi nạp thư viện', 'Không thể nạp công cụ sao chép ảnh.', 'error');
+          }
+        });
+        return;
+      }
+    }
 
     if (window.chibiNotifications) {
       window.chibiNotifications.showToast('Đang chụp ảnh phiếu...', 'Đang xử lý hình ảnh phiếu thi đua để copy vào Clipboard...', 'info');

@@ -144,6 +144,54 @@ const DEFAULT_CRITERIA = [
     "points": 3,
     "icon": "🧹",
     "category": "Lao động"
+  },
+  {
+    "id": "c132501",
+    "name": "Không đồng phục",
+    "type": "minus",
+    "points": 2,
+    "icon": "👔",
+    "category": "Nề nếp"
+  },
+  {
+    "id": "c160961",
+    "name": "Tự ý đổi chỗ ngồi",
+    "type": "minus",
+    "points": 1,
+    "icon": "🪑",
+    "category": "Nề nếp"
+  },
+  {
+    "id": "c199455",
+    "name": "Điểm tốt",
+    "type": "plus",
+    "points": 3,
+    "icon": "💯",
+    "category": "Học tập"
+  },
+  {
+    "id": "c252785",
+    "name": "Không chép bài đầy đủ",
+    "type": "minus",
+    "points": 1,
+    "icon": "📝",
+    "category": "Học tập"
+  },
+  {
+    "id": "c199660",
+    "name": "Vắng có phép",
+    "type": "minus",
+    "points": 1,
+    "icon": "📋",
+    "category": "Chuyên cần"
+  },
+  {
+    "id": "c218759",
+    "name": "Vắng không phép",
+    "type": "minus",
+    "points": 2,
+    "icon": "❌",
+    "category": "Chuyên cần"
   }
 ];
 

@@ -6,16 +6,17 @@ class AppController {
   constructor() {
     this.currentTab = 'table';
     this.currentGroup = 'all';
-    this.currentWeek = 1;
+    this.currentWeek = 10;
     this.currentDay = 'T2';
     this.activeScoringStudentId = null;
     this.activeScoringDay = 'T2';
-    this.bienBanWeek = 1;
+    this.bienBanWeek = 10;
     this.bienBanMode = 'auto';
+    this._hasUserExplicitlyChangedWeek = false;
 
     // Criteria Statistics & Analytics State
     this.statsPeriodType = 'week';
-    this.statsPeriodValue = 1;
+    this.statsPeriodValue = 10;
     this.statsScope = 'all';
     this.statsTypeFilter = 'all';
     this.activeDetailCriteriaId = null;
@@ -125,6 +126,7 @@ class AppController {
     const weekSelect = document.getElementById('select-week');
     if (weekSelect) {
       weekSelect.addEventListener('change', (e) => {
+        this._hasUserExplicitlyChangedWeek = true;
         const val = e.target.value;
         this.currentWeek = (val === 'hk1' || val === 'hk2' || val === 'all-year') ? val : parseInt(val, 10);
         this.refreshAll();
@@ -574,6 +576,15 @@ class AppController {
 
     // Show/Hide Weekly Report Printing buttons (Homeroom Teacher / GVCN only)
     this.updateBienBanVisibility();
+
+    // Synchronize Main Week Selector with settings.currentWeek
+    const weekSelect = document.getElementById('select-week');
+    if (weekSelect && settings.currentWeek) {
+      if (!this._hasUserExplicitlyChangedWeek) {
+        this.currentWeek = settings.currentWeek;
+        weekSelect.value = String(settings.currentWeek);
+      }
+    }
   }
 
   // --- RENDER TOP QUICK SWITCHER ---
@@ -2631,7 +2642,11 @@ class AppController {
     document.getElementById('setting-school-name').value = settings.schoolName;
     document.getElementById('setting-teacher-name').value = settings.teacherName;
     document.getElementById('setting-teacher-pass').value = settings.teacherPass || 'admin123';
-    document.getElementById('setting-slogan').value = settings.slogan;
+    document.getElementById('setting-slogan').value = settings.slogan || '';
+    const elWeek = document.getElementById('setting-current-week');
+    if (elWeek) elWeek.value = settings.currentWeek || 10;
+    const elMonth = document.getElementById('setting-current-month');
+    if (elMonth) elMonth.value = settings.currentMonth || 11;
 
     this.switchSettingsSubTab('class');
     this.renderSettingsStudentList();
@@ -3185,19 +3200,25 @@ class AppController {
     const elTeacher = document.getElementById('setting-teacher-name');
     const elPass = document.getElementById('setting-teacher-pass');
     const elSlogan = document.getElementById('setting-slogan');
+    const elWeek = document.getElementById('setting-current-week');
+    const elMonth = document.getElementById('setting-current-month');
 
     const className = elClass ? elClass.value.trim() : (window.classData.data.settings.className || 'Lớp 9A4');
     const schoolName = elSchool ? elSchool.value.trim() : (window.classData.data.settings.schoolName || 'TRƯỜNG THCS TÂY PHÚ');
     const teacherName = elTeacher ? elTeacher.value.trim() : (window.classData.data.settings.teacherName || 'Thầy Võ Văn Hà');
     const teacherPass = elPass ? elPass.value.trim() : (window.classData.data.settings.teacherPass || 'admin123');
     const slogan = elSlogan ? elSlogan.value.trim() : (window.classData.data.settings.slogan || '');
+    const currentWeek = elWeek ? (parseInt(elWeek.value, 10) || 10) : (window.classData.data.settings.currentWeek || 10);
+    const currentMonth = elMonth ? (parseInt(elMonth.value, 10) || 11) : (window.classData.data.settings.currentMonth || 11);
 
     const updated = {
       className,
       schoolName,
       teacherName,
       teacherPass,
-      slogan
+      slogan,
+      currentWeek,
+      currentMonth
     };
 
     // Thu thập toàn bộ chỉnh sửa trên danh sách học sinh (nếu có ô nào đang nhập dở)
